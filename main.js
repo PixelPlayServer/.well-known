@@ -499,3 +499,43 @@ document.addEventListener('DOMContentLoaded', function() {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = PixelPlayWebsite;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const targetDate = new Date('2025-06-06T00:00:00');
+  const now = new Date();
+
+  if (now >= targetDate) {
+    // Si la fecha actual es el 6 de junio de 2025 o posterior, redirigir a index.html
+    window.location.href = 'index.html';
+  } else {
+    // Si aún no es el 6 de junio de 2025, iniciar el contador regresivo
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = targetDate - now;
+
+      if (diff <= 0) {
+        // Si se alcanza la fecha objetivo, redirigir a index.html
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      daysEl.textContent = days;
+      hoursEl.textContent = hours.toString().padStart(2, '0');
+      minutesEl.textContent = minutes.toString().padStart(2, '0');
+      secondsEl.textContent = seconds.toString().padStart(2, '0');
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  }
+});
