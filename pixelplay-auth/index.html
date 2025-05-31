@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PixelPlay Authentication</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <h1>Authenticating...</h1>
+    <script>
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            
+            // Send it back to the launcher using custom protocol
+            window.location.href = `pixelplay://auth-callback?code=${code}&state=${state}`;
+        } catch (error) {
+            document.body.innerHTML += `<p>Error: ${error.message}</p>`;
+        }
+    </script>
+</body>
+</html>
