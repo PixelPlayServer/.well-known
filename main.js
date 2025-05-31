@@ -1,6 +1,6 @@
 /**
  * PixelPlay Website - Funcionalidades Principales
- * Maneja animaciones, efectos visuales y funcionalidades generales
+ * Maneja animaciones, efectos visuales, funcionalidades generales y sistema de countdown
  */
 
 class PixelPlayWebsite {
@@ -9,13 +9,28 @@ class PixelPlayWebsite {
         this.animationFrameId = null;
         this.particles = [];
         this.scrollThreshold = 100;
+        this.targetDate = new Date('2025-06-06T00:00:00').getTime();
+        this.countdownInterval = null;
+        this.isTimerPage = this.checkIfTimerPage();
         this.init();
+    }
+
+    /**
+     * Verifica si estamos en la página del timer
+     */
+    checkIfTimerPage() {
+        return document.body.innerHTML.includes('PixelPlay') && 
+               document.body.innerHTML.includes('Próximamente') &&
+               document.getElementById('countdown') !== null;
     }
 
     /**
      * Inicializa la página web
      */
     init() {
+        // Verificar primero si necesitamos mostrar timer o página principal
+        this.checkDateAndRedirect();
+        
         this.setupEventListeners();
         this.initAnimations();
         this.createParticleSystem();
@@ -23,11 +38,107 @@ class PixelPlayWebsite {
         this.checkWebGLSupport();
         this.initIntersectionObserver();
         
+        // Inicializar countdown si estamos en página timer
+        if (this.isTimerPage) {
+            this.initCountdown();
+        }
+        
         // Marcar como cargado después de la inicialización
         setTimeout(() => {
             this.isLoaded = true;
             this.showWelcomeMessage();
         }, 1000);
+    }
+
+    /**
+     * Verifica la fecha y redirige si es necesario
+     */
+    checkDateAndRedirect() {
+        const now = new Date().getTime();
+        const currentPage = window.location.pathname;
+        
+        if (now >= this.targetDate) {
+            // Si ya pasó la fecha objetivo y estamos en timer.html, redirigir a index.html
+            if (currentPage.includes('timer.html') || currentPage === '/timer.html') {
+                window.location.href = 'index.html';
+                return;
+            }
+        } else {
+            // Si aún no es la fecha y estamos en index.html, redirigir a timer.html
+            if (currentPage.includes('index.html') || currentPage === '/' || currentPage === '/index.html') {
+                // Solo redirigir si no estamos ya en timer.html
+                if (!currentPage.includes('timer.html')) {
+                    window.location.href = 'timer.html';
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * Inicializa el sistema de countdown
+     */
+    initCountdown() {
+        if (!this.isTimerPage) return;
+
+        const daysElement = document.getElementById('days');
+        const hoursElement = document.getElementById('hours');
+        const minutesElement = document.getElementById('minutes');
+        const secondsElement = document.getElementById('seconds');
+        const countdownContainer = document.getElementById('countdown');
+        const accessGranted = document.getElementById('accessGranted');
+
+        if (!daysElement || !hoursElement || !minutesElement || !secondsElement) {
+            console.warn('Elementos del countdown no encontrados');
+            return;
+        }
+
+        const updateCountdown = () => {
+            const now = new Date().getTime();
+            const timeLeft = this.targetDate - now;
+
+            if (timeLeft > 0) {
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                daysElement.textContent = days.toString().padStart(2, '0');
+                hoursElement.textContent = hours.toString().padStart(2, '0');
+                minutesElement.textContent = minutes.toString().padStart(2, '0');
+                secondsElement.textContent = seconds.toString().padStart(2, '0');
+            } else {
+                // Tiempo agotado - mostrar acceso o redirigir
+                if (countdownContainer && accessGranted) {
+                    countdownContainer.parentElement.style.display = 'none';
+                    accessGranted.style.display = 'block';
+                }
+                
+                // Redirigir automáticamente después de 3 segundos
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
+                
+                // Limpiar intervalo
+                if (this.countdownInterval) {
+                    clearInterval(this.countdownInterval);
+                    this.countdownInterval = null;
+                }
+            }
+        };
+
+        // Actualizar inmediatamente y luego cada segundo
+        updateCountdown();
+        this.countdownInterval = setInterval(updateCountdown, 1000);
+
+        // Configurar botón de acceso si existe
+        const accessBtn = document.querySelector('.access-btn');
+        if (accessBtn) {
+            accessBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = 'index.html';
+            });
+        }
     }
 
     /**
@@ -51,6 +162,11 @@ class PixelPlayWebsite {
         
         // Smooth scrolling para links internos
         this.setupSmoothScrolling();
+
+        // Verificar fecha periódicamente (cada minuto)
+        setInterval(() => {
+            this.checkDateAndRedirect();
+        }, 60000);
     }
 
     /**
@@ -61,17 +177,22 @@ class PixelPlayWebsite {
         const animatedElements = document.querySelectorAll('.fade-in, .fade-in-delayed, .fade-in-delayed-2');
         
         animatedElements.forEach(element => {
-            element.style.opacity = '0';
-            element.style.transform = 'translateY(40px)';
+            // Solo aplicar si no tienen animación CSS ya definida
+            if (!element.style.animation) {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(40px)';
+            }
         });
         
         // Disparar animaciones después de que cargue la página
         setTimeout(() => {
             animatedElements.forEach((element, index) => {
                 setTimeout(() => {
-                    element.style.transition = 'all 1.2s cubic-bezier(.39,.58,.57,1)';
-                    element.style.opacity = '1';
-                    element.style.transform = 'none';
+                    if (!element.style.animation) {
+                        element.style.transition = 'all 1.2s cubic-bezier(.39,.58,.57,1)';
+                        element.style.opacity = '1';
+                        element.style.transform = 'none';
+                    }
                 }, index * 100);
             });
         }, 200);
@@ -221,7 +342,7 @@ class PixelPlayWebsite {
         });
         
         // Observar elementos que necesitan animación
-        const observeElements = document.querySelectorAll('.feature-card, .news-item, .info-card');
+        const observeElements = document.querySelectorAll('.feature-card, .news-item, .info-card, .countdown-item');
         observeElements.forEach(el => observer.observe(el));
     }
 
@@ -239,8 +360,8 @@ class PixelPlayWebsite {
         });
 
         // Header background blur al hacer scroll
-        const header = document.querySelector('.hero');
-        if (header) {
+        const header = document.querySelector('.hero, .countdown-container');
+        if (header && scrollY > 50) {
             const opacity = Math.min(scrollY / 300, 0.9);
             header.style.background = `rgba(12, 12, 12, ${opacity})`;
         }
@@ -281,8 +402,8 @@ class PixelPlayWebsite {
      * Maneja atajos de teclado
      */
     handleKeyboard(event) {
-        // Tecla D para descargar rápido
-        if (event.key.toLowerCase() === 'd' && event.ctrlKey) {
+        // Tecla D para descargar rápido (solo en página principal)
+        if (event.key.toLowerCase() === 'd' && event.ctrlKey && !this.isTimerPage) {
             event.preventDefault();
             const downloadBtn = document.getElementById('downloadBtn');
             if (downloadBtn && !downloadBtn.disabled) {
@@ -293,6 +414,31 @@ class PixelPlayWebsite {
         // Tecla Escape para cerrar mensajes
         if (event.key === 'Escape') {
             this.clearStatusMessages();
+        }
+
+        // Tecla Space para ver countdown detallado (solo en timer)
+        if (event.key === ' ' && this.isTimerPage) {
+            event.preventDefault();
+            this.showDetailedCountdown();
+        }
+    }
+
+    /**
+     * Muestra countdown detallado
+     */
+    showDetailedCountdown() {
+        const now = new Date().getTime();
+        const timeLeft = this.targetDate - now;
+        
+        if (timeLeft > 0) {
+            const totalSeconds = Math.floor(timeLeft / 1000);
+            const totalMinutes = Math.floor(timeLeft / (1000 * 60));
+            const totalHours = Math.floor(timeLeft / (1000 * 60 * 60));
+            
+            this.showToast(
+                `Faltan: ${totalHours} horas, ${totalMinutes % 60} minutos, ${totalSeconds % 60} segundos`, 
+                'info'
+            );
         }
     }
 
@@ -306,9 +452,10 @@ class PixelPlayWebsite {
                 cancelAnimationFrame(this.animationFrameId);
             }
         } else {
-            // Reanudar animaciones
+            // Reanudar animaciones y verificar fecha
             if (this.isLoaded) {
                 this.startParticleAnimation();
+                this.checkDateAndRedirect();
             }
         }
     }
@@ -352,19 +499,28 @@ class PixelPlayWebsite {
      * Dispara animación específica para un elemento
      */
     triggerElementAnimation(element) {
-        element.style.animation = 'fadeInUp 0.8s ease-out forwards';
+        if (!element.style.animation) {
+            element.style.animation = 'fadeInUp 0.8s ease-out forwards';
+        }
     }
 
     /**
      * Muestra mensaje de bienvenida
      */
     showWelcomeMessage() {
-        console.log('🎮 PixelPlay Website cargado completamente');
+        const pageType = this.isTimerPage ? 'Timer' : 'Principal';
+        console.log(`🎮 PixelPlay Website (${pageType}) cargado completamente`);
         console.log('🚀 Sistema de partículas activo');
         console.log('✨ Animaciones inicializadas');
         
+        if (this.isTimerPage) {
+            console.log('⏰ Countdown iniciado');
+            console.log(`🎯 Fecha objetivo: ${new Date(this.targetDate).toLocaleString()}`);
+        }
+        
         // Opcional: mostrar toast de bienvenida
-        this.showToast('¡Bienvenido a PixelPlay!', 'success');
+        const message = this.isTimerPage ? '¡Pronto llegará PixelPlay!' : '¡Bienvenido a PixelPlay!';
+        this.showToast(message, 'success');
     }
 
     /**
@@ -419,6 +575,14 @@ class PixelPlayWebsite {
         if (statusDiv) {
             statusDiv.innerHTML = '';
         }
+        
+        // Remover toasts
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach(toast => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        });
     }
 
     /**
@@ -451,6 +615,10 @@ class PixelPlayWebsite {
             cancelAnimationFrame(this.animationFrameId);
         }
         
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+        }
+        
         if (this.canvas && this.canvas.parentNode) {
             this.canvas.parentNode.removeChild(this.canvas);
         }
@@ -479,6 +647,30 @@ additionalStyles.textContent = `
         font-family: 'IBM Plex Sans', sans-serif;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
+    
+    /* Mejoras para countdown items */
+    .countdown-item {
+        transition: all 0.3s ease;
+    }
+    
+    .countdown-item:hover {
+        transform: translateY(-5px) scale(1.05);
+    }
+    
+    /* Animación para números del countdown */
+    .countdown-number {
+        transition: all 0.3s ease;
+    }
+    
+    .countdown-number.updated {
+        animation: numberUpdate 0.5s ease-out;
+    }
+    
+    @keyframes numberUpdate {
+        0% { transform: scale(1.2); }
+        50% { transform: scale(1.3); color: #27ae60; }
+        100% { transform: scale(1); }
+    }
 `;
 document.head.appendChild(additionalStyles);
 
@@ -495,47 +687,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Verificación adicional para redirección automática
+window.addEventListener('load', function() {
+    // Verificar cada 30 segundos si estamos en la página correcta
+    setInterval(() => {
+        if (window.pixelPlayWebsite) {
+            window.pixelPlayWebsite.checkDateAndRedirect();
+        }
+    }, 30000);
+});
+
 // Exportar para uso en módulos si es necesario
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = PixelPlayWebsite;
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  const targetDate = new Date('2025-06-06T00:00:00');
-  const now = new Date();
-
-  if (now >= targetDate) {
-    // Si la fecha actual es el 6 de junio de 2025 o posterior, redirigir a index.html
-    window.location.href = 'index.html';
-  } else {
-    // Si aún no es el 6 de junio de 2025, iniciar el contador regresivo
-    const daysEl = document.getElementById('days');
-    const hoursEl = document.getElementById('hours');
-    const minutesEl = document.getElementById('minutes');
-    const secondsEl = document.getElementById('seconds');
-
-    function updateCountdown() {
-      const now = new Date();
-      const diff = targetDate - now;
-
-      if (diff <= 0) {
-        // Si se alcanza la fecha objetivo, redirigir a index.html
-        window.location.href = 'index.html';
-        return;
-      }
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-
-      daysEl.textContent = days;
-      hoursEl.textContent = hours.toString().padStart(2, '0');
-      minutesEl.textContent = minutes.toString().padStart(2, '0');
-      secondsEl.textContent = seconds.toString().padStart(2, '0');
-    }
-
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-  }
-});
