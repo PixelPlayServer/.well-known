@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Card Reader</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #1c1c1c;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .reader {
+      background: #333;
+      border-radius: 16px;
+      padding: 30px;
+      width: 320px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    .screen {
+      background: #000;
+      color: #0f0;
+      padding: 20px;
+      border-radius: 8px;
+      min-height: 120px;
+      font-size: 18px;
+      margin-bottom: 20px;
+      white-space: pre-line;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .key {
+      padding: 15px;
+      font-size: 18px;
+      background: #555;
+      border: none;
+      color: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .key:hover {
+      background: #777;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .approved {
+      color: #0f0;
+    }
+
+    .error {
+      color: #f33;
+    }
+  </style>
+</head>
+<body>
+  <div class="reader">
+    <div class="screen" id="screen">Waiting for checkout...</div>
+    <div class="keypad hidden" id="keypad"></div>
+  </div>
+
+  <script>
+    let currentAmount = 0;
+    let pinInput = '';
+    const CORRECT_PIN = '1002';
+
+    function showScreen(message, cls = '') {
+      const screen = document.getElementById('screen');
+      screen.className = 'screen ' + cls;
+      screen.textContent = message;
+    }
+
+    function showKeypad() {
+      const keypad = document.getElementById('keypad');
+      keypad.classList.remove('hidden');
+      keypad.innerHTML = '';
+
+      for (let i = 1; i <= 9; i++) {
+        keypad.appendChild(makeKey(i));
+      }
+
+      keypad.appendChild(makeKey('←', backspace));
+      keypad.appendChild(makeKey(0));
+      keypad.appendChild(makeKey('OK', submitPin));
+    }
+
+    function makeKey(label, handler) {
+      const key = document.createElement('button');
+      key.className = 'key';
+      key.textContent = label;
+      key.onclick = handler || (() => handleDigit(label));
+      return key;
+    }
+
+    function handleDigit(digit) {
+      if (pinInput.length < 4) {
+        pinInput += digit;
+        updatePinScreen();
+      }
+    }
+
+    function backspace() {
+      pinInput = pinInput.slice(0, -1);
+      updatePinScreen();
+    }
+
+    function updatePinScreen() {
+      showScreen(`Enter PIN:\n${'*'.repeat(pinInput.length)}`);
+    }
+
+    function submitPin() {
+      if (pinInput === CORRECT_PIN) {
+        showScreen('Approved (00)', 'approved');
+        setTimeout(() => {
+          pinInput = '';
+          showScreen('Waiting for checkout...');
+          document.getElementById('keypad').classList.add('hidden');
+        }, 2000);
+      } else {
+        showScreen('Incorrect PIN', 'error');
+        pinInput = '';
+        setTimeout(updatePinScreen, 1000);
+      }
+    }
+
+    // This simulates receiving JSON from the register
+    window.addEventListener('message', (e) => {
+      const data = e.data;
+      if (typeof data !== 'object' || !data.amount) return;
+
+      currentAmount = data.amount;
+      showScreen(`Amount: $${currentAmount.toFixed(2)}\nTap card...`);
+
+      setTimeout(() => {
+        showScreen(`Card detected\nEnter PIN:`);
+        showKeypad();
+        pinInput = '';
+      }, 1500);
+    }, false);
+  </script>
+</body>
+</html>
