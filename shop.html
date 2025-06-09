@@ -389,15 +389,27 @@
         }
 
         function checkout() {
-            if (cart.length === 0) return;
-            
-            alert(`Total: $${total.toFixed(2)}\nThank you!`);
-            cart = [];
-            total = 0;
-            input = '';
-            updateCart();
-            updateDisplay();
-        }
+    if (cart.length === 0) return;
+
+    // Send total to card reader
+    const message = {
+        amount: total,
+        items: cart.map(item => ({ id: item.id, name: item.name, price: item.price }))
+    };
+
+    // Send to iframe or popup version of card reader
+    const readerWindow = window.open('https://pixelplay.gg/card-reader', 'CardReader', 'width=400,height=600');
+    setTimeout(() => {
+        readerWindow.postMessage(message, '*');
+    }, 1000);
+
+    // Clear cart after sending
+    cart = [];
+    total = 0;
+    input = '';
+    updateCart();
+    updateDisplay();
+}
 
         function voidAll() {
             cart = [];
