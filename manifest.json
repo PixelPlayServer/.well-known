@@ -1,7 +1,7 @@
 {
-  "name": "Cash Register",
-  "short_name": "CashReg",
-  "start_url": ".",
+  "name": "PixelPlay Shop",
+  "short_name": "Shop",
+  "start_url": "/shop/",
   "display": "standalone",
   "background_color": "#fafafa",
   "theme_color": "#000000"
