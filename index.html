@@ -3,460 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PixelPlay - Próximamente</title>
+    <title>PixelPlay.gg - Servidor de Minecraft con penes</title>
+    <meta name="description" content="PixelPlay - Servidor de Minecraft 1.20.1 con mods y plugins únicos. Descarga nuestro launcher exclusivo y únete a la aventura.">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Reset y Configuración Base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'IBM Plex Sans', sans-serif;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 50%, #0f0f0f 100%);
-            color: #e0e0e0;
-            overflow-x: hidden;
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        /* Animación de Fondo */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.1;
-            pointer-events: none;
-        }
-
-        .floating-cube {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: linear-gradient(45deg, #2ecc40, #27ae60);
-            animation: float 6s ease-in-out infinite;
-            border-radius: 2px;
-            box-shadow: 0 0 10px rgba(46, 204, 64, 0.3);
-        }
-
-        @keyframes float {
-            0%, 100% { 
-                transform: translateY(0px) rotate(0deg); 
-                opacity: 0.7;
-            }
-            50% { 
-                transform: translateY(-20px) rotate(180deg); 
-                opacity: 1;
-            }
-        }
-
-        /* Animaciones de Entrada */
-        .fade-in {
-            animation: fadeIn 1.2s cubic-bezier(.39,.58,.57,1) both;
-        }
-
-        .fade-in-delayed {
-            animation: fadeIn 1.2s cubic-bezier(.39,.58,.57,1) both;
-            animation-delay: 0.3s;
-        }
-
-        .fade-in-delayed-2 {
-            animation: fadeIn 1.2s cubic-bezier(.39,.58,.57,1) both;
-            animation-delay: 0.6s;
-        }
-
-        @keyframes fadeIn {
-            0% { 
-                opacity: 0; 
-                transform: translateY(40px) scale(0.98); 
-            }
-            100% { 
-                opacity: 1; 
-                transform: none; 
-            }
-        }
-
-        /* Contenedor Principal */
-        .countdown-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            position: relative;
-            padding: 2rem;
-        }
-
-        .countdown-content {
-            max-width: 800px;
-            width: 100%;
-        }
-
-        /* Logo */
-        .logo {
-            font-size: 4.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #2ecc40 0%, #27ae60 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 30px rgba(46, 204, 64, 0.3);
-            letter-spacing: -2px;
-        }
-
-        /* Subtítulo */
-        .subtitle {
-            font-size: 1.8rem;
-            color: #bdbdbd;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-
-        .description {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin-bottom: 3rem;
-            color: #e0e0e0;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Timer */
-        .timer-container {
-            background: rgba(24, 26, 27, 0.8);
-            border-radius: 20px;
-            padding: 3rem 2rem;
-            margin: 3rem 0;
-            border: 1px solid rgba(46, 204, 64, 0.2);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .timer-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #2ecc40, transparent);
-            animation: shimmer 3s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        .timer-title {
-            font-size: 2rem;
-            color: #2ecc40;
-            margin-bottom: 2rem;
-            font-weight: 600;
-        }
-
-        .countdown-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .countdown-item {
-            background: rgba(46, 204, 64, 0.1);
-            border: 1px solid rgba(46, 204, 64, 0.3);
-            border-radius: 15px;
-            padding: 1.5rem 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .countdown-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(46, 204, 64, 0.2);
-        }
-
-        .countdown-number {
-            font-size: 3rem;
-            font-weight: 700;
-            color: #2ecc40;
-            line-height: 1;
-            display: block;
-            text-shadow: 0 0 20px rgba(46, 204, 64, 0.5);
-        }
-
-        .countdown-label {
-            font-size: 1rem;
-            color: #bdbdbd;
-            margin-top: 0.5rem;
-            font-weight: 500;
-        }
-
-        /* Fecha objetivo */
-        .target-date {
-            font-size: 1.3rem;
-            color: #2ecc40;
-            font-weight: 600;
-            margin-top: 2rem;
-            padding: 1rem;
-            background: rgba(46, 204, 64, 0.1);
-            border-radius: 10px;
-            border: 1px solid rgba(46, 204, 64, 0.2);
-        }
-
-        /* Mensaje de acceso */
-        .access-granted {
-            display: none;
-            text-align: center;
-            padding: 2rem;
-            background: rgba(46, 204, 64, 0.1);
-            border: 2px solid #2ecc40;
-            border-radius: 15px;
-            margin-top: 2rem;
-        }
-
-        .access-granted h3 {
-            color: #2ecc40;
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-        }
-
-        .access-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            background: linear-gradient(135deg, #2ecc40 0%, #27ae60 100%);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 600;
-            padding: 1rem 2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(46, 204, 64, 0.3);
-            font-family: inherit;
-            text-decoration: none;
-            margin-top: 1rem;
-        }
-
-        .access-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(46, 204, 64, 0.4);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .logo {
-                font-size: 3rem;
-            }
-            
-            .subtitle {
-                font-size: 1.4rem;
-            }
-            
-            .countdown-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-            
-            .countdown-number {
-                font-size: 2.5rem;
-            }
-            
-            .timer-container {
-                padding: 2rem 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .logo {
-                font-size: 2.5rem;
-            }
-            
-            .countdown-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            
-            .countdown-number {
-                font-size: 2rem;
-            }
-        }
-
-        /* Partículas de fondo */
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #2ecc40;
-            border-radius: 50%;
-            animation: particle-float 8s infinite linear;
-            opacity: 0.6;
-        }
-
-        @keyframes particle-float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            50% {
-                opacity: 0.6;
-            }
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
     <!-- Animación de fondo -->
-    <div class="bg-animation" id="bgAnimation"></div>
-
-    <!-- Contenedor principal -->
-    <div class="countdown-container">
-        <div class="countdown-content">
-            <h1 class="logo fade-in">PixelPlay</h1>
-            <h2 class="subtitle fade-in-delayed">Próximamente</h2>
-            <p class="description fade-in-delayed-2">
-                Estamos preparando algo increíble para ti. Una experiencia gaming única que cambiará la forma en que juegas.
-            </p>
-
-            <div class="timer-container fade-in-delayed-2">
-                <h3 class="timer-title">Lanzamiento en:</h3>
-                <div class="countdown-grid" id="countdown">
-                    <div class="countdown-item">
-                        <span class="countdown-number" id="days">00</span>
-                        <p class="countdown-label">Días</p>
-                    </div>
-                    <div class="countdown-item">
-                        <span class="countdown-number" id="hours">00</span>
-                        <p class="countdown-label">Horas</p>
-                    </div>
-                    <div class="countdown-item">
-                        <span class="countdown-number" id="minutes">00</span>
-                        <p class="countdown-label">Minutos</p>
-                    </div>
-                    <div class="countdown-item">
-                        <span class="countdown-number" id="seconds">00</span>
-                        <p class="countdown-label">Segundos</p>
-                    </div>
-                </div>
-                <div class="target-date">
-                    🚀 Fecha actualizacion: 14 de Junio, 2025
-                </div>
-            </div>
-
-            <div class="access-granted" id="accessGranted">
-                <h3>¡Ya está disponible!</h3>
-                <p>El momento ha llegado. Bienvenido a PixelPlay.</p>
-                <a href="#" class="access-btn" onclick="redirectToSite()">
-                    🎮 Acceder a PixelPlay
-                </a>
-            </div>
-        </div>
+    <div class="bg-animation">
+        <div class="floating-cube" style="top: 10%; left: 10%; animation-delay: 0s;"></div>
+        <div class="floating-cube" style="top: 20%; left: 80%; animation-delay: 1s;"></div>
+        <div class="floating-cube" style="top: 70%; left: 20%; animation-delay: 2s;"></div>
+        <div class="floating-cube" style="top: 60%; left: 90%; animation-delay: 3s;"></div>
+        <div class="floating-cube" style="top: 30%; left: 60%; animation-delay: 4s;"></div>
+        <div class="floating-cube" style="top: 40%; left: 30%; animation-delay: 5s;"></div>
     </div>
 
-    <script>
-        // Fecha objetivo - 6 de junio de 2025
-        const targetDate = new Date('2025-06-14T17:30:00').getTime();
+    <!-- Sección Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content fade-in">
+                <div class="logo">PixelPlay</div>
+                <div class="subtitle">Servidor de Minecraft 1.20.1</div>
+                <p class="description">
+                    Experimenta Minecraft como nunca antes con nuestra colección única de mods y plugins. 
+                    Un mundo lleno de aventuras, creatividad y diversión te espera.
+                </p>
+                <div class="hero-stats fade-in-delayed">
+                    <div class="stat">
+                        <span class="stat-number">1.20.1</span>
+                        <span class="stat-label">Versión</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Online</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">30+</span>
+                        <span class="stat-label">Mods & Plugins</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        // Elementos del DOM
-        const daysElement = document.getElementById('days');
-        const hoursElement = document.getElementById('hours');
-        const minutesElement = document.getElementById('minutes');
-        const secondsElement = document.getElementById('seconds');
-        const countdownContainer = document.getElementById('countdown');
-        const accessGranted = document.getElementById('accessGranted');
+    <!-- Sección Características -->
+    <section class="features">
+        <div class="container">
+            <h2 class="features-title fade-in">Características Únicas</h2>
+            <div class="features-grid">
+                <div class="feature-card fade-in-delayed">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Plugins Optimizados</h3>
+                    <p>Plugins personalizados que mejoran el rendimiento y añaden funcionalidades únicas.</p>
+                </div>
+                <div class="feature-card fade-in-delayed-2">
+                    <div class="feature-icon">👥</div>
+                    <h3>Admins Activos</h3>
+                    <p>Un equipo de administradores siempre disponible para ayudarte y garantizar una experiencia de juego fluida.</p>
+                </div>
+                    <div class="feature-card fade-in-delayed-2">
+                    <div class="feature-icon">🔨</div>
+                    <h3>Desarrollo Activo</h3>
+                    <p>Un equipo de desarrolladores siempre trabajando en nuevas características y mejoras.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        // Función para actualizar el countdown
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const timeLeft = targetDate - now;
+    <!-- Sección Descarga -->
+    <section class="download">
+        <div class="container">
+            <div class="download-content fade-in">
+                <h2>Descarga PixelPlay</h2>
+                <p>Obtén acceso exclusivo a nuestro servidor descargando el launcher oficial. Es la única forma de conectarte a nuestro mundo único.</p>
+                
+                <div class="download-info">
+                    <div class="info-card">
+                        <h3>Requisitos del Sistema</h3>
+                        <ul>
+                            <li>Java 17 o superior</li>
+                            <li>4GB RAM mínimo (8GB recomendado)</li>
+                            <li>2GB espacio libre</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3>Incluye</h3>
+                        <ul>
+                            <li>Launcher personalizado</li>
+                            <li>Mods preinstalados</li>
+                            <li>Configuración optimizada</li>
+                            <li>Actualizaciones automáticas</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <button class="download-btn" id="downloadBtn">
+                    <span class="download-icon"></span>
+                    Descargar PixelPlay Launcher
+                    <span class="download-size">(~150MB)</span>
+                </button>
+                
+                <div class="download-status" id="downloadStatus"></div>
+                
+                <div class="download-warning">
+                    <p><strong>⚠️ Importante:</strong> Este es el único método oficial para acceder al servidor. No confíes en descargas de terceros.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            if (timeLeft > 0) {
-                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+    <!-- Sección Noticias -->
+    <section class="news">
+        <div class="container">
+            <div class="news-content fade-in-delayed">
+                <div class="news-title">Últimas Noticias</div>
+                <div class="news-items">
+                        <div class="news-item">
+                        <div class="news-date">14 Junio 2025</div>
+                        <h4>Lanzamiento oficial del launcher! 🎉</h4>
+                        <p>Estamos emocionados de presentar nuestro novedoso launcher que transformará tu experiencia de juego en PixelPlay.</p>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-date">07 Junio 2025</div>
+                        <h4>Playevent en marcha! 🎉</h4>
+                        <p>Estamos emocionados de presentar nuestras nuevas funciones en el cliente para mejorar la experiencia de Minecraft.</p>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-date">30 Abril 2025</div>
+                        <h4>Nuevo cliente disponible</h4>
+                        <p>Lanzamiento oficial del PixelPlay Launcher con interfaz renovada y mejor rendimiento.</p>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-date">15 Marzo 2025</div>
+                        <h4>Actualización de Mods</h4>
+                        <p>Actualización importante de mods y plugins para mejorar la jugabilidad y estabilidad del servidor.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                daysElement.textContent = days.toString().padStart(2, '0');
-                hoursElement.textContent = hours.toString().padStart(2, '0');
-                minutesElement.textContent = minutes.toString().padStart(2, '0');
-                secondsElement.textContent = seconds.toString().padStart(2, '0');
-            } else {
-                // Tiempo agotado - mostrar acceso
-                countdownContainer.parentElement.style.display = 'none';
-                accessGranted.style.display = 'block';
-            }
-        }
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">PixelPlay</div>
+                <p class="footer-disclaimer">
+                    © 2025 PixelPlay. No estamos afiliados con Mojang Studios o Microsoft.<br>
+                    Minecraft es una marca registrada de Mojang Studios.
+                </p>
+                <div class="footer-social">
+                    <p>¿Necesitas ayuda? Contactanos en support@pixelplay.gg</p>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-        // Función para redireccionar (aquí puedes cambiar la URL)
-        function redirectToSite() {
-            // Cambiar esta URL por la página principal de PixelPlay
-            window.location.href = 'https://pixelplay.gg/';
-        }
-
-        // Actualizar countdown cada segundo
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-
-        // Crear cubos flotantes
-        function createFloatingCubes() {
-            const bgAnimation = document.getElementById('bgAnimation');
-            
-            for (let i = 0; i < 15; i++) {
-                const cube = document.createElement('div');
-                cube.className = 'floating-cube';
-                cube.style.left = Math.random() * 100 + '%';
-                cube.style.top = Math.random() * 100 + '%';
-                cube.style.animationDelay = Math.random() * 6 + 's';
-                cube.style.animationDuration = (6 + Math.random() * 4) + 's';
-                bgAnimation.appendChild(cube);
-            }
-        }
-
-        // Crear partículas flotantes
-        function createParticles() {
-            const bgAnimation = document.getElementById('bgAnimation');
-            
-            setInterval(() => {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDuration = (8 + Math.random() * 4) + 's';
-                bgAnimation.appendChild(particle);
-
-                // Remover partícula después de la animación
-                setTimeout(() => {
-                    if (particle.parentNode) {
-                        particle.parentNode.removeChild(particle);
-                    }
-                }, 12000);
-            }, 300);
-        }
-
-        // Inicializar animaciones
-        createFloatingCubes();
-        createParticles();
-
-        // Verificar si ya pasó la fecha (para testing)
-        if (new Date() >= new Date('2025-06-14T17:30:00')) {
-            countdownContainer.parentElement.style.display = 'none';
-            accessGranted.style.display = 'block';
-        }
-    </script>
+    <!-- Scripts -->
+    <script src="downloads-manager.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
