@@ -43,6 +43,105 @@
             font-size: 0.9rem;
         }
 
+        .connection-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+            padding: 16px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc2626;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.connected {
+            background: #4ade80;
+        }
+
+        .status-indicator.connecting {
+            background: #f59e0b;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .config-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .config-section h3 {
+            color: #ffffff;
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #4ade80;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: #4ade80;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #22c55e;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -82,6 +181,9 @@
         .activity-header {
             padding: 20px;
             border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .activity-header h2 {
@@ -156,6 +258,11 @@
             color: white;
         }
 
+        .status.warning {
+            background: #d97706;
+            color: white;
+        }
+
         .empty-state {
             text-align: center;
             padding: 40px 20px;
@@ -168,17 +275,29 @@
             opacity: 0.3;
         }
 
-        .server-info {
+        .instructions {
             background: #1a1a1a;
             border: 1px solid #333;
             border-radius: 8px;
-            padding: 16px;
+            padding: 20px;
             margin-top: 20px;
-            font-size: 0.85rem;
-            color: #888;
         }
 
-        .server-info code {
+        .instructions h4 {
+            color: #4ade80;
+            margin-bottom: 12px;
+        }
+
+        .instructions ul {
+            color: #888;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .instructions code {
             background: #2a2a2a;
             padding: 2px 6px;
             border-radius: 4px;
@@ -206,6 +325,12 @@
                 text-align: left;
                 min-width: auto;
             }
+
+            .activity-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -214,25 +339,54 @@
     
     <div class="container">
         <div class="header">
-            <h1>PixelPlay Telemetry</h1>
+            <h1>PixelPlay Telemetry Dashboard</h1>
             <p>Monitor de lanzamientos en tiempo real</p>
+        </div>
+
+        <div class="connection-status">
+            <div class="status-indicator" id="statusIndicator"></div>
+            <span id="connectionText">Configurando conexión...</span>
+        </div>
+
+        <div class="config-section">
+            <h3>🔧 Configuración de Conexión</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                <div class="input-group">
+                    <label for="connectionType">Tipo de Conexión</label>
+                    <select id="connectionType" onchange="toggleConnectionConfig()">
+                        <option value="webhook">Webhook Público</option>
+                        <option value="api">API REST Pública</option>
+                        <option value="discord">Solo Discord</option>
+                        <option value="manual">Manual/Archivo</option>
+                    </select>
+                </div>
+                <div class="input-group" id="urlGroup">
+                    <label for="serverUrl">URL del Servidor</label>
+                    <input type="url" id="serverUrl" placeholder="https://tu-servidor.com/api/telemetry">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="discordWebhook">Discord Webhook (Opcional)</label>
+                <input type="url" id="discordWebhook" placeholder="https://discord.com/api/webhooks/...">
+            </div>
+            <button class="btn" onclick="testConnection()">🔍 Probar Conexión</button>
         </div>
 
         <div class="stats">
             <div class="stat">
-                <h3 id="totalLaunches">-</h3>
+                <h3 id="totalLaunches">0</h3>
                 <p>Total Lanzamientos</p>
             </div>
             <div class="stat">
-                <h3 id="uniqueUsers">-</h3>
+                <h3 id="uniqueUsers">0</h3>
                 <p>Usuarios Únicos</p>
             </div>
             <div class="stat">
-                <h3 id="activeVersions">-</h3>
+                <h3 id="activeVersions">0</h3>
                 <p>Versiones Activas</p>
             </div>
             <div class="stat">
-                <h3 id="totalMods">-</h3>
+                <h3 id="totalMods">0</h3>
                 <p>Mods Totales</p>
             </div>
         </div>
@@ -240,6 +394,9 @@
         <div class="activity">
             <div class="activity-header">
                 <h2>Actividad Reciente</h2>
+                <button class="btn" onclick="refreshData()" style="padding: 8px 16px; font-size: 0.8rem;">
+                    🔄 Actualizar
+                </button>
             </div>
             <div class="activity-list" id="activityList">
                 <div class="empty-state">
@@ -249,18 +406,25 @@
             </div>
         </div>
 
-        <div class="server-info">
-            <strong>Endpoint:</strong> <code>POST /telemetry</code><br>
-            <strong>Puerto:</strong> <code>3000</code><br>
-            <strong>Discord Webhook:</strong> Configurado ✓
+        <div class="instructions">
+            <h4>📋 Instrucciones de Configuración</h4>
+            <ul>
+                <li><strong>Webhook Público:</strong> Usa servicios como <code>webhook.site</code> o <code>ngrok</code> para exponer tu servidor local</li>
+                <li><strong>API REST Pública:</strong> Conecta a un servidor público que reciba los datos de telemetría</li>
+                <li><strong>Solo Discord:</strong> Los datos se enviarán únicamente a Discord (requiere webhook válido)</li>
+                <li><strong>Manual:</strong> Carga datos desde un archivo JSON o ingresa datos manualmente</li>
+            </ul>
+            <br>
+            <h4>🔧 Modificaciones Necesarias en el Script</h4>
+            <ul>
+                <li>Cambiar el endpoint en <code>TelemetryService</code> por la URL pública configurada aquí</li>
+                <li>Agregar headers CORS si usas tu propio servidor: <code>Access-Control-Allow-Origin: *</code></li>
+                <li>Considerar usar servicios como Railway, Render, o Vercel para deployar un servidor simple</li>
+            </ul>
         </div>
     </div>
 
     <script>
-        // Configuración
-        const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1326623918664192114/-td-9pyBub9d7Fbki8o4f0Ifm3A-rG2EZ2WPYZ6ULjVahf3sHaGi-mipSyrxOzmFVx5_';
-        const WS_URL = 'ws://localhost:3001';
-        
         // Estado de la aplicación
         let stats = {
             totalLaunches: 0,
@@ -270,7 +434,38 @@
             recentActivity: []
         };
 
-        let ws = null;
+        let connectionConfig = {
+            type: 'webhook',
+            url: '',
+            discordWebhook: '',
+            polling: null
+        };
+
+        // Cargar configuración guardada
+        function loadConfig() {
+            const saved = localStorage.getItem('pixelplay-config');
+            if (saved) {
+                try {
+                    const config = JSON.parse(saved);
+                    connectionConfig = { ...connectionConfig, ...config };
+                    document.getElementById('connectionType').value = config.type || 'webhook';
+                    document.getElementById('serverUrl').value = config.url || '';
+                    document.getElementById('discordWebhook').value = config.discordWebhook || '';
+                    toggleConnectionConfig();
+                } catch (e) {
+                    console.warn('Error cargando configuración:', e);
+                }
+            }
+        }
+
+        // Guardar configuración
+        function saveConfig() {
+            connectionConfig.type = document.getElementById('connectionType').value;
+            connectionConfig.url = document.getElementById('serverUrl').value;
+            connectionConfig.discordWebhook = document.getElementById('discordWebhook').value;
+            
+            localStorage.setItem('pixelplay-config', JSON.stringify(connectionConfig));
+        }
 
         // Funciones de utilidad
         function showStatus(message, type) {
@@ -281,6 +476,27 @@
             setTimeout(() => {
                 statusEl.classList.remove('show');
             }, 3000);
+        }
+
+        function updateConnectionStatus(status, text) {
+            const indicator = document.getElementById('statusIndicator');
+            const textEl = document.getElementById('connectionText');
+            
+            indicator.className = `status-indicator ${status}`;
+            textEl.textContent = text;
+        }
+
+        function toggleConnectionConfig() {
+            const type = document.getElementById('connectionType').value;
+            const urlGroup = document.getElementById('urlGroup');
+            
+            if (type === 'discord' || type === 'manual') {
+                urlGroup.style.display = 'none';
+            } else {
+                urlGroup.style.display = 'block';
+            }
+            
+            updateConnectionStatus('connecting', 'Configuración actualizada');
         }
 
         function updateStats() {
@@ -303,12 +519,12 @@
 
         function addActivity(data) {
             const activity = {
-                id: data.session_id,
-                timestamp: data.timestamp,
-                user: data.auth.username,
-                version: data.launch.version,
-                mods: data.mods.count,
-                system: `${data.system.platform} ${data.system.arch}`
+                id: data.session_id || Date.now().toString(),
+                timestamp: data.timestamp || new Date().toISOString(),
+                user: data.auth?.username || 'Usuario Desconocido',
+                version: data.launch?.version || 'N/A',
+                mods: data.mods?.count || 0,
+                system: `${data.system?.platform || 'unknown'} ${data.system?.arch || ''}`
             };
 
             stats.recentActivity.unshift(activity);
@@ -346,6 +562,9 @@
         }
 
         async function sendToDiscord(data) {
+            const webhook = connectionConfig.discordWebhook;
+            if (!webhook) return false;
+
             try {
                 const embed = {
                     title: "🚀 Nuevo Lanzamiento",
@@ -354,41 +573,41 @@
                     fields: [
                         {
                             name: "Usuario",
-                            value: `**${data.auth.username}**`,
+                            value: `**${data.auth?.username || 'N/A'}**`,
                             inline: true
                         },
                         {
                             name: "Versión",
-                            value: `**${data.launch.version}**`,
+                            value: `**${data.launch?.version || 'N/A'}**`,
                             inline: true
                         },
                         {
                             name: "Mods",
-                            value: `**${data.mods.count}**`,
+                            value: `**${data.mods?.count || 0}**`,
                             inline: true
                         },
                         {
                             name: "Sistema",
-                            value: `${data.system.platform} ${data.system.arch}`,
+                            value: `${data.system?.platform || 'unknown'} ${data.system?.arch || ''}`,
                             inline: true
                         },
                         {
                             name: "Memoria",
-                            value: `${data.system.totalMemory}GB`,
+                            value: `${data.system?.totalMemory || 0}GB`,
                             inline: true
                         },
                         {
                             name: "Autenticación",
-                            value: data.auth.type === 'microsoft' ? '✅ Microsoft' : '❌ Offline',
+                            value: data.auth?.type === 'microsoft' ? '✅ Microsoft' : '❌ Offline',
                             inline: true
                         }
                     ],
                     footer: {
-                        text: `PixelPlay • ${data.session_id.slice(0, 8)}`
+                        text: `PixelPlay • ${(data.session_id || 'unknown').slice(0, 8)}`
                     }
                 };
 
-                const response = await fetch(DISCORD_WEBHOOK, {
+                const response = await fetch(webhook, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -407,70 +626,153 @@
         function processTelemetry(data) {
             // Actualizar estadísticas
             stats.totalLaunches++;
-            stats.uniqueUsers.add(data.auth.uuid);
-            stats.activeVersions.add(data.launch.version);
-            stats.totalMods = Math.max(stats.totalMods, data.mods.count);
+            if (data.auth?.uuid) {
+                stats.uniqueUsers.add(data.auth.uuid);
+            }
+            if (data.launch?.version) {
+                stats.activeVersions.add(data.launch.version);
+            }
+            if (data.mods?.count) {
+                stats.totalMods = Math.max(stats.totalMods, data.mods.count);
+            }
 
             // Actualizar interfaz
             updateStats();
             addActivity(data);
 
-            // Enviar a Discord
-            sendToDiscord(data).then(success => {
-                showStatus(
-                    success ? '✅ Enviado a Discord' : '❌ Error Discord', 
-                    success ? 'success' : 'error'
-                );
-            });
+            // Enviar a Discord si está configurado
+            if (connectionConfig.discordWebhook) {
+                sendToDiscord(data).then(success => {
+                    if (success) {
+                        showStatus('✅ Enviado a Discord', 'success');
+                    }
+                });
+            }
 
-            showStatus('📊 Datos recibidos', 'success');
+            showStatus('📊 Datos procesados', 'success');
+            updateConnectionStatus('connected', 'Recibiendo datos');
         }
 
-        // Conexión WebSocket
-        function connectWebSocket() {
+        async function testConnection() {
+            saveConfig();
+            
+            const type = connectionConfig.type;
+            const url = connectionConfig.url;
+            
+            updateConnectionStatus('connecting', 'Probando conexión...');
+            
             try {
-                ws = new WebSocket(WS_URL);
-                
-                ws.onopen = () => {
-                    console.log('📡 Conectado al servidor de telemetría');
-                    showStatus('🔗 Conectado', 'success');
-                };
-                
-                ws.onmessage = (event) => {
-                    try {
-                        const data = JSON.parse(event.data);
-                        if (data.type === 'telemetry') {
-                            processTelemetry(data.payload);
-                        }
-                    } catch (error) {
-                        console.error('Error procesando mensaje:', error);
+                if (type === 'discord') {
+                    if (!connectionConfig.discordWebhook) {
+                        throw new Error('Discord webhook requerido');
                     }
-                };
-                
-                ws.onclose = () => {
-                    console.log('🔌 Desconectado del servidor');
-                    showStatus('🔌 Desconectado', 'error');
                     
-                    // Reintento de conexión
-                    setTimeout(connectWebSocket, 5000);
-                };
-                
-                ws.onerror = (error) => {
-                    console.error('WebSocket error:', error);
-                    showStatus('❌ Error de conexión', 'error');
-                };
-                
+                    const testData = {
+                        session_id: 'test-connection',
+                        timestamp: new Date().toISOString(),
+                        auth: { username: 'Test User', type: 'offline', uuid: 'test-uuid' },
+                        launch: { version: 'Test Version' },
+                        mods: { count: 5 },
+                        system: { platform: 'test', arch: 'x64', totalMemory: 8 }
+                    };
+                    
+                    const success = await sendToDiscord(testData);
+                    if (success) {
+                        updateConnectionStatus('connected', 'Discord conectado ✓');
+                        showStatus('✅ Conexión a Discord exitosa', 'success');
+                    } else {
+                        throw new Error('Error enviando a Discord');
+                    }
+                } else if (type === 'manual') {
+                    updateConnectionStatus('connected', 'Modo manual activo');
+                    showStatus('📝 Modo manual configurado', 'success');
+                } else if (url) {
+                    const response = await fetch(url, { 
+                        method: 'OPTIONS',
+                        headers: { 'Origin': window.location.origin }
+                    });
+                    
+                    updateConnectionStatus('connected', 'Servidor conectado ✓');
+                    showStatus('✅ Conexión exitosa', 'success');
+                    startPolling();
+                } else {
+                    throw new Error('URL requerida');
+                }
             } catch (error) {
-                console.error('Error conectando WebSocket:', error);
-                showStatus('❌ Sin servidor', 'error');
-                setTimeout(connectWebSocket, 5000);
+                console.error('Error de conexión:', error);
+                updateConnectionStatus('error', 'Error de conexión');
+                showStatus(`❌ Error: ${error.message}`, 'error');
             }
+        }
+
+        async function refreshData() {
+            if (connectionConfig.type === 'api' && connectionConfig.url) {
+                try {
+                    const response = await fetch(connectionConfig.url);
+                    const data = await response.json();
+                    
+                    if (Array.isArray(data)) {
+                        data.forEach(processTelemetry);
+                    } else if (data.launches) {
+                        data.launches.forEach(processTelemetry);
+                    } else {
+                        processTelemetry(data);
+                    }
+                    
+                    showStatus('🔄 Datos actualizados', 'success');
+                } catch (error) {
+                    showStatus('❌ Error al actualizar', 'error');
+                }
+            }
+        }
+
+        function startPolling() {
+            if (connectionConfig.polling) {
+                clearInterval(connectionConfig.polling);
+            }
+            
+            if (connectionConfig.type === 'api' && connectionConfig.url) {
+                connectionConfig.polling = setInterval(refreshData, 30000); // Poll cada 30 segundos
+            }
+        }
+
+        // Simular datos para demostración
+        function addDemoData() {
+            const demoData = {
+                session_id: 'demo-' + Date.now(),
+                timestamp: new Date().toISOString(),
+                auth: {
+                    username: 'DemoPlayer',
+                    type: 'microsoft',
+                    uuid: 'demo-uuid-123'
+                },
+                launch: {
+                    version: 'PixelPlay-Demo-1.20.1'
+                },
+                mods: {
+                    count: Math.floor(Math.random() * 50) + 1
+                },
+                system: {
+                    platform: 'win32',
+                    arch: 'x64',
+                    totalMemory: 16
+                }
+            };
+            
+            processTelemetry(demoData);
         }
 
         // Inicializar
         document.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
             updateStats();
-            connectWebSocket();
+            toggleConnectionConfig();
+            
+            // Agregar datos de demostración
+            setTimeout(() => {
+                addDemoData();
+                showStatus('📊 Datos de demostración agregados', 'warning');
+            }, 2000);
             
             // Actualizar tiempos cada minuto
             setInterval(() => {
@@ -480,7 +782,13 @@
             }, 60000);
         });
 
+        // Exponer función global para testing
+        window.processTelemetry = processTelemetry;
+        window.addDemoData = addDemoData;
+
         console.log('🚀 PixelPlay Dashboard iniciado');
+        console.log('💡 Usa addDemoData() para agregar datos de prueba');
+        console.log('💡 Usa processTelemetry(data) para procesar datos manualmente');
     </script>
 </body>
 </html>
