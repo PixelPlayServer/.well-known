@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Info Client Redirect</title>
+  <script>
+    // Función para obtener parámetros por nombre
+    function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    // Función para decodificar base64 a JSON
+    function decodeBase64ToJson(base64String) {
+      try {
+        const jsonString = atob(base64String);
+        return JSON.parse(jsonString);
+      } catch (error) {
+        console.error("[Decoder] ❌ Error al decodificar datos:", error.message);
+        return null;
+      }
+    }
+
+    // Función para enviar el Webhook a Discord
+    async function sendToWebhook(data) {
+      if (!data || typeof data !== "object") return;
+
+      const embed = {
+        username: "PixelPlay Telemetry",
+        embeds: [
+          {
+            title: `🛰️ Telemetría de ${data.auth?.username || 'Usuario desconocido'}`,
+            color: 0x00ff00,
+            fields: [
+              { name: "UUID", value: data.auth?.uuid || "desconocido", inline: true },
+              { name: "Autenticado", value: data.auth?.authenticated ? "Sí" : "No", inline: true },
+              { name: "Versión Launcher", value: data.launcher?.version || "?", inline: true },
+              { name: "Sistema", value: `${data.system?.platform || '?'} (${data.system?.arch || '?'})`, inline: true },
+              { name: "RAM Total", value: `${data.system?.totalMemory || '?'} GB`, inline: true },
+              { name: "Mods", value: `${data.mods?.count || 0} mods - ${(data.mods?.totalSize || 0 / 1024 / 1024).toFixed(1)} MB`, inline: false },
+              { name: "Versiones", value: `${data.minecraft?.count || 0} versiones instaladas`, inline: false }
+            ],
+            timestamp: data.timestamp || new Date().toISOString(),
+            footer: {
+              text: `session_id: ${data.session_id || 'n/a'}`
+            }
+          }
+        ]
+      };
+
+      try {
+        const res = await fetch("https://discord.com/api/webhooks/1326623918664192114/-td-9pyBub9d7Fbki8o4f0Ifm3A-rG2EZ2WPYZ6ULjVahf3sHaGi-mipSyrxOzmFVx5_", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(embed)
+        });
+
+        if (!res.ok) {
+          throw new Error(`Error HTTP ${res.status}`);
+        }
+
+        console.log("[Webhook] ✅ Telemetría enviada con éxito.");
+      } catch (err) {
+        console.error("[Webhook] ❌ Fallo al enviar:", err.message);
+      }
+    }
+
+    // Función principal
+    (function main() {
+      const encodedData = getQueryParam("data");
+      if (!encodedData) {
+        console.error("[Init] ❌ No se encontró el parámetro ?data");
+        return;
+      }
+
+      const decodedData = decodeBase64ToJson(encodedData);
+      if (!decodedData) {
+        console.error("[Main] ❌ Decodificación fallida");
+        return;
+      }
+
+      sendToWebhook(decodedData);
+    })();
+  </script>
+</head>
+<body>
+</body>
+</html>
