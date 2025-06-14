@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PixelPlay Telemetry Dashboard</title>
+    <title>PixelPlay Telemetry</title>
     <style>
         * {
             margin: 0;
@@ -12,147 +12,200 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            max-width: 800px;
-            width: 100%;
-            margin: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
         }
 
         .header p {
-            opacity: 0.8;
-            font-size: 1.1em;
+            color: #888;
+            font-size: 0.9rem;
         }
 
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .stat {
-            background: rgba(255, 255, 255, 0.1);
+            background: #1a1a1a;
             padding: 20px;
-            border-radius: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .stat h3 {
-            font-size: 2em;
-            color: #4ecdc4;
-            margin-bottom: 5px;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4ade80;
+            margin-bottom: 8px;
         }
 
         .stat p {
-            opacity: 0.8;
+            color: #888;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .recent-activity {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
+        .activity {
+            background: #1a1a1a;
+            border-radius: 8px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .activity-header {
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid #333;
         }
 
-        .recent-activity h2 {
-            margin-bottom: 15px;
-            color: #ff6b6b;
+        .activity-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .activity-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border-left: 4px solid #4ecdc4;
+            padding: 16px 20px;
+            border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .activity-item:last-child {
-            margin-bottom: 0;
+            border-bottom: none;
+        }
+
+        .activity-info {
+            flex: 1;
+        }
+
+        .activity-user {
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .activity-details {
+            font-size: 0.85rem;
+            color: #888;
         }
 
         .activity-time {
-            font-size: 0.9em;
-            opacity: 0.7;
-            margin-bottom: 5px;
+            font-size: 0.8rem;
+            color: #666;
+            text-align: right;
+            min-width: 60px;
         }
 
         .status {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: bold;
-            display: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .status.show {
+            transform: translateX(0);
         }
 
         .status.success {
-            background: #4ecdc4;
+            background: #059669;
             color: white;
         }
 
         .status.error {
-            background: #ff6b6b;
+            background: #dc2626;
             color: white;
         }
 
-        .webhook-info {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .server-info {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
             margin-top: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
+            color: #888;
         }
 
-        .webhook-info h3 {
-            color: #4ecdc4;
-            margin-bottom: 10px;
+        .server-info code {
+            background: #2a2a2a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #4ade80;
         }
 
-        .webhook-info p {
-            opacity: 0.8;
-            font-size: 0.9em;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .pulse {
-            animation: pulse 0.5s ease-in-out;
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .activity-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .activity-time {
+                text-align: left;
+                min-width: auto;
+            }
         }
     </style>
 </head>
@@ -161,50 +214,54 @@
     
     <div class="container">
         <div class="header">
-            <h1>🎮 PixelPlay Telemetry</h1>
-            <p>Monitor de lanzamientos y actividad del launcher</p>
+            <h1>PixelPlay Telemetry</h1>
+            <p>Monitor de lanzamientos en tiempo real</p>
         </div>
 
         <div class="stats">
             <div class="stat">
-                <h3 id="totalLaunches">0</h3>
-                <p>Lanzamientos Totales</p>
+                <h3 id="totalLaunches">-</h3>
+                <p>Total Lanzamientos</p>
             </div>
             <div class="stat">
-                <h3 id="uniqueUsers">0</h3>
+                <h3 id="uniqueUsers">-</h3>
                 <p>Usuarios Únicos</p>
             </div>
             <div class="stat">
-                <h3 id="activeVersions">0</h3>
+                <h3 id="activeVersions">-</h3>
                 <p>Versiones Activas</p>
             </div>
             <div class="stat">
-                <h3 id="totalMods">0</h3>
-                <p>Mods Instalados</p>
+                <h3 id="totalMods">-</h3>
+                <p>Mods Totales</p>
             </div>
         </div>
 
-        <div class="recent-activity">
-            <h2>📊 Actividad Reciente</h2>
-            <div id="activityList">
-                <div class="activity-item">
-                    <div class="activity-time">Esperando datos...</div>
-                    <div>Sistema iniciado y listo para recibir telemetría</div>
+        <div class="activity">
+            <div class="activity-header">
+                <h2>Actividad Reciente</h2>
+            </div>
+            <div class="activity-list" id="activityList">
+                <div class="empty-state">
+                    <div class="icon">📊</div>
+                    <p>Esperando datos de telemetría...</p>
                 </div>
             </div>
         </div>
 
-        <div class="webhook-info">
-            <h3>🔗 Configuración Discord</h3>
-            <p>Los datos se envían automáticamente a Discord cuando se reciben nuevos lanzamientos.</p>
+        <div class="server-info">
+            <strong>Endpoint:</strong> <code>POST /telemetry</code><br>
+            <strong>Puerto:</strong> <code>3000</code><br>
+            <strong>Discord Webhook:</strong> Configurado ✓
         </div>
     </div>
 
     <script>
-        // Configuración del webhook de Discord
+        // Configuración
         const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1326623918664192114/-td-9pyBub9d7Fbki8o4f0Ifm3A-rG2EZ2WPYZ6ULjVahf3sHaGi-mipSyrxOzmFVx5_';
+        const WS_URL = 'ws://localhost:3001';
         
-        // Estadísticas en memoria
+        // Estado de la aplicación
         let stats = {
             totalLaunches: 0,
             uniqueUsers: new Set(),
@@ -213,129 +270,140 @@
             recentActivity: []
         };
 
-        // Función para mostrar estado
+        let ws = null;
+
+        // Funciones de utilidad
         function showStatus(message, type) {
             const statusEl = document.getElementById('status');
             statusEl.textContent = message;
-            statusEl.className = `status ${type}`;
-            statusEl.style.display = 'block';
+            statusEl.className = `status ${type} show`;
             
             setTimeout(() => {
-                statusEl.style.display = 'none';
+                statusEl.classList.remove('show');
             }, 3000);
         }
 
-        // Función para actualizar estadísticas en pantalla
-        function updateStatsDisplay() {
-            document.getElementById('totalLaunches').textContent = stats.totalLaunches;
-            document.getElementById('uniqueUsers').textContent = stats.uniqueUsers.size;
-            document.getElementById('activeVersions').textContent = stats.activeVersions.size;
-            document.getElementById('totalMods').textContent = stats.totalMods;
+        function updateStats() {
+            document.getElementById('totalLaunches').textContent = stats.totalLaunches.toLocaleString();
+            document.getElementById('uniqueUsers').textContent = stats.uniqueUsers.size.toLocaleString();
+            document.getElementById('activeVersions').textContent = stats.activeVersions.size.toLocaleString();
+            document.getElementById('totalMods').textContent = stats.totalMods.toLocaleString();
         }
 
-        // Función para agregar actividad reciente
-        function addRecentActivity(activity) {
-            stats.recentActivity.unshift(activity);
-            if (stats.recentActivity.length > 5) {
-                stats.recentActivity = stats.recentActivity.slice(0, 5);
-            }
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
             
+            if (diff < 60000) return 'Ahora';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h`;
+            return date.toLocaleDateString();
+        }
+
+        function addActivity(data) {
+            const activity = {
+                id: data.session_id,
+                timestamp: data.timestamp,
+                user: data.auth.username,
+                version: data.launch.version,
+                mods: data.mods.count,
+                system: `${data.system.platform} ${data.system.arch}`
+            };
+
+            stats.recentActivity.unshift(activity);
+            if (stats.recentActivity.length > 50) {
+                stats.recentActivity = stats.recentActivity.slice(0, 50);
+            }
+
+            renderActivity();
+        }
+
+        function renderActivity() {
             const activityList = document.getElementById('activityList');
+            
+            if (stats.recentActivity.length === 0) {
+                activityList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📊</div>
+                        <p>Sin actividad reciente</p>
+                    </div>
+                `;
+                return;
+            }
+
             activityList.innerHTML = stats.recentActivity.map(activity => `
                 <div class="activity-item">
-                    <div class="activity-time">${activity.time}</div>
-                    <div>${activity.message}</div>
+                    <div class="activity-info">
+                        <div class="activity-user">${activity.user}</div>
+                        <div class="activity-details">
+                            ${activity.version} • ${activity.mods} mods • ${activity.system}
+                        </div>
+                    </div>
+                    <div class="activity-time">${formatTime(activity.timestamp)}</div>
                 </div>
             `).join('');
         }
 
-        // Función para enviar a Discord
-        async function sendToDiscord(telemetryData) {
-            const embed = {
-                title: "🚀 Nuevo Lanzamiento de PixelPlay",
-                color: 0x4ECDC4,
-                timestamp: new Date().toISOString(),
-                thumbnail: {
-                    url: "https://cdn.discordapp.com/attachments/123456789/minecraft-icon.png"
-                },
-                fields: [
-                    {
-                        name: "👤 Usuario",
-                        value: `**${telemetryData.auth.username}**\n\`${telemetryData.auth.uuid}\``,
-                        inline: true
-                    },
-                    {
-                        name: "🎮 Versión",
-                        value: `**${telemetryData.launch.version}**`,
-                        inline: true
-                    },
-                    {
-                        name: "🔐 Autenticación",
-                        value: telemetryData.auth.type === 'microsoft' ? '✅ Microsoft' : '❌ Offline',
-                        inline: true
-                    },
-                    {
-                        name: "🧩 Mods Instalados",
-                        value: `**${telemetryData.mods.count}** mods\n(${(telemetryData.mods.totalSize / 1024 / 1024).toFixed(1)} MB)`,
-                        inline: true
-                    },
-                    {
-                        name: "📦 Versiones Disponibles",
-                        value: `**${telemetryData.minecraft.count}** versiones`,
-                        inline: true
-                    },
-                    {
-                        name: "💻 Sistema",
-                        value: `${telemetryData.system.platform} ${telemetryData.system.arch}\n${telemetryData.system.cpus} CPUs, ${telemetryData.system.totalMemory}GB RAM`,
-                        inline: true
-                    }
-                ],
-                footer: {
-                    text: `PixelPlay Launcher v${telemetryData.launcher.version} • Session: ${telemetryData.session_id.slice(0, 8)}`
-                }
-            };
-
-            // Agregar top mods si existen
-            if (telemetryData.mods.tree && telemetryData.mods.tree.length > 0) {
-                const topMods = telemetryData.mods.tree
-                    .slice(0, 5)
-                    .map(mod => `• ${mod.name} (${(mod.size / 1024 / 1024).toFixed(1)}MB)`)
-                    .join('\n');
-                
-                embed.fields.push({
-                    name: "🔧 Top Mods",
-                    value: topMods,
-                    inline: false
-                });
-            }
-
+        async function sendToDiscord(data) {
             try {
+                const embed = {
+                    title: "🚀 Nuevo Lanzamiento",
+                    color: 0x4ade80,
+                    timestamp: new Date().toISOString(),
+                    fields: [
+                        {
+                            name: "Usuario",
+                            value: `**${data.auth.username}**`,
+                            inline: true
+                        },
+                        {
+                            name: "Versión",
+                            value: `**${data.launch.version}**`,
+                            inline: true
+                        },
+                        {
+                            name: "Mods",
+                            value: `**${data.mods.count}**`,
+                            inline: true
+                        },
+                        {
+                            name: "Sistema",
+                            value: `${data.system.platform} ${data.system.arch}`,
+                            inline: true
+                        },
+                        {
+                            name: "Memoria",
+                            value: `${data.system.totalMemory}GB`,
+                            inline: true
+                        },
+                        {
+                            name: "Autenticación",
+                            value: data.auth.type === 'microsoft' ? '✅ Microsoft' : '❌ Offline',
+                            inline: true
+                        }
+                    ],
+                    footer: {
+                        text: `PixelPlay • ${data.session_id.slice(0, 8)}`
+                    }
+                };
+
                 const response = await fetch(DISCORD_WEBHOOK, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         embeds: [embed],
-                        username: "PixelPlay Telemetry",
-                        avatar_url: "https://cdn.discordapp.com/attachments/123456789/pixelplay-avatar.png"
+                        username: "PixelPlay Telemetry"
                     })
                 });
 
-                if (response.ok) {
-                    showStatus('✅ Enviado a Discord', 'success');
-                    return true;
-                } else {
-                    throw new Error(`HTTP ${response.status}`);
-                }
+                return response.ok;
             } catch (error) {
-                console.error('Error enviando a Discord:', error);
-                showStatus('❌ Error enviando a Discord', 'error');
+                console.error('Discord error:', error);
                 return false;
             }
         }
 
-        // Función para procesar telemetría recibida
         function processTelemetry(data) {
             // Actualizar estadísticas
             stats.totalLaunches++;
@@ -343,89 +411,76 @@
             stats.activeVersions.add(data.launch.version);
             stats.totalMods = Math.max(stats.totalMods, data.mods.count);
 
-            // Agregar actividad reciente
-            const time = new Date().toLocaleTimeString();
-            const activity = {
-                time: time,
-                message: `${data.auth.username} lanzó ${data.launch.version} con ${data.mods.count} mods`
-            };
-            addRecentActivity(activity);
-
-            // Actualizar display
-            updateStatsDisplay();
-            
-            // Animación de pulso
-            document.querySelector('.container').classList.add('pulse');
-            setTimeout(() => {
-                document.querySelector('.container').classList.remove('pulse');
-            }, 500);
+            // Actualizar interfaz
+            updateStats();
+            addActivity(data);
 
             // Enviar a Discord
-            sendToDiscord(data);
+            sendToDiscord(data).then(success => {
+                showStatus(
+                    success ? '✅ Enviado a Discord' : '❌ Error Discord', 
+                    success ? 'success' : 'error'
+                );
+            });
+
+            showStatus('📊 Datos recibidos', 'success');
         }
 
-        // Simular endpoint para recibir datos (en producción esto sería un servidor real)
-        // Para desarrollo, puedes usar este endpoint simulado
-        function simulateIncomingData() {
-            const sampleData = {
-                timestamp: new Date().toISOString(),
-                session_id: "abc123def456",
-                launcher: {
-                    name: "PixelPlay",
-                    version: "3.0.0"
-                },
-                auth: {
-                    type: "microsoft",
-                    uuid: "550e8400-e29b-41d4-a716-446655440000",
-                    username: "TestUser",
-                    authenticated: true
-                },
-                system: {
-                    platform: "win32",
-                    arch: "x64",
-                    release: "10.0.19042",
-                    cpus: 8,
-                    totalMemory: 16,
-                    machineId: "test-machine-123"
-                },
-                minecraft: {
-                    count: 5,
-                    versions: ["forge-1.20.1", "vanilla-1.19.4", "fabric-1.20.1"]
-                },
-                mods: {
-                    exists: true,
-                    count: 127,
-                    totalSize: 268435456,
-                    tree: [
-                        {name: "JEI-1.20.1.jar", size: 2048576, hash: "abc123"},
-                        {name: "OptiFine-1.20.1.jar", size: 4096768, hash: "def456"},
-                        {name: "JourneyMap-1.20.1.jar", size: 3072384, hash: "ghi789"}
-                    ]
-                },
-                launch: {
-                    version: "forge-1.20.1",
-                    timestamp: new Date().toISOString()
+        // Conexión WebSocket
+        function connectWebSocket() {
+            try {
+                ws = new WebSocket(WS_URL);
+                
+                ws.onopen = () => {
+                    console.log('📡 Conectado al servidor de telemetría');
+                    showStatus('🔗 Conectado', 'success');
+                };
+                
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'telemetry') {
+                            processTelemetry(data.payload);
+                        }
+                    } catch (error) {
+                        console.error('Error procesando mensaje:', error);
+                    }
+                };
+                
+                ws.onclose = () => {
+                    console.log('🔌 Desconectado del servidor');
+                    showStatus('🔌 Desconectado', 'error');
+                    
+                    // Reintento de conexión
+                    setTimeout(connectWebSocket, 5000);
+                };
+                
+                ws.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    showStatus('❌ Error de conexión', 'error');
+                };
+                
+            } catch (error) {
+                console.error('Error conectando WebSocket:', error);
+                showStatus('❌ Sin servidor', 'error');
+                setTimeout(connectWebSocket, 5000);
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStats();
+            connectWebSocket();
+            
+            // Actualizar tiempos cada minuto
+            setInterval(() => {
+                if (stats.recentActivity.length > 0) {
+                    renderActivity();
                 }
-            };
+            }, 60000);
+        });
 
-            processTelemetry(sampleData);
-        }
-
-        // Para pruebas - eliminar en producción
-        setTimeout(() => {
-            showStatus('🔄 Datos de prueba cargados', 'success');
-            simulateIncomingData();
-        }, 2000);
-
-        // En un servidor real, aquí estaría el endpoint POST
-        // app.post('/info-client', (req, res) => {
-        //     processTelemetry(req.body);
-        //     res.json({ success: true });
-        // });
-
-        console.log('🚀 PixelPlay Telemetry Dashboard iniciado');
-        console.log('📡 Esperando datos de telemetría...');
-        console.log('🔗 Discord webhook configurado');
+        console.log('🚀 PixelPlay Dashboard iniciado');
     </script>
 </body>
 </html>
