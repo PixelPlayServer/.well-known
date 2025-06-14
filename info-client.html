@@ -76,7 +76,7 @@
             50% { opacity: 0.5; }
         }
 
-        .config-section {
+        .url-info {
             background: #1a1a1a;
             border: 1px solid #333;
             border-radius: 8px;
@@ -84,38 +84,21 @@
             margin-bottom: 30px;
         }
 
-        .config-section h3 {
-            color: #ffffff;
+        .url-info h3 {
+            color: #4ade80;
             margin-bottom: 16px;
             font-size: 1.1rem;
         }
 
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        .input-group label {
-            display: block;
-            color: #888;
-            font-size: 0.85rem;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 12px;
+        .url-code {
             background: #2a2a2a;
-            border: 1px solid #444;
+            padding: 12px;
             border-radius: 6px;
-            color: #ffffff;
-            font-size: 0.9rem;
-        }
-
-        .input-group input:focus, .input-group select:focus {
-            outline: none;
-            border-color: #4ade80;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #4ade80;
+            word-break: break-all;
+            margin-bottom: 12px;
         }
 
         .btn {
@@ -140,6 +123,15 @@
             color: #888;
             cursor: not-allowed;
             transform: none;
+        }
+
+        .btn.secondary {
+            background: #374151;
+            color: #e5e7eb;
+        }
+
+        .btn.secondary:hover {
+            background: #4b5563;
         }
 
         .stats {
@@ -340,36 +332,24 @@
     <div class="container">
         <div class="header">
             <h1>PixelPlay Telemetry Dashboard</h1>
-            <p>Monitor de lanzamientos en tiempo real</p>
+            <p>Receptor automático de datos via URL</p>
         </div>
 
         <div class="connection-status">
             <div class="status-indicator" id="statusIndicator"></div>
-            <span id="connectionText">Configurando conexión...</span>
+            <span id="connectionText">Inicializando receptor...</span>
         </div>
 
-        <div class="config-section">
-            <h3>🔧 Configuración de Conexión</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-                <div class="input-group">
-                    <label for="connectionType">Tipo de Conexión</label>
-                    <select id="connectionType" onchange="toggleConnectionConfig()">
-                        <option value="webhook">Webhook Público</option>
-                        <option value="api">API REST Pública</option>
-                        <option value="discord">Solo Discord</option>
-                        <option value="manual">Manual/Archivo</option>
-                    </select>
-                </div>
-                <div class="input-group" id="urlGroup">
-                    <label for="serverUrl">URL del Servidor</label>
-                    <input type="url" id="serverUrl" placeholder="https://tu-servidor.com/api/telemetry">
-                </div>
+        <div class="url-info">
+            <h3>🔗 URL del Endpoint</h3>
+            <div class="url-code" id="endpointUrl">
+                https://pixelplay.gg/info-client?data=DATOS_CODIFICADOS_BASE64
             </div>
-            <div class="input-group">
-                <label for="discordWebhook">Discord Webhook (Opcional)</label>
-                <input type="url" id="discordWebhook" placeholder="https://discord.com/api/webhooks/...">
-            </div>
-            <button class="btn" onclick="testConnection()">🔍 Probar Conexión</button>
+            <p style="color: #888; font-size: 0.85rem; margin-bottom: 12px;">
+                Esta página detecta automáticamente datos en la URL y los envía a Discord
+            </p>
+            <button class="btn secondary" onclick="copyEndpoint()">📋 Copiar URL Base</button>
+            <button class="btn" onclick="testWithSampleData()">🧪 Probar con Datos de Ejemplo</button>
         </div>
 
         <div class="stats">
@@ -394,8 +374,8 @@
         <div class="activity">
             <div class="activity-header">
                 <h2>Actividad Reciente</h2>
-                <button class="btn" onclick="refreshData()" style="padding: 8px 16px; font-size: 0.8rem;">
-                    🔄 Actualizar
+                <button class="btn" onclick="clearActivity()" style="padding: 8px 16px; font-size: 0.8rem;">
+                    🗑️ Limpiar
                 </button>
             </div>
             <div class="activity-list" id="activityList">
@@ -407,24 +387,27 @@
         </div>
 
         <div class="instructions">
-            <h4>📋 Instrucciones de Configuración</h4>
+            <h4>📋 Cómo Funciona</h4>
             <ul>
-                <li><strong>Webhook Público:</strong> Usa servicios como <code>webhook.site</code> o <code>ngrok</code> para exponer tu servidor local</li>
-                <li><strong>API REST Pública:</strong> Conecta a un servidor público que reciba los datos de telemetría</li>
-                <li><strong>Solo Discord:</strong> Los datos se enviarán únicamente a Discord (requiere webhook válido)</li>
-                <li><strong>Manual:</strong> Carga datos desde un archivo JSON o ingresa datos manualmente</li>
+                <li><strong>Detección Automática:</strong> La página detecta parámetros <code>data</code> en la URL</li>
+                <li><strong>Decodificación:</strong> Los datos deben estar codificados en Base64 en el parámetro <code>data</code></li>
+                <li><strong>Envío a Discord:</strong> Automáticamente envía los datos decodificados al webhook configurado</li>
+                <li><strong>Formato:</strong> <code>?data=eyJ0aW1lc3RhbXAiOiIyMDI0LTA2LTEzVDEwOjAwOjAwWiJ9</code></li>
             </ul>
             <br>
-            <h4>🔧 Modificaciones Necesarias en el Script</h4>
+            <h4>🔧 Configuración del Launcher</h4>
             <ul>
-                <li>Cambiar el endpoint en <code>TelemetryService</code> por la URL pública configurada aquí</li>
-                <li>Agregar headers CORS si usas tu propio servidor: <code>Access-Control-Allow-Origin: *</code></li>
-                <li>Considerar usar servicios como Railway, Render, o Vercel para deployar un servidor simple</li>
+                <li>Modificar el endpoint en <code>TelemetryService</code> a: <code>https://pixelplay.gg/info-client</code></li>
+                <li>Los datos se enviarán como parámetro GET codificado en Base64</li>
+                <li>El webhook de Discord está preconfigurado y funcionará automáticamente</li>
             </ul>
         </div>
     </div>
 
     <script>
+        // Configuración del webhook de Discord
+        const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1326623918664192114/-td-9pyBub9d7Fbki8o4f0Ifm3A-rG2EZ2WPYZ6ULjVahf3sHaGi-mipSyrxOzmFVx5_';
+
         // Estado de la aplicación
         let stats = {
             totalLaunches: 0,
@@ -433,39 +416,6 @@
             totalMods: 0,
             recentActivity: []
         };
-
-        let connectionConfig = {
-            type: 'webhook',
-            url: '',
-            discordWebhook: '',
-            polling: null
-        };
-
-        // Cargar configuración guardada
-        function loadConfig() {
-            const saved = localStorage.getItem('pixelplay-config');
-            if (saved) {
-                try {
-                    const config = JSON.parse(saved);
-                    connectionConfig = { ...connectionConfig, ...config };
-                    document.getElementById('connectionType').value = config.type || 'webhook';
-                    document.getElementById('serverUrl').value = config.url || '';
-                    document.getElementById('discordWebhook').value = config.discordWebhook || '';
-                    toggleConnectionConfig();
-                } catch (e) {
-                    console.warn('Error cargando configuración:', e);
-                }
-            }
-        }
-
-        // Guardar configuración
-        function saveConfig() {
-            connectionConfig.type = document.getElementById('connectionType').value;
-            connectionConfig.url = document.getElementById('serverUrl').value;
-            connectionConfig.discordWebhook = document.getElementById('discordWebhook').value;
-            
-            localStorage.setItem('pixelplay-config', JSON.stringify(connectionConfig));
-        }
 
         // Funciones de utilidad
         function showStatus(message, type) {
@@ -484,19 +434,6 @@
             
             indicator.className = `status-indicator ${status}`;
             textEl.textContent = text;
-        }
-
-        function toggleConnectionConfig() {
-            const type = document.getElementById('connectionType').value;
-            const urlGroup = document.getElementById('urlGroup');
-            
-            if (type === 'discord' || type === 'manual') {
-                urlGroup.style.display = 'none';
-            } else {
-                urlGroup.style.display = 'block';
-            }
-            
-            updateConnectionStatus('connecting', 'Configuración actualizada');
         }
 
         function updateStats() {
@@ -562,68 +499,90 @@
         }
 
         async function sendToDiscord(data) {
-            const webhook = connectionConfig.discordWebhook;
-            if (!webhook) return false;
-
             try {
                 const embed = {
-                    title: "🚀 Nuevo Lanzamiento",
+                    title: "🚀 Nuevo Lanzamiento - PixelPlay",
                     color: 0x4ade80,
                     timestamp: new Date().toISOString(),
+                    thumbnail: {
+                        url: "https://minecraft.wiki/images/2/2d/Plains_Grass_Block.png"
+                    },
                     fields: [
                         {
-                            name: "Usuario",
+                            name: "👤 Usuario",
                             value: `**${data.auth?.username || 'N/A'}**`,
                             inline: true
                         },
                         {
-                            name: "Versión",
+                            name: "🎮 Versión",
                             value: `**${data.launch?.version || 'N/A'}**`,
                             inline: true
                         },
                         {
-                            name: "Mods",
+                            name: "🔧 Mods",
                             value: `**${data.mods?.count || 0}**`,
                             inline: true
                         },
                         {
-                            name: "Sistema",
+                            name: "💻 Sistema",
                             value: `${data.system?.platform || 'unknown'} ${data.system?.arch || ''}`,
                             inline: true
                         },
                         {
-                            name: "Memoria",
+                            name: "🧠 Memoria",
                             value: `${data.system?.totalMemory || 0}GB`,
                             inline: true
                         },
                         {
-                            name: "Autenticación",
+                            name: "🔐 Auth",
                             value: data.auth?.type === 'microsoft' ? '✅ Microsoft' : '❌ Offline',
                             inline: true
                         }
                     ],
                     footer: {
-                        text: `PixelPlay • ${(data.session_id || 'unknown').slice(0, 8)}`
+                        text: `PixelPlay Launcher • ${(data.session_id || 'unknown').slice(-8)}`,
+                        icon_url: "https://cdn.discordapp.com/emojis/1234567890123456789.png"
                     }
                 };
 
-                const response = await fetch(webhook, {
+                // Agregar información adicional si está disponible
+                if (data.mods?.tree && data.mods.tree.length > 0) {
+                    const modList = data.mods.tree.slice(0, 5).map(mod => `• ${mod.name}`).join('\n');
+                    const moreText = data.mods.tree.length > 5 ? `\n... y ${data.mods.tree.length - 5} más` : '';
+                    
+                    embed.fields.push({
+                        name: "📦 Mods Principales",
+                        value: `\`\`\`${modList}${moreText}\`\`\``,
+                        inline: false
+                    });
+                }
+
+                const response = await fetch(DISCORD_WEBHOOK, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         embeds: [embed],
-                        username: "PixelPlay Telemetry"
+                        username: "PixelPlay Telemetry",
+                        avatar_url: "https://minecraft.wiki/images/2/2d/Plains_Grass_Block.png"
                     })
                 });
 
-                return response.ok;
+                if (response.ok) {
+                    console.log('✅ Datos enviados a Discord correctamente');
+                    return true;
+                } else {
+                    console.error('❌ Error enviando a Discord:', response.status);
+                    return false;
+                }
             } catch (error) {
-                console.error('Discord error:', error);
+                console.error('❌ Error enviando a Discord:', error);
                 return false;
             }
         }
 
         function processTelemetry(data) {
+            console.log('📊 Procesando datos de telemetría:', data);
+
             // Actualizar estadísticas
             stats.totalLaunches++;
             if (data.auth?.uuid) {
@@ -640,139 +599,124 @@
             updateStats();
             addActivity(data);
 
-            // Enviar a Discord si está configurado
-            if (connectionConfig.discordWebhook) {
-                sendToDiscord(data).then(success => {
-                    if (success) {
-                        showStatus('✅ Enviado a Discord', 'success');
-                    }
-                });
-            }
-
-            showStatus('📊 Datos procesados', 'success');
-            updateConnectionStatus('connected', 'Recibiendo datos');
-        }
-
-        async function testConnection() {
-            saveConfig();
-            
-            const type = connectionConfig.type;
-            const url = connectionConfig.url;
-            
-            updateConnectionStatus('connecting', 'Probando conexión...');
-            
-            try {
-                if (type === 'discord') {
-                    if (!connectionConfig.discordWebhook) {
-                        throw new Error('Discord webhook requerido');
-                    }
-                    
-                    const testData = {
-                        session_id: 'test-connection',
-                        timestamp: new Date().toISOString(),
-                        auth: { username: 'Test User', type: 'offline', uuid: 'test-uuid' },
-                        launch: { version: 'Test Version' },
-                        mods: { count: 5 },
-                        system: { platform: 'test', arch: 'x64', totalMemory: 8 }
-                    };
-                    
-                    const success = await sendToDiscord(testData);
-                    if (success) {
-                        updateConnectionStatus('connected', 'Discord conectado ✓');
-                        showStatus('✅ Conexión a Discord exitosa', 'success');
-                    } else {
-                        throw new Error('Error enviando a Discord');
-                    }
-                } else if (type === 'manual') {
-                    updateConnectionStatus('connected', 'Modo manual activo');
-                    showStatus('📝 Modo manual configurado', 'success');
-                } else if (url) {
-                    const response = await fetch(url, { 
-                        method: 'OPTIONS',
-                        headers: { 'Origin': window.location.origin }
-                    });
-                    
-                    updateConnectionStatus('connected', 'Servidor conectado ✓');
-                    showStatus('✅ Conexión exitosa', 'success');
-                    startPolling();
+            // Enviar a Discord
+            sendToDiscord(data).then(success => {
+                if (success) {
+                    showStatus('✅ Enviado a Discord correctamente', 'success');
+                    updateConnectionStatus('connected', 'Datos enviados a Discord ✓');
                 } else {
-                    throw new Error('URL requerida');
+                    showStatus('❌ Error enviando a Discord', 'error');
+                    updateConnectionStatus('error', 'Error enviando a Discord');
                 }
-            } catch (error) {
-                console.error('Error de conexión:', error);
-                updateConnectionStatus('error', 'Error de conexión');
-                showStatus(`❌ Error: ${error.message}`, 'error');
-            }
+            });
+
+            showStatus('📊 Datos procesados correctamente', 'success');
         }
 
-        async function refreshData() {
-            if (connectionConfig.type === 'api' && connectionConfig.url) {
-                try {
-                    const response = await fetch(connectionConfig.url);
-                    const data = await response.json();
-                    
-                    if (Array.isArray(data)) {
-                        data.forEach(processTelemetry);
-                    } else if (data.launches) {
-                        data.launches.forEach(processTelemetry);
-                    } else {
-                        processTelemetry(data);
-                    }
-                    
-                    showStatus('🔄 Datos actualizados', 'success');
-                } catch (error) {
-                    showStatus('❌ Error al actualizar', 'error');
-                }
-            }
-        }
-
-        function startPolling() {
-            if (connectionConfig.polling) {
-                clearInterval(connectionConfig.polling);
-            }
+        // Detectar y procesar datos de la URL
+        function checkUrlForData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const encodedData = urlParams.get('data');
             
-            if (connectionConfig.type === 'api' && connectionConfig.url) {
-                connectionConfig.polling = setInterval(refreshData, 30000); // Poll cada 30 segundos
+            if (encodedData) {
+                try {
+                    console.log('🔍 Datos detectados en URL, decodificando...');
+                    updateConnectionStatus('connecting', 'Procesando datos de URL...');
+                    
+                    // Decodificar datos de Base64
+                    const decodedData = atob(encodedData);
+                    const data = JSON.parse(decodedData);
+                    
+                    console.log('✅ Datos decodificados correctamente:', data);
+                    processTelemetry(data);
+                    
+                    // Limpiar URL sin recargar la página
+                    const cleanUrl = window.location.href.split('?')[0];
+                    window.history.replaceState({}, document.title, cleanUrl);
+                    
+                } catch (error) {
+                    console.error('❌ Error decodificando datos:', error);
+                    showStatus('❌ Error decodificando datos de URL', 'error');
+                    updateConnectionStatus('error', 'Error decodificando datos');
+                }
+            } else {
+                updateConnectionStatus('connected', 'Esperando datos...');
             }
         }
 
-        // Simular datos para demostración
-        function addDemoData() {
-            const demoData = {
-                session_id: 'demo-' + Date.now(),
+        function copyEndpoint() {
+            const baseUrl = window.location.href.split('?')[0];
+            navigator.clipboard.writeText(baseUrl).then(() => {
+                showStatus('📋 URL copiada al portapapeles', 'success');
+            }).catch(() => {
+                showStatus('❌ Error copiando URL', 'error');
+            });
+        }
+
+        function testWithSampleData() {
+            const sampleData = {
                 timestamp: new Date().toISOString(),
+                session_id: 'test-' + Date.now(),
+                launcher: {
+                    name: 'PixelPlay',
+                    version: '3.0.0'
+                },
                 auth: {
-                    username: 'DemoPlayer',
                     type: 'microsoft',
-                    uuid: 'demo-uuid-123'
-                },
-                launch: {
-                    version: 'PixelPlay-Demo-1.20.1'
-                },
-                mods: {
-                    count: Math.floor(Math.random() * 50) + 1
+                    uuid: 'test-uuid-' + Math.floor(Math.random() * 1000),
+                    username: 'TestPlayer',
+                    authenticated: true
                 },
                 system: {
                     platform: 'win32',
                     arch: 'x64',
-                    totalMemory: 16
+                    release: '10.0.19043',
+                    cpus: 8,
+                    totalMemory: 16,
+                    machineId: 'test-machine'
+                },
+                minecraft: {
+                    count: 3,
+                    versions: [
+                        { id: 'PixelPlay-3.0.0', type: 'release' },
+                        { id: '1.20.1', type: 'release' },
+                        { id: 'fabric-loader-0.15.11-1.20.1', type: 'release' }
+                    ]
+                },
+                mods: {
+                    exists: true,
+                    count: 15,
+                    totalSize: 52428800,
+                    tree: [
+                        { name: 'fabric-api-0.92.2.jar', size: 1048576 },
+                        { name: 'jei-1.20.1-15.2.0.27.jar', size: 2097152 },
+                        { name: 'optifine-1.20.1.jar', size: 3145728 },
+                        { name: 'worldedit-mod-7.2.15.jar', size: 4194304 },
+                        { name: 'tinkers-construct-3.7.1.jar', size: 5242880 }
+                    ]
+                },
+                launch: {
+                    version: 'PixelPlay-3.0.0',
+                    timestamp: new Date().toISOString()
                 }
             };
-            
-            processTelemetry(demoData);
+
+            console.log('🧪 Probando con datos de ejemplo');
+            processTelemetry(sampleData);
+        }
+
+        function clearActivity() {
+            stats.recentActivity = [];
+            renderActivity();
+            showStatus('🗑️ Actividad limpiada', 'warning');
         }
 
         // Inicializar
         document.addEventListener('DOMContentLoaded', () => {
-            loadConfig();
-            updateStats();
-            toggleConnectionConfig();
+            console.log('🚀 PixelPlay Dashboard iniciado');
             
-            // Agregar datos de demostración
-            setTimeout(() => {
-                addDemoData();
-                showStatus('📊 Datos de demostración agregados', 'warning');
-            }, 2000);
+            updateStats();
+            checkUrlForData();
             
             // Actualizar tiempos cada minuto
             setInterval(() => {
@@ -782,12 +726,11 @@
             }, 60000);
         });
 
-        // Exponer función global para testing
+        // Exponer funciones globales
         window.processTelemetry = processTelemetry;
-        window.addDemoData = addDemoData;
+        window.testWithSampleData = testWithSampleData;
 
-        console.log('🚀 PixelPlay Dashboard iniciado');
-        console.log('💡 Usa addDemoData() para agregar datos de prueba');
+        console.log('💡 Usa testWithSampleData() para probar el envío a Discord');
         console.log('💡 Usa processTelemetry(data) para procesar datos manualmente');
     </script>
 </body>
