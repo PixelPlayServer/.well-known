@@ -1,6 +1,7 @@
 /**
  * PixelPlay Downloads Manager
  * Gestor de descargas para el launcher de PixelPlay con soporte multi-plataforma
+ * Soporta archivos locales y en la nube
  */
 
 class DownloadManager {
@@ -26,7 +27,7 @@ class DownloadManager {
         } else if (/Win/.test(userAgent) || /Win/.test(platform)) {
             return 'windows';
         } else if (/Linux/.test(userAgent) || /Linux/.test(platform)) {
-            return 'linux'; // No soportado pero detectado
+            return 'linux';
         } else {
             return 'unknown';
         }
@@ -82,9 +83,20 @@ class DownloadManager {
             return null;
         }
         
+        // Determinar la URL según el tipo de archivo
+        let downloadUrl;
+        if (osDownload.type === 'cloud' && osDownload.cloudUrl) {
+            downloadUrl = osDownload.cloudUrl;
+        } else if (osDownload.type === 'local') {
+            downloadUrl = `${this.downloadPath}${osDownload.filename}`;
+        } else {
+            console.error('Configuración de descarga inválida para', this.userOS);
+            return null;
+        }
+        
         return {
             ...osDownload,
-            url: `${this.downloadPath}${osDownload.filename}`,
+            url: downloadUrl,
             version: this.downloadInfo.version,
             releaseDate: this.downloadInfo.releaseDate
         };
@@ -113,21 +125,37 @@ class DownloadManager {
         // Actualizar botón de descarga
         const downloadBtn = document.getElementById('downloadBtn');
         if (downloadBtn) {
-            const osName = this.userOS === 'mac' ? 'macOS' : 'Windows';
-            const osIcon = this.userOS === 'mac' ? '🍎' : '🪟';
+            const osInfo = this.getOSDisplayInfo();
+            const fileTypeIcon = currentDownload.type === 'cloud' ? '☁️' : '💾';
             
             downloadBtn.innerHTML = `
                 <span class="download-icon">⬇️</span>
-                Descargar para ${osName} ${osIcon}
-                <span class="download-size">(${currentDownload.size})</span>
+                Descargar para ${osInfo.name} ${osInfo.icon}
+                <span class="download-size">(${currentDownload.size}) ${fileTypeIcon}</span>
             `;
         }
         
         // Actualizar información de requisitos
         this.updateSystemRequirements(currentDownload);
         
-        // Mostrar información de versión
+        // Mostrar información de versión y tipo de archivo
         this.showVersionInfo();
+    }
+    
+    /**
+     * Obtiene información de visualización del OS
+     */
+    getOSDisplayInfo() {
+        switch (this.userOS) {
+            case 'mac':
+                return { name: 'macOS', icon: '🍎' };
+            case 'windows':
+                return { name: 'Windows', icon: '🪟' };
+            case 'linux':
+                return { name: 'Linux', icon: '🐧' };
+            default:
+                return { name: 'Sistema', icon: '💻' };
+        }
     }
     
     /**
@@ -138,6 +166,7 @@ class DownloadManager {
         if (requirementsCard && this.downloadInfo) {
             const osSpecificReqs = downloadInfo.compatible.join(', ');
             const archInfo = downloadInfo.architecture.join(' / ');
+            const fileTypeText = downloadInfo.type === 'cloud' ? 'Archivo en la nube' : 'Archivo local';
             
             requirementsCard.innerHTML = `
                 <li>Minecraft Java Edition</li>
@@ -146,21 +175,28 @@ class DownloadManager {
                 <li>${this.downloadInfo.requirements.storage}</li>
                 <li>Sistemas: ${osSpecificReqs}</li>
                 <li>Arquitectura: ${archInfo}</li>
+                <li>Tipo: ${fileTypeText}</li>
             `;
         }
     }
     
     /**
-     * Muestra información de versión
+     * Muestra información de versión y tipo de archivo
      */
     showVersionInfo() {
         if (!this.downloadInfo) return;
         
+        const currentDownload = this.getCurrentOSDownload();
         const statusDiv = document.getElementById('downloadStatus');
-        if (statusDiv) {
+        
+        if (statusDiv && currentDownload) {
+            const fileTypeIcon = currentDownload.type === 'cloud' ? '☁️' : '💾';
+            const fileTypeText = currentDownload.type === 'cloud' ? 'Cloud' : 'Local';
+            
             statusDiv.innerHTML = `
                 <div class="version-info">
-                    📦 Versión ${this.downloadInfo.version} | 📅 ${this.downloadInfo.releaseDate}
+                    📦 Versión ${this.downloadInfo.version} | 📅 ${this.downloadInfo.releaseDate}<br>
+                    ${fileTypeIcon} Archivo ${fileTypeText} | 📏 ${currentDownload.size}
                 </div>
             `;
         }
@@ -184,12 +220,18 @@ class DownloadManager {
         }
         
         if (statusDiv) {
-            const supportedSystems = Object.keys(this.downloadInfo?.downloads || {}).join(', ');
+            const supportedSystems = Object.keys(this.downloadInfo?.downloads || {})
+                .map(os => {
+                    const osInfo = this.getOSDisplayInfo.call({userOS: os});
+                    return `${osInfo.name} ${osInfo.icon}`;
+                })
+                .join(', ');
+                
             statusDiv.innerHTML = `
                 <div class="error-message">
-                    ⚠️ Lo sentimos, tu sistema operativo (${this.userOS}) no está soportado actualmente.<br>
+                    ⚠️ Lo sentimos, tu sistema operativo no está soportado actualmente.<br>
                     <small>Sistemas soportados: ${supportedSystems}</small><br>
-                    <small>¿Usas Linux? Puedes intentar ejecutar la versión de Windows con Wine.</small>
+                    <small>¿Usas Linux? Ahora tenemos soporte experimental.</small>
                 </div>
             `;
         }
@@ -206,11 +248,18 @@ class DownloadManager {
         }
         
         try {
-            const response = await fetch(currentDownload.url, { 
-                method: 'HEAD' 
-            });
+            let isAvailable = false;
             
-            if (response.ok) {
+            if (currentDownload.type === 'cloud') {
+                // Para archivos cloud, verificamos con un método más específico
+                isAvailable = await this.checkCloudFileAvailability(currentDownload);
+            } else {
+                // Para archivos locales, verificamos con HEAD request
+                const response = await fetch(currentDownload.url, { method: 'HEAD' });
+                isAvailable = response.ok;
+            }
+            
+            if (isAvailable) {
                 this.enableDownloadButton();
                 console.log('Archivo de descarga disponible:', currentDownload.filename);
             } else {
@@ -220,6 +269,31 @@ class DownloadManager {
         } catch (error) {
             this.disableDownloadButton('Error de conexión');
             console.error('Error verificando disponibilidad:', error);
+        }
+    }
+    
+    /**
+     * Verifica disponibilidad de archivos en la nube
+     */
+    async checkCloudFileAvailability(downloadInfo) {
+        try {
+            // Para Google Drive, GitHub releases, etc., usamos un método diferente
+            if (downloadInfo.cloudUrl.includes('drive.google.com')) {
+                // Para Google Drive, asumimos que está disponible si la URL es válida
+                // En producción, podrías implementar una verificación más robusta
+                return downloadInfo.cloudUrl.includes('uc?export=download');
+            } else if (downloadInfo.cloudUrl.includes('github.com')) {
+                // Para GitHub releases
+                const response = await fetch(downloadInfo.cloudUrl, { method: 'HEAD' });
+                return response.ok;
+            } else {
+                // Para otros servicios cloud
+                const response = await fetch(downloadInfo.cloudUrl, { method: 'HEAD' });
+                return response.ok;
+            }
+        } catch (error) {
+            console.warn('No se pudo verificar archivo cloud:', error);
+            return true; // Asumimos que está disponible si no podemos verificar
         }
     }
     
@@ -279,18 +353,21 @@ class DownloadManager {
             // Cambiar estado del botón
             if (downloadBtn) {
                 downloadBtn.disabled = true;
-                const osName = this.userOS === 'mac' ? 'macOS' : 'Windows';
+                const osInfo = this.getOSDisplayInfo();
+                const fileTypeIcon = currentDownload.type === 'cloud' ? '☁️' : '💾';
+                
                 downloadBtn.innerHTML = `
                     <span class="download-icon">⏳</span>
-                    Preparando descarga para ${osName}...
+                    Preparando descarga para ${osInfo.name}... ${fileTypeIcon}
                 `;
             }
             
             // Mostrar estado de preparación
             if (statusDiv) {
+                const fileTypeText = currentDownload.type === 'cloud' ? 'desde la nube' : 'local';
                 statusDiv.innerHTML = `
                     <div class="preparing-message">
-                        🔄 Preparando descarga de ${currentDownload.filename}...<br>
+                        🔄 Preparando descarga ${fileTypeText} de ${currentDownload.filename}...<br>
                         <small>Verificando integridad del archivo...</small>
                     </div>
                 `;
@@ -346,8 +423,12 @@ class DownloadManager {
      */
     async verifyFileIntegrity(downloadInfo) {
         try {
-            const response = await fetch(downloadInfo.url, { method: 'HEAD' });
-            return response.ok && response.headers.get('content-length');
+            if (downloadInfo.type === 'cloud') {
+                return await this.checkCloudFileAvailability(downloadInfo);
+            } else {
+                const response = await fetch(downloadInfo.url, { method: 'HEAD' });
+                return response.ok && response.headers.get('content-length');
+            }
         } catch (error) {
             console.error('Error verificando integridad:', error);
             return false;
@@ -359,22 +440,28 @@ class DownloadManager {
      */
     async initiateDownload(downloadInfo) {
         try {
-            // Crear elemento de descarga
-            const link = document.createElement('a');
-            link.href = downloadInfo.url;
-            link.download = downloadInfo.filename;
-            link.style.display = 'none';
-            
-            // Agregar al DOM y hacer clic
-            document.body.appendChild(link);
-            link.click();
-            
-            // Limpiar
-            setTimeout(() => {
-                document.body.removeChild(link);
-            }, 100);
-            
-            return true;
+            if (downloadInfo.type === 'cloud' && downloadInfo.cloudUrl.includes('drive.google.com')) {
+                // Para Google Drive, abrimos en nueva ventana
+                window.open(downloadInfo.cloudUrl, '_blank');
+                return true;
+            } else {
+                // Para otros tipos de descarga, usar método tradicional
+                const link = document.createElement('a');
+                link.href = downloadInfo.url;
+                link.download = downloadInfo.filename;
+                link.style.display = 'none';
+                
+                // Agregar al DOM y hacer clic
+                document.body.appendChild(link);
+                link.click();
+                
+                // Limpiar
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                }, 100);
+                
+                return true;
+            }
         } catch (error) {
             console.error('Error iniciando descarga:', error);
             return false;
@@ -387,15 +474,29 @@ class DownloadManager {
     showSuccessMessage(downloadInfo) {
         const statusDiv = document.getElementById('downloadStatus');
         if (statusDiv) {
-            const osName = this.userOS === 'mac' ? 'macOS' : 'Windows';
-            const installInstructions = this.userOS === 'mac' 
-                ? 'Abre el archivo .dmg y arrastra PixelPlay a Aplicaciones'
-                : 'Ejecuta el archivo .exe como administrador para instalar';
+            const osInfo = this.getOSDisplayInfo();
+            const fileTypeIcon = downloadInfo.type === 'cloud' ? '☁️' : '💾';
+            const fileTypeText = downloadInfo.type === 'cloud' ? 'cloud' : 'local';
+            
+            let installInstructions;
+            switch (this.userOS) {
+                case 'mac':
+                    installInstructions = 'Abre el archivo .dmg y arrastra PixelPlay a Aplicaciones';
+                    break;
+                case 'windows':
+                    installInstructions = 'Ejecuta el archivo .exe como administrador para instalar';
+                    break;
+                case 'linux':
+                    installInstructions = 'Haz el archivo .AppImage ejecutable y ejecútalo';
+                    break;
+                default:
+                    installInstructions = 'Sigue las instrucciones de instalación del sistema';
+            }
                 
             statusDiv.innerHTML = `
                 <div class="success-message">
-                    ✅ ¡Descarga iniciada correctamente!<br>
-                    <small>Descargando: ${downloadInfo.filename} (${downloadInfo.size})</small><br>
+                    ✅ ¡Descarga iniciada correctamente! ${fileTypeIcon}<br>
+                    <small>Descargando: ${downloadInfo.filename} (${downloadInfo.size}) - Archivo ${fileTypeText}</small><br>
                     <small><strong>Instalación:</strong> ${installInstructions}</small>
                 </div>
             `;
@@ -427,13 +528,13 @@ class DownloadManager {
             const currentDownload = this.getCurrentOSDownload();
             if (currentDownload) {
                 downloadBtn.disabled = false;
-                const osName = this.userOS === 'mac' ? 'macOS' : 'Windows';
-                const osIcon = this.userOS === 'mac' ? '🍎' : '🪟';
+                const osInfo = this.getOSDisplayInfo();
+                const fileTypeIcon = currentDownload.type === 'cloud' ? '☁️' : '💾';
                 
                 downloadBtn.innerHTML = `
                     <span class="download-icon">⬇️</span>
-                    Descargar para ${osName} ${osIcon}
-                    <span class="download-size">(${currentDownload.size})</span>
+                    Descargar para ${osInfo.name} ${osInfo.icon}
+                    <span class="download-size">(${currentDownload.size}) ${fileTypeIcon}</span>
                 `;
             }
         }
@@ -448,6 +549,7 @@ class DownloadManager {
             filename: downloadInfo.filename,
             version: downloadInfo.version,
             os: this.userOS,
+            fileType: downloadInfo.type,
             userAgent: navigator.userAgent,
             referrer: document.referrer || 'direct',
             size: downloadInfo.size
@@ -512,6 +614,7 @@ class DownloadManager {
         const compatibility = {
             os: this.userOS,
             isSupported: !!currentDownload,
+            fileType: currentDownload?.type || 'unknown',
             warnings: [],
             requirements: this.downloadInfo?.requirements || {}
         };
@@ -581,6 +684,12 @@ style.textContent = `
         padding: 0.5rem;
         margin-top: 0.5rem;
         text-align: center;
+        line-height: 1.4;
+    }
+    
+    .download-size {
+        font-size: 0.85em;
+        opacity: 0.8;
     }
     
     @keyframes pulse {
