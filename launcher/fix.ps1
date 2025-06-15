@@ -193,23 +193,29 @@ try {
         throw "Directorio de aplicación no encontrado"
     }
 
+    Write-Host "  🔄 Refrescando variables de entorno..." -ForegroundColor Gray
+    # Refrescar variables de entorno para que Node.js sea reconocido
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    Start-Sleep -Milliseconds 500
+
     Write-Host "  🔄 Ejecutando npm install (esto puede tardar varios minutos)..." -ForegroundColor Gray
     
-    # Cambiar al directorio de la aplicación y ejecutar npm install
-    Push-Location $appDir
-    $npmProcess = Start-Process -FilePath "npm" -ArgumentList "install" -Wait -PassThru -NoNewWindow
-    Pop-Location
+    # Usar cmd para ejecutar npm install con PATH actualizado
+    $npmCommand = "cd /d `"$appDir`" && npm install"
+    $npmProcess = Start-Process -FilePath "cmd.exe" -ArgumentList "/c", $npmCommand -Wait -PassThru -WindowStyle Hidden
     
     if ($npmProcess.ExitCode -eq 0) {
         Write-Host "  ✅ Dependencias instaladas exitosamente" -ForegroundColor Green
     } else {
         Write-Host "  ⚠️ npm install completado con advertencias (código: $($npmProcess.ExitCode))" -ForegroundColor Yellow
+        Write-Host "  ℹ️ Esto es normal si ya existían las dependencias" -ForegroundColor Gray
     }
     Start-Sleep -Milliseconds 300
 }
 catch {
     Write-Host "  ❌ Error al ejecutar npm install: $_" -ForegroundColor Red
     Write-Host "  ℹ️ Continuando con la creación del acceso directo..." -ForegroundColor Gray
+    Write-Host "  💡 El acceso directo incluirá npm install como respaldo" -ForegroundColor Yellow
 }
 
 # --- 8. CREACIÓN DE NUEVO ACCESO DIRECTO ---
@@ -224,13 +230,13 @@ try {
     $wshell = New-Object -ComObject WScript.Shell
     $shortcut = $wshell.CreateShortcut((Join-Path $desktopPath "Pixelplay Launcher.lnk"))
     
-    # Crear acceso directo que solo ejecute npm start
-    Write-Host "  🔄 Creando acceso directo optimizado..." -ForegroundColor Gray
+    # Crear acceso directo que ejecute npm install && npm start como respaldo
+    Write-Host "  🔄 Creando acceso directo con respaldo de dependencias..." -ForegroundColor Gray
     $shortcut.TargetPath = "cmd.exe"
-    $shortcut.Arguments = "/k `"cd /d `"$appDir`" && npm start`""
+    $shortcut.Arguments = "/k `"cd /d `"$appDir`" && npm install && npm start`""
     $shortcut.WorkingDirectory = $appDir
     $shortcut.IconLocation = $iconPath
-    $shortcut.Description = "Pixelplay Launcher - Inicia la aplicación directamente"
+    $shortcut.Description = "Pixelplay Launcher - Inicia con verificación de dependencias"
     
     $shortcut.Save()
     Start-Sleep -Milliseconds 300
