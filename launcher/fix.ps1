@@ -1,37 +1,41 @@
 <#
 .SYNOPSIS
-    Este script automatiza la configuraci�n del entorno para Pixelplay Launcher.
-    Requiere ejecuci�n como Administrador.
+    Este script automatiza la configuración del entorno para Pixelplay Launcher.
+    Requiere ejecución como Administrador.
 
 .DESCRIPTION
     El script realiza las siguientes acciones:
-    1. Verifica si se est� ejecutando con privilegios de administrador y, si no, se reinicia como tal.
+    1. Verifica si se está ejecutando con privilegios de administrador y, si no, se reinicia como tal.
     2. Crea un directorio temporal para las descargas.
     3. Descarga los instaladores MSI de OpenJDK 21 y Node.js v22.
     4. Instala ambos MSI de forma silenciosa.
-    5. Busca y elimina cualquier acceso directo existente de "Pixelplay Launcher" en el escritorio y en el men� de inicio com�n.
-    6. Elimina carpetas de versiones antiguas dentro de la instalaci�n de Pixelplay Launcher.
-    7. Crea un nuevo acceso directo en el escritorio que ejecuta 'npm install' y 'npm start' en el directorio de la aplicaci�n.
+    5. Busca y elimina cualquier acceso directo existente de "Pixelplay Launcher" en el escritorio y en el menú de inicio común.
+    6. Elimina carpetas de versiones antiguas dentro de la instalación de Pixelplay Launcher.
+    7. Crea un nuevo acceso directo en el escritorio que ejecuta 'npm install' y 'npm start' en el directorio de la aplicación.
     8. Limpia los archivos descargados al finalizar.
 
 .NOTES
     Autor: Gemini
     Fecha: 15/06/2025
+    Corrección: Uso de cmd en lugar de PowerShell para evitar problemas de política de ejecución
 #>
 
-# --- 1. VERIFICACI�N DE PERMISOS DE ADMINISTRADOR ---
-Write-Host "Verificando permisos de administrador..." -ForegroundColor Yellow
+# --- 1. VERIFICACIÓN DE PERMISOS DE ADMINISTRADOR ---
+Write-Host "🔐 Verificando permisos de administrador..." -ForegroundColor Cyan
 if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Warning "Este script requiere privilegios de administrador. Intentando reiniciar como administrador..."
+    Write-Host "⚠️  Este script requiere privilegios de administrador" -ForegroundColor Yellow
+    Write-Host "🔄 Reiniciando como administrador..." -ForegroundColor Cyan
     Start-Process powershell.exe -Verb RunAs -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $MyInvocation.MyCommand.Path)
     exit
 }
-Write-Host "Permisos de administrador confirmados." -ForegroundColor Green
+Write-Host "✅ Permisos de administrador confirmados" -ForegroundColor Green
+Start-Sleep -Milliseconds 500
 
-# --- 2. DEFINICI�N DE VARIABLES ---
-Write-Host "Configurando variables..." -ForegroundColor Cyan
+# --- 2. DEFINICIÓN DE VARIABLES ---
+Write-Host "`n⚙️ Inicializando configuración..." -ForegroundColor Cyan
+Start-Sleep -Milliseconds 300
 
-# Directorio de la aplicaci�n y del icono
+# Directorio de la aplicación y del icono
 $launcherBaseDir = "C:\Program Files\Pixelplay Launcher"
 $appDir = Join-Path $launcherBaseDir "resources\app"
 $iconPath = Join-Path $launcherBaseDir "pixel.ico"
@@ -60,102 +64,167 @@ $versionsToDelete = @(
 $versionsBasePath = Join-Path $appDir "client\versions"
 
 # --- 3. DESCARGA DE ARCHIVOS ---
-Write-Host "`n--- Iniciando descargas ---" -ForegroundColor Yellow
-try {
-    Write-Host "Descargando OpenJDK 21..."
-    Invoke-WebRequest -Uri $openjdkUrl -OutFile $openjdkFile -UseBasicParsing
-    Write-Host "OpenJDK 21 descargado correctamente." -ForegroundColor Green
+Write-Host "`n📥 Descargando componentes necesarios..." -ForegroundColor Cyan
+$downloadProgress = @("⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏")
+$progressIndex = 0
 
-    Write-Host "Descargando Node.js v22..."
+try {
+    Write-Host "  🔄 Descargando OpenJDK 21..." -NoNewline
+    for ($i = 0; $i -lt 3; $i++) {
+        Write-Host "`r  $($downloadProgress[$progressIndex % $downloadProgress.Length]) Descargando OpenJDK 21..." -NoNewline
+        $progressIndex++
+        Start-Sleep -Milliseconds 200
+    }
+    Invoke-WebRequest -Uri $openjdkUrl -OutFile $openjdkFile -UseBasicParsing
+    Write-Host "`r  ✅ OpenJDK 21 descargado correctamente           " -ForegroundColor Green
+
+    Write-Host "  🔄 Descargando Node.js v22..." -NoNewline
+    for ($i = 0; $i -lt 3; $i++) {
+        Write-Host "`r  $($downloadProgress[$progressIndex % $downloadProgress.Length]) Descargando Node.js v22..." -NoNewline
+        $progressIndex++
+        Start-Sleep -Milliseconds 200
+    }
     Invoke-WebRequest -Uri $nodejsUrl -OutFile $nodejsFile -UseBasicParsing
-    Write-Host "Node.js v22 descargado correctamente." -ForegroundColor Green
+    Write-Host "`r  ✅ Node.js v22 descargado correctamente         " -ForegroundColor Green
 }
 catch {
-    Write-Error "Ocurri� un error durante la descarga: $_"
+    Write-Host "`r  ❌ Error durante la descarga: $_" -ForegroundColor Red
     exit 1
 }
 
-# --- 4. INSTALACI�N DE SOFTWARE ---
-Write-Host "`n--- Iniciando instalaciones (esto puede tardar unos minutos) ---" -ForegroundColor Yellow
-try {
-    Write-Host "Instalando OpenJDK 21..."
-    Start-Process msiexec.exe -ArgumentList "/i `"$openjdkFile`" /quiet /norestart" -Wait
-    Write-Host "OpenJDK 21 instalado correctamente." -ForegroundColor Green
+# --- 4. INSTALACIÓN DE SOFTWARE ---
+Write-Host "`n⚙️ Configurando entorno de desarrollo..." -ForegroundColor Cyan
+Start-Sleep -Milliseconds 500
 
-    Write-Host "Instalando Node.js v22..."
+try {
+    Write-Host "  🔄 Instalando OpenJDK 21 (esto puede tardar unos minutos)..." -ForegroundColor Gray
+    Start-Process msiexec.exe -ArgumentList "/i `"$openjdkFile`" /quiet /norestart" -Wait
+    Write-Host "  ✅ OpenJDK 21 instalado exitosamente" -ForegroundColor Green
+    Start-Sleep -Milliseconds 300
+
+    Write-Host "  🔄 Instalando Node.js v22 (esto puede tardar unos minutos)..." -ForegroundColor Gray
     Start-Process msiexec.exe -ArgumentList "/i `"$nodejsFile`" /quiet /norestart" -Wait
-    Write-Host "Node.js v22 instalado correctamente." -ForegroundColor Green
+    Write-Host "  ✅ Node.js v22 instalado exitosamente" -ForegroundColor Green
+    Start-Sleep -Milliseconds 300
 }
 catch {
-    Write-Error "Ocurri� un error durante la instalaci�n: $_"
+    Write-Host "`r  ❌ Error durante la instalación: $_" -ForegroundColor Red
     exit 1
 }
 
 # --- 5. LIMPIEZA DE ACCESOS DIRECTOS ANTIGUOS ---
-Write-Host "`n--- Limpiando accesos directos antiguos ---" -ForegroundColor Yellow
+Write-Host "`n🔄 Restableciendo App, manteniendo la sesión..." -ForegroundColor Cyan
+Start-Sleep -Milliseconds 500
+
+# Definir todas las rutas donde pueden estar los accesos directos
 $desktopPath = [Environment]::GetFolderPath('Desktop')
-$commonProgramsPath = Join-Path ([Environment]::GetFolderPath('CommonStartMenu')) "Programs"
-$shortcutPaths = @(
-    (Join-Path $desktopPath "Pixelplay Launcher.lnk"),
-    (Join-Path $commonProgramsPath "Pixelplay Launcher.lnk")
+$publicDesktopPath = "C:\Users\Public\Desktop"
+$commonProgramsPath = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
+$userProgramsPath = Join-Path ([Environment]::GetFolderPath('StartMenu')) "Programs"
+
+$shortcutLocations = @(
+    @{ Path = $desktopPath; Name = "Escritorio personal" },
+    @{ Path = $publicDesktopPath; Name = "Escritorio público" },
+    @{ Path = $commonProgramsPath; Name = "Menú de inicio (sistema)" },
+    @{ Path = $userProgramsPath; Name = "Menú de inicio (usuario)" }
 )
 
-# B�squeda m�s amplia por si el nombre var�a ligeramente
-Get-ChildItem -Path $desktopPath, $commonProgramsPath -Filter "*.lnk" | Where-Object { $_.Name -like "*Pixelplay Launcher*" } | ForEach-Object {
-    Write-Host "Eliminando acceso directo encontrado en: $($_.FullName)"
-    Remove-Item $_.FullName -Force -ErrorAction SilentlyContinue
+$shortcutsFound = 0
+foreach ($location in $shortcutLocations) {
+    if (Test-Path $location.Path) {
+        $shortcuts = Get-ChildItem -Path $location.Path -Filter "*.lnk" -ErrorAction SilentlyContinue | 
+                    Where-Object { $_.Name -like "*Pixelplay Launcher*" }
+        
+        foreach ($shortcut in $shortcuts) {
+            Write-Host "  ✓ Encontrado en $($location.Name): $($shortcut.Name)" -ForegroundColor Gray
+            Remove-Item $shortcut.FullName -Force -ErrorAction SilentlyContinue
+            $shortcutsFound++
+            Start-Sleep -Milliseconds 200
+        }
+    }
 }
-Write-Host "Limpieza de accesos directos finalizada." -ForegroundColor Green
 
-# --- 6. ELIMINACI�N DE CARPETAS DE VERSIONES ---
-Write-Host "`n--- Eliminando carpetas de versiones antiguas ---" -ForegroundColor Yellow
+if ($shortcutsFound -gt 0) {
+    Write-Host "  ✓ Se eliminaron $shortcutsFound acceso(s) directo(s) anterior(es)" -ForegroundColor Green
+} else {
+    Write-Host "  ℹ No se encontraron accesos directos anteriores" -ForegroundColor Gray
+}
+Start-Sleep -Milliseconds 300
+
+# --- 6. ELIMINACIÓN DE CARPETAS DE VERSIONES ---
+Write-Host "`n🔄 Actualizando versiones de Pixelplay, por favor espere..." -ForegroundColor Cyan
+Start-Sleep -Milliseconds 500
+
 if (Test-Path $versionsBasePath) {
+    $versionsDeleted = 0
     foreach ($version in $versionsToDelete) {
         $versionPath = Join-Path $versionsBasePath $version
         if (Test-Path $versionPath) {
-            Write-Host "Eliminando carpeta: $versionPath"
-            Remove-Item -Path $versionPath -Recurse -Force
-        } else {
-            Write-Host "La carpeta $versionPath no existe, se omite." -ForegroundColor Gray
+            Write-Host "  ✓ Eliminando versión: $version" -ForegroundColor Gray
+            Remove-Item -Path $versionPath -Recurse -Force -ErrorAction SilentlyContinue
+            $versionsDeleted++
+            Start-Sleep -Milliseconds 300
         }
     }
-    Write-Host "Eliminaci�n de carpetas de versiones finalizada." -ForegroundColor Green
+    
+    if ($versionsDeleted -gt 0) {
+        Write-Host "  ✓ Se eliminaron $versionsDeleted versión(es) obsoleta(s)" -ForegroundColor Green
+    } else {
+        Write-Host "  ℹ No se encontraron versiones obsoletas para eliminar" -ForegroundColor Gray
+    }
 } else {
-    Write-Warning "El directorio base de versiones '$versionsBasePath' no fue encontrado."
+    Write-Host "  ⚠ El directorio de versiones no fue encontrado" -ForegroundColor Yellow
 }
+Start-Sleep -Milliseconds 300
 
+# --- 7. CREACIÓN DE NUEVO ACCESO DIRECTO ---
+Write-Host "`n🚀 Configurando launcher mejorado..." -ForegroundColor Cyan
+Start-Sleep -Milliseconds 500
 
-# --- 7. CREACI�N DE NUEVO ACCESO DIRECTO ---
-Write-Host "`n--- Creando nuevo acceso directo de Pixelplay Launcher ---" -ForegroundColor Yellow
 try {
     # Verificar que el directorio de la app y el icono existan
-    if (-NOT(Test-Path $appDir)) { throw "El directorio de la aplicaci�n '$appDir' no existe. No se puede crear el acceso directo." }
-    if (-NOT(Test-Path $iconPath)) { Write-Warning "El archivo de icono '$iconPath' no fue encontrado. El acceso directo se crear� sin un icono personalizado." }
+    if (-NOT(Test-Path $appDir)) { 
+        Write-Host "  ❌ El directorio de la aplicación no existe: $appDir" -ForegroundColor Red
+        throw "Directorio de aplicación no encontrado"
+    }
+    
+    if (-NOT(Test-Path $iconPath)) { 
+        Write-Host "  ⚠ Icono personalizado no encontrado, usando icono por defecto" -ForegroundColor Yellow
+    }
 
     $wshell = New-Object -ComObject WScript.Shell
     $shortcut = $wshell.CreateShortcut((Join-Path $desktopPath "Pixelplay Launcher.lnk"))
     
-    # El comando a ejecutar
-    $command = "Set-Location -Path '$appDir'; npm install; npm start"
-    
-    $shortcut.TargetPath = "powershell.exe"
-    $shortcut.Arguments = "-NoExit -Command `"$command`""
+    # Usar cmd en lugar de PowerShell para evitar problemas de política de ejecución
+    Write-Host "  🔄 Creando acceso directo optimizado..." -ForegroundColor Gray
+    $shortcut.TargetPath = "cmd.exe"
+    $shortcut.Arguments = "/k `"cd /d `"$appDir`" && npm install && npm start`""
     $shortcut.WorkingDirectory = $appDir
     $shortcut.IconLocation = $iconPath
-    $shortcut.Description = "Inicia Pixelplay Launcher ejecutando npm install y npm start."
+    $shortcut.Description = "Pixelplay Launcher - Ejecuta npm install y npm start automáticamente"
     
     $shortcut.Save()
+    Start-Sleep -Milliseconds 300
 
-    Write-Host "El nuevo acceso directo se ha creado en el escritorio." -ForegroundColor Green
+    Write-Host "  ✅ Acceso directo creado exitosamente en el escritorio" -ForegroundColor Green
 }
 catch {
-    Write-Error "No se pudo crear el acceso directo: $_"
+    Write-Host "  ❌ Error al crear el acceso directo: $_" -ForegroundColor Red
     exit 1
 }
 
 # --- 8. LIMPIEZA FINAL ---
-Write-Host "`n--- Limpiando archivos temporales ---" -ForegroundColor Yellow
-Remove-Item -Path $tempDir -Recurse -Force
-Write-Host "Limpieza finalizada." -ForegroundColor Green
+Write-Host "`n🧹 Finalizando configuración..." -ForegroundColor Cyan
+Start-Sleep -Milliseconds 500
 
-Write-Host "`n*** PROCESO COMPLETADO ***" -ForegroundColor Magenta
+Write-Host "  🔄 Limpiando archivos temporales..." -ForegroundColor Gray
+Remove-Item -Path $tempDir -Recurse -Force -ErrorAction SilentlyContinue
+Start-Sleep -Milliseconds 300
+Write-Host "  ✅ Limpieza completada" -ForegroundColor Green
+
+Write-Host "`n🎉 ¡CONFIGURACIÓN COMPLETADA EXITOSAMENTE!" -ForegroundColor Magenta
+Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
+Write-Host "✨ Pixelplay Launcher está listo para usar" -ForegroundColor Green
+Write-Host "🚀 Haz doble clic en el acceso directo del escritorio para iniciar" -ForegroundColor Cyan
+Write-Host "💡 El launcher se actualizará automáticamente al inicio" -ForegroundColor Yellow
+Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
