@@ -11,14 +11,19 @@
     4. Instala ambos MSI de forma silenciosa.
     5. Busca y elimina cualquier acceso directo existente de "Pixelplay Launcher" en el escritorio y en el menú de inicio común.
     6. Elimina carpetas de versiones antiguas dentro de la instalación de Pixelplay Launcher.
-    7. Crea un nuevo acceso directo en el escritorio que ejecuta 'npm install' y 'npm start' en el directorio de la aplicación.
-    8. Limpia los archivos descargados al finalizar.
+    7. Ejecuta npm install en el directorio de la aplicación.
+    8. Crea un nuevo acceso directo en el escritorio que solo ejecuta 'npm start'.
+    9. Limpia los archivos descargados al finalizar.
 
 .NOTES
     Autor: Gemini
     Fecha: 15/06/2025
-    Corrección: Uso de cmd en lugar de PowerShell para evitar problemas de política de ejecución
+    Corrección: Configuración UTF-8 y ejecución directa de npm install
 #>
+
+# --- CONFIGURACIÓN DE CODIFICACIÓN ---
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
 
 # --- 1. VERIFICACIÓN DE PERMISOS DE ADMINISTRADOR ---
 Write-Host "🔐 Verificando permisos de administrador..." -ForegroundColor Cyan
@@ -177,17 +182,41 @@ if (Test-Path $versionsBasePath) {
 }
 Start-Sleep -Milliseconds 300
 
-# --- 7. CREACIÓN DE NUEVO ACCESO DIRECTO ---
-Write-Host "`n🚀 Configurando launcher mejorado..." -ForegroundColor Cyan
+# --- 7. EJECUTAR NPM INSTALL ---
+Write-Host "`n📦 Actualizando dependencias del launcher..." -ForegroundColor Cyan
 Start-Sleep -Milliseconds 500
 
 try {
-    # Verificar que el directorio de la app y el icono existan
+    # Verificar que el directorio de la app exista
     if (-NOT(Test-Path $appDir)) { 
         Write-Host "  ❌ El directorio de la aplicación no existe: $appDir" -ForegroundColor Red
         throw "Directorio de aplicación no encontrado"
     }
+
+    Write-Host "  🔄 Ejecutando npm install (esto puede tardar varios minutos)..." -ForegroundColor Gray
     
+    # Cambiar al directorio de la aplicación y ejecutar npm install
+    Push-Location $appDir
+    $npmProcess = Start-Process -FilePath "npm" -ArgumentList "install" -Wait -PassThru -NoNewWindow
+    Pop-Location
+    
+    if ($npmProcess.ExitCode -eq 0) {
+        Write-Host "  ✅ Dependencias instaladas exitosamente" -ForegroundColor Green
+    } else {
+        Write-Host "  ⚠️ npm install completado con advertencias (código: $($npmProcess.ExitCode))" -ForegroundColor Yellow
+    }
+    Start-Sleep -Milliseconds 300
+}
+catch {
+    Write-Host "  ❌ Error al ejecutar npm install: $_" -ForegroundColor Red
+    Write-Host "  ℹ️ Continuando con la creación del acceso directo..." -ForegroundColor Gray
+}
+
+# --- 8. CREACIÓN DE NUEVO ACCESO DIRECTO ---
+Write-Host "`n🚀 Configurando launcher optimizado..." -ForegroundColor Cyan
+Start-Sleep -Milliseconds 500
+
+try {
     if (-NOT(Test-Path $iconPath)) { 
         Write-Host "  ⚠ Icono personalizado no encontrado, usando icono por defecto" -ForegroundColor Yellow
     }
@@ -195,13 +224,13 @@ try {
     $wshell = New-Object -ComObject WScript.Shell
     $shortcut = $wshell.CreateShortcut((Join-Path $desktopPath "Pixelplay Launcher.lnk"))
     
-    # Usar cmd en lugar de PowerShell para evitar problemas de política de ejecución
+    # Crear acceso directo que solo ejecute npm start
     Write-Host "  🔄 Creando acceso directo optimizado..." -ForegroundColor Gray
     $shortcut.TargetPath = "cmd.exe"
-    $shortcut.Arguments = "/k `"cd /d `"$appDir`" && npm install && npm start`""
+    $shortcut.Arguments = "/k `"cd /d `"$appDir`" && npm start`""
     $shortcut.WorkingDirectory = $appDir
     $shortcut.IconLocation = $iconPath
-    $shortcut.Description = "Pixelplay Launcher - Ejecuta npm install y npm start automáticamente"
+    $shortcut.Description = "Pixelplay Launcher - Inicia la aplicación directamente"
     
     $shortcut.Save()
     Start-Sleep -Milliseconds 300
@@ -213,7 +242,7 @@ catch {
     exit 1
 }
 
-# --- 8. LIMPIEZA FINAL ---
+# --- 9. LIMPIEZA FINAL ---
 Write-Host "`n🧹 Finalizando configuración..." -ForegroundColor Cyan
 Start-Sleep -Milliseconds 500
 
@@ -226,5 +255,5 @@ Write-Host "`n🎉 ¡CONFIGURACIÓN COMPLETADA EXITOSAMENTE!" -ForegroundColor M
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
 Write-Host "✨ Pixelplay Launcher está listo para usar" -ForegroundColor Green
 Write-Host "🚀 Haz doble clic en el acceso directo del escritorio para iniciar" -ForegroundColor Cyan
-Write-Host "💡 El launcher se actualizará automáticamente al inicio" -ForegroundColor Yellow
+Write-Host "💡 Las dependencias ya están actualizadas y listas" -ForegroundColor Yellow
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
