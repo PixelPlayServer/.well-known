@@ -3,7 +3,7 @@
 
 # Verificar si se ejecuta como administrador
 if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "🔒 Iniciando proceso de migración..." -ForegroundColor Yellow
+    Write-Host "Iniciando proceso de migración..." -ForegroundColor Yellow
     Write-Host "Se requieren permisos elevados para completar la operación." -ForegroundColor Cyan
     
     # Reiniciar como administrador
@@ -93,7 +93,7 @@ function Remove-OldDirectory {
 
 # Inicio del script
 Clear-Host
-Write-Host "🚀 Pixelplay Launcher - Proceso de Optimización" -ForegroundColor Green
+Write-Host "Pixelplay Launcher - Proceso de Optimización" -ForegroundColor Green
 Write-Host "================================================" -ForegroundColor Green
 Write-Host ""
 
@@ -101,7 +101,7 @@ Write-Host ""
 Show-Progress -Status "Verificando instalación..." -Step 1 -Total 6
 
 if (-not (Test-Path $sourceDir)) {
-    Write-Host "❌ No se encontró una instalación de Pixelplay Launcher." -ForegroundColor Red
+    Write-Host " No se encontró una instalación de Pixelplay Launcher." -ForegroundColor Red
     Write-Host "El proceso no puede continuar." -ForegroundColor Yellow
     Read-Host "Presiona Enter para salir"
     exit 1
@@ -118,7 +118,7 @@ try {
     }
 }
 catch {
-    Write-Host "❌ Error al preparar la nueva ubicación." -ForegroundColor Red
+    Write-Host " Error al preparar la nueva ubicación." -ForegroundColor Red
     Read-Host "Presiona Enter para salir"
     exit 1
 }
@@ -132,7 +132,7 @@ try {
     Copy-Item -Path "$sourceDir\*" -Destination $targetDir -Recurse -Force -ErrorAction Stop
 }
 catch {
-    Write-Host "❌ Error durante la transferencia de archivos." -ForegroundColor Red
+    Write-Host " Error durante la transferencia de archivos." -ForegroundColor Red
     Read-Host "Presiona Enter para salir"
     exit 1
 }
@@ -173,10 +173,10 @@ Write-Progress -Activity "Migración de Pixelplay Launcher" -Completed
 
 # Resultados finales
 Clear-Host
-Write-Host "✅ Optimización Completada Exitosamente" -ForegroundColor Green
+Write-Host " Optimización Completada Exitosamente" -ForegroundColor Green
 Write-Host "=====================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "📋 Resumen del proceso:" -ForegroundColor Cyan
+Write-Host " Resumen del proceso:" -ForegroundColor Cyan
 Write-Host "• Archivos transferidos correctamente" -ForegroundColor White
 Write-Host "• $updatedShortcuts accesos directos actualizados" -ForegroundColor White
 
