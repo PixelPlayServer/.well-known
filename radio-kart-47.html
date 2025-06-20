@@ -1,541 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>F1 Team Radio - Joaquín Silva #47</title>
+    <title>Radio P2P F1 - Joaquín Silva #47</title>
+    <!-- PeerJS CDN for signaling -->
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Courier New', monospace;
-            background: #000;
-            color: #00ff00;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: #111;
-            border: 2px solid #00ff00;
-            border-radius: 10px;
-            padding: 30px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .title {
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            color: #00ff00;
-        }
-
-        .pilot-info {
-            font-size: 1.2em;
-            margin-bottom: 30px;
-            color: #ffffff;
-        }
-
-        .mode-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 10px;
-            background: #333;
-            color: #00ff00;
-            border: 1px solid #00ff00;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .mode-btn.active {
-            background: #00ff00;
-            color: #000;
-        }
-
-        .status {
-            font-size: 1.1em;
-            margin: 20px 0;
-            padding: 10px;
-            background: #222;
-            border-left: 4px solid #00ff00;
-        }
-
-        .status.error { border-left-color: #ff0000; color: #ff0000; }
-        .status.transmitting { border-left-color: #ffff00; color: #ffff00; }
-        .status.connected { border-left-color: #00ff00; color: #00ff00; }
-
-        .controls {
-            margin: 30px 0;
-        }
-
-        .btn {
-            background: #00ff00;
-            color: #000;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.1em;
-            font-family: inherit;
-            cursor: pointer;
-            margin: 10px;
-            border-radius: 5px;
-        }
-
-        .btn:hover {
-            background: #00cc00;
-        }
-
-        .btn:active {
-            background: #008800;
-        }
-
-        .btn.talk {
-            background: #ff4444;
-            color: #fff;
-        }
-
-        .btn.talk:hover {
-            background: #cc0000;
-        }
-
-        .btn.talk.active {
-            background: #ffff00;
-            color: #000;
-            animation: pulse 0.5s infinite alternate;
-        }
-
-        @keyframes pulse {
-            from { opacity: 0.8; }
-            to { opacity: 1; }
-        }
-
-        .connection-info {
-            background: #222;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: 1.2em;
-            border: 1px solid #00ff00;
-        }
-
-        .audio-level {
-            width: 100%;
-            height: 20px;
-            background: #333;
-            margin: 10px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .audio-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #00ff00, #ffff00, #ff0000);
-            width: 0%;
-            transition: width 0.1s ease;
-        }
-
-        .hidden { display: none; }
-
-        .instructions {
-            font-size: 0.9em;
-            color: #888;
-            margin-top: 20px;
-            text-align: left;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Courier New', monospace; background: #000; color: #0f0; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .container { background: #111; border: 2px solid #0f0; border-radius: 8px; padding: 20px; width: 100%; max-width: 420px; text-align: center; }
+        .title { font-size: 1.6em; margin-bottom: 16px; }
+        .controls { margin: 20px 0; }
+        input, button { font-family: inherit; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; background: #222; color: #0f0; border: 1px solid #0f0; border-radius: 4px; }
+        button { padding: 12px 20px; background: #0f0; color: #000; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s; }
+        button:hover { background: #0c0; }
+        .status { margin-top: 12px; padding: 8px; background: #222; border-left: 4px solid #0f0; }
+        .audio-meter { width: 100%; height: 10px; background: #333; margin-top: 12px; overflow: hidden; }
+        .meter-bar { height: 100%; background: linear-gradient(90deg, #0f0, #ff0, #f00); width: 0; transition: width 0.1s; }
+        @media (max-width: 480px) {
+            .container { padding: 12px; }
+            button { width: 100%; margin-bottom: 8px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="title">F1 TEAM RADIO</div>
-        <div class="pilot-info">JOAQUÍN SILVA - #47</div>
-
-        <div class="mode-selector">
-            <button class="mode-btn active" onclick="setMode('team')">TEAM</button>
-            <button class="mode-btn" onclick="setMode('pilot')">PILOT</button>
+        <div class="title">Radio P2P F1 - #47 Joaquín Silva</div>
+        <div class="controls">
+            <button id="create-room">Crear Sala</button>
+            <input id="room-id" placeholder="ID de Sala" />
+            <button id="join-room">Unirse a Sala</button>
         </div>
-
-        <div class="status" id="status">DISCONNECTED</div>
-
-        <div class="audio-level">
-            <div class="audio-bar" id="audioBar"></div>
-        </div>
-
-        <!-- TEAM MODE -->
-        <div id="team-mode">
-            <div class="controls">
-                <button class="btn" id="connectBtn" onclick="connect()">CONNECT</button>
-                <button class="btn talk hidden" id="talkBtn" 
-                        onmousedown="startTalk()" 
-                        onmouseup="stopTalk()" 
-                        ontouchstart="startTalk()" 
-                        ontouchend="stopTalk()">
-                    PUSH TO TALK
-                </button>
-            </div>
-            <div class="connection-info hidden" id="connectionInfo">
-                ROOM: <span id="roomId">---</span>
-            </div>
-        </div>
-
-        <!-- PILOT MODE -->
-        <div id="pilot-mode" class="hidden">
-            <div class="controls">
-                <input type="text" id="roomInput" placeholder="Enter Room Code" 
-                       style="padding: 10px; font-family: inherit; background: #222; color: #00ff00; border: 1px solid #00ff00; margin-bottom: 10px; width: 100%;">
-                <button class="btn" id="joinBtn" onclick="joinRoom()">JOIN ROOM</button>
-            </div>
-            <div class="status hidden" id="pilotStatus">OPEN MIC - ALWAYS ON</div>
-        </div>
-
-        <div class="instructions">
-            <strong>TEAM:</strong> Click CONNECT to create room. Share the URL with pilot.<br>
-            <strong>PILOT:</strong> Use shared URL or enter room code manually.<br>
-            <strong>URL FORMAT:</strong> ?room=ABC123&mode=pilot
-        </div>
+        <div class="status" id="status">Estado: Desconectado</div>
+        <div class="audio-meter"><div class="meter-bar" id="meter"></div></div>
     </div>
 
-    <script>
-        let currentMode = 'team';
-        let localStream = null;
-        let remoteAudio = null;
-        let audioContext = null;
-        let analyser = null;
-        let roomId = null;
-        let isConnected = false;
-        let isTalking = false;
-        let audioLevel = 0;
+<script>
+(async function(){
+    // Inicialización P2P usando PeerJS
+    const peer = new Peer({ host: '0.peerjs.com', secure: true, port: 443 });
+    let localStream, connCall;
+    const statusEl = document.getElementById('status');
+    const meterBar = document.getElementById('meter');
 
-        // Simple P2P communication using BroadcastChannel API
-        let channel = null;
+    async function initAudio() {
+        localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const audioCtx = new AudioContext();
+        const analyser = audioCtx.createAnalyser();
+        const source = audioCtx.createMediaStreamSource(localStream);
+        source.connect(analyser);
+        analyser.fftSize = 256;
+        const data = new Uint8Array(analyser.frequencyBinCount);
+        (function updateMeter(){
+            analyser.getByteFrequencyData(data);
+            const avg = data.reduce((a,b)=>a+b)/data.length / 255;
+            meterBar.style.width = (avg * 100) + '%';
+            requestAnimationFrame(updateMeter);
+        })();
+    }
 
-        function setMode(mode) {
-            currentMode = mode;
-            
-            // Update buttons
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Show/hide modes
-            document.getElementById('team-mode').classList.toggle('hidden', mode !== 'team');
-            document.getElementById('pilot-mode').classList.toggle('hidden', mode !== 'pilot');
-            
-            // Reset connection
-            disconnect();
-        }
+    peer.on('open', id => {
+        statusEl.textContent = 'Estado: ID de Sala ' + id;
+    });
 
-        function generateRoomId() {
-            return Math.random().toString(36).substring(2, 8).toUpperCase();
-        }
-
-        async function connect() {
-            try {
-                roomId = generateRoomId();
-                document.getElementById('roomId').textContent = roomId;
-                document.getElementById('connectionInfo').classList.remove('hidden');
-                
-                await initializeAudio();
-                setupBroadcastChannel();
-                
-                updateStatus('connected', 'WAITING FOR PILOT');
-                document.getElementById('connectBtn').classList.add('hidden');
-                document.getElementById('talkBtn').classList.remove('hidden');
-                
-                // Update URL with room code
-                setUrlParameter('room', roomId);
-                setUrlParameter('mode', 'team');
-                
-            } catch (error) {
-                updateStatus('error', 'MIC ACCESS DENIED');
-                console.error('Connection error:', error);
-            }
-        }
-
-        async function joinRoom() {
-            const input = document.getElementById('roomInput').value.trim().toUpperCase();
-            if (!input) {
-                updateStatus('error', 'ENTER ROOM CODE');
-                return;
-            }
-            
-            roomId = input;
-            
-            try {
-                await initializeAudio();
-                setupBroadcastChannel();
-                
-                updateStatus('connected', 'CONNECTED TO TEAM');
-                document.getElementById('joinBtn').classList.add('hidden');
-                document.getElementById('pilotStatus').classList.remove('hidden');
-                
-                // Update URL with room code and pilot mode
-                setUrlParameter('room', roomId);
-                setUrlParameter('mode', 'pilot');
-                
-                // Pilot always transmits
-                startPilotTransmission();
-                
-            } catch (error) {
-                updateStatus('error', 'CONNECTION FAILED');
-                console.error('Join error:', error);
-            }
-        }
-
-        async function initializeAudio() {
-            localStream = await navigator.mediaDevices.getUserMedia({ 
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    autoGainControl: true
-                } 
-            });
-            
-            setupAudioAnalyser();
-            setupRemoteAudio();
-            isConnected = true;
-        }
-
-        function setupBroadcastChannel() {
-            if (channel) channel.close();
-            
-            channel = new BroadcastChannel('radio-' + roomId);
-            channel.onmessage = handleMessage;
-            
-            // Send ping to establish connection
-            channel.postMessage({ type: 'ping', mode: currentMode });
-        }
-
-        function setupAudioAnalyser() {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const source = audioContext.createMediaStreamSource(localStream);
-            analyser = audioContext.createAnalyser();
-            analyser.fftSize = 256;
-            source.connect(analyser);
-            
-            updateAudioLevel();
-        }
-
-        function setupRemoteAudio() {
-            remoteAudio = new Audio();
-            remoteAudio.autoplay = true;
-        }
-
-        function updateAudioLevel() {
-            if (!analyser) return;
-            
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            analyser.getByteFrequencyData(dataArray);
-            
-            const average = dataArray.reduce((a, b) => a + b) / bufferLength;
-            audioLevel = (average / 255) * 100;
-            
-            document.getElementById('audioBar').style.width = audioLevel + '%';
-            
-            // Send audio data if transmitting
-            if ((currentMode === 'pilot' || isTalking) && isConnected) {
-                sendAudioData();
-            }
-            
-            requestAnimationFrame(updateAudioLevel);
-        }
-
-        function sendAudioData() {
-            if (!localStream || !channel) return;
-            
-            // Create a simple audio transmission simulation
-            const audioTrack = localStream.getAudioTracks()[0];
-            if (audioTrack && audioTrack.enabled) {
-                channel.postMessage({
-                    type: 'audio',
-                    level: audioLevel,
-                    mode: currentMode,
-                    timestamp: Date.now()
-                });
-            }
-        }
-
-        function handleMessage(event) {
-            const { type, mode, level, timestamp } = event.data;
-            
-            if (type === 'ping') {
-                if (currentMode === 'team' && mode === 'pilot') {
-                    updateStatus('connected', 'PILOT CONNECTED');
-                } else if (currentMode === 'pilot' && mode === 'team') {
-                    updateStatus('connected', 'CONNECTED TO TEAM');
-                }
-            }
-            
-            if (type === 'audio' && mode !== currentMode) {
-                // Simulate receiving audio
-                if (level > 10) {
-                    updateStatus('transmitting', `RECEIVING FROM ${mode.toUpperCase()}`);
-                    playAudioFeedback(level);
-                } else {
-                    updateStatus('connected', 'CONNECTED');
-                }
-            }
-        }
-
-        function playAudioFeedback(level) {
-            // Create audio feedback for received transmission
-            if (!audioContext) return;
-            
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(200 + (level * 5), audioContext.currentTime);
-            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-            
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.1);
-        }
-
-        function startTalk() {
-            if (!isConnected) return;
-            
-            isTalking = true;
-            document.getElementById('talkBtn').classList.add('active');
-            updateStatus('transmitting', 'TRANSMITTING...');
-            
-            localStream.getAudioTracks().forEach(track => {
-                track.enabled = true;
-            });
-        }
-
-        function stopTalk() {
-            isTalking = false;
-            document.getElementById('talkBtn').classList.remove('active');
-            updateStatus('connected', 'CONNECTED');
-            
-            localStream.getAudioTracks().forEach(track => {
-                track.enabled = false;
-            });
-        }
-
-        function startPilotTransmission() {
-            if (!localStream) return;
-            
-            // Keep pilot mic always enabled
-            localStream.getAudioTracks().forEach(track => {
-                track.enabled = true;
-            });
-            
-            updateStatus('transmitting', 'TRANSMITTING - OPEN MIC');
-        }
-
-        function updateStatus(type, message) {
-            const statusEl = document.getElementById('status');
-            statusEl.className = 'status ' + type;
-            statusEl.textContent = message;
-        }
-
-        function disconnect() {
-            if (channel) {
-                channel.close();
-                channel = null;
-            }
-            
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localStream = null;
-            }
-            
-            if (audioContext) {
-                audioContext.close();
-                audioContext = null;
-            }
-            
-            isConnected = false;
-            isTalking = false;
-            roomId = null;
-            
-            updateStatus('', 'DISCONNECTED');
-            
-            // Reset UI
-            document.getElementById('connectBtn').classList.remove('hidden');
-            document.getElementById('talkBtn').classList.add('hidden');
-            document.getElementById('joinBtn').classList.remove('hidden');
-            document.getElementById('connectionInfo').classList.add('hidden');
-            document.getElementById('pilotStatus').classList.add('hidden');
-        }
-
-        // URL parameter handling
-        function getUrlParameter(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
-
-        function setUrlParameter(name, value) {
-            const url = new URL(window.location);
-            url.searchParams.set(name, value);
-            window.history.replaceState({}, '', url);
-        }
-
-        function autoConnectFromUrl() {
-            const urlRoom = getUrlParameter('room');
-            const urlMode = getUrlParameter('mode');
-            
-            if (urlRoom) {
-                roomId = urlRoom.toUpperCase();
-                
-                if (urlMode === 'pilot') {
-                    setMode('pilot');
-                    document.getElementById('roomInput').value = roomId;
-                    setTimeout(() => joinRoom(), 500);
-                } else {
-                    // Team mode - auto connect with existing room
-                    setTimeout(() => connectWithRoom(roomId), 500);
-                }
-            }
-        }
-
-        async function connectWithRoom(existingRoom) {
-            try {
-                roomId = existingRoom;
-                document.getElementById('roomId').textContent = roomId;
-                document.getElementById('connectionInfo').classList.remove('hidden');
-                
-                await initializeAudio();
-                setupBroadcastChannel();
-                
-                updateStatus('connected', 'ROOM RESTORED - WAITING FOR PILOT');
-                document.getElementById('connectBtn').classList.add('hidden');
-                document.getElementById('talkBtn').classList.remove('hidden');
-                
-                // Update URL
-                setUrlParameter('room', roomId);
-                setUrlParameter('mode', 'team');
-                
-            } catch (error) {
-                updateStatus('error', 'MIC ACCESS DENIED');
-                console.error('Connection error:', error);
-            }
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            // Prevent context menu on touch devices for better mobile experience
-            document.addEventListener('contextmenu', e => e.preventDefault());
-            
-            // Auto-connect from URL parameters
-            autoConnectFromUrl();
+    peer.on('call', call => {
+        connCall = call;
+        call.answer(localStream);
+        statusEl.textContent = 'Estado: Llamada entrante';
+        call.on('stream', remoteStream => {
+            new Audio(URL.createObjectURL(remoteStream)).play();
+            statusEl.textContent = 'Estado: En P2P con ' + call.peer;
         });
-    </script>
+    });
+
+    document.getElementById('create-room').onclick = async ()=>{
+        await initAudio();
+        statusEl.textContent = 'Sala creada: ' + peer.id;
+    };
+
+    document.getElementById('join-room').onclick = async ()=>{
+        const id = document.getElementById('room-id').value.trim();
+        if(!id) { statusEl.textContent = 'Ingrese ID de Sala'; return; }
+        if(!localStream) await initAudio();
+        connCall = peer.call(id, localStream);
+        connCall.on('stream', remoteStream => {
+            new Audio(URL.createObjectURL(remoteStream)).play();
+            statusEl.textContent = 'Conectado a ' + id;
+        });
+    };
+})();
+</script>
 </body>
 </html>
