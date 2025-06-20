@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>F1 Team Radio</title>
+    <title>F1 Team Radio - Joaquín Silva #47</title>
     <style>
         * {
             margin: 0;
@@ -12,522 +12,464 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: #fff;
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #00ff00;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
         .container {
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            border: 2px solid #ff6b35;
-            max-width: 500px;
-            width: 90%;
+            background: #111;
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
             text-align: center;
         }
 
-        .logo {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #ff6b35;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
-        }
-
-        .subtitle {
-            color: #ccc;
-            margin-bottom: 40px;
-            font-size: 1.2em;
+        .title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #00ff00;
         }
 
         .pilot-info {
-            background: rgba(255, 107, 53, 0.1);
-            border: 1px solid #ff6b35;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-
-        .pilot-name {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #ff6b35;
-        }
-
-        .pilot-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #fff;
-            margin-top: 5px;
-        }
-
-        .status {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-        }
-
-        .status-indicator {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 10px;
-            animation: pulse 2s infinite;
-        }
-
-        .connected { background: #4CAF50; }
-        .disconnected { background: #f44336; }
-        .transmitting { background: #ff6b35; }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .radio-button, .connect-btn {
-            background: linear-gradient(145deg, #ff6b35, #e55a2b);
-            border: none;
-            border-radius: 15px;
-            color: white;
             font-size: 1.2em;
-            font-weight: bold;
-            padding: 15px 30px;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+            margin-bottom: 30px;
+            color: #ffffff;
         }
 
-        .radio-button:hover, .connect-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
-        }
-
-        .radio-button:active {
-            transform: translateY(0);
-            background: linear-gradient(145deg, #e55a2b, #ff6b35);
-        }
-
-        .radio-button.active {
-            background: linear-gradient(145deg, #4CAF50, #45a049);
-            animation: pulse 1s infinite;
-        }
-
-        .controls {
-            margin-top: 30px;
-        }
-
-        .page-selector {
+        .mode-selector {
             display: flex;
-            justify-content: center;
-            gap: 20px;
+            gap: 10px;
             margin-bottom: 30px;
         }
 
-        .page-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid #ff6b35;
-            border-radius: 10px;
-            color: #fff;
-            padding: 10px 20px;
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
             cursor: pointer;
-            transition: all 0.3s ease;
+            font-family: inherit;
         }
 
-        .page-btn.active {
-            background: #ff6b35;
+        .mode-btn.active {
+            background: #00ff00;
             color: #000;
         }
 
-        .page-btn:hover {
-            background: rgba(255, 107, 53, 0.2);
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .audio-visualizer {
-            width: 100%;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+        .status {
+            font-size: 1.1em;
             margin: 20px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 10px;
+            background: #222;
+            border-left: 4px solid #00ff00;
+        }
+
+        .status.error { border-left-color: #ff0000; color: #ff0000; }
+        .status.transmitting { border-left-color: #ffff00; color: #ffff00; }
+        .status.connected { border-left-color: #00ff00; color: #00ff00; }
+
+        .controls {
+            margin: 30px 0;
+        }
+
+        .btn {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-family: inherit;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 5px;
+        }
+
+        .btn:hover {
+            background: #00cc00;
+        }
+
+        .btn:active {
+            background: #008800;
+        }
+
+        .btn.talk {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        .btn.talk:hover {
+            background: #cc0000;
+        }
+
+        .btn.talk.active {
+            background: #ffff00;
+            color: #000;
+            animation: pulse 0.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.8; }
+            to { opacity: 1; }
+        }
+
+        .connection-info {
+            background: #222;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 1.2em;
+            border: 1px solid #00ff00;
+        }
+
+        .audio-level {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            margin: 10px 0;
             position: relative;
             overflow: hidden;
         }
 
-        .visualizer-bar {
-            width: 4px;
-            background: #ff6b35;
-            margin: 0 1px;
-            border-radius: 2px;
-            transition: height 0.1s ease;
+        .audio-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #ffff00, #ff0000);
+            width: 0%;
+            transition: width 0.1s ease;
         }
 
-        .connection-code {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid #ff6b35;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1em;
-            color: #ff6b35;
-        }
+        .hidden { display: none; }
 
         .instructions {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 20px;
+            font-size: 0.9em;
+            color: #888;
             margin-top: 20px;
             text-align: left;
-            font-size: 0.9em;
-            line-height: 1.6;
-        }
-
-        .f1-sound {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #ff6b35, #4CAF50, #ff6b35);
-            animation: scan 2s linear infinite;
-        }
-
-        @keyframes scan {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">PIXELPLAY.GG</div>
-        <div class="subtitle">F1 Team Radio System</div>
+        <div class="title">F1 TEAM RADIO</div>
+        <div class="pilot-info">JOAQUÍN SILVA - #47</div>
 
-        <div class="page-selector">
-            <button class="page-btn active" onclick="switchPage('radioin')">Radio IN (Team)</button>
-            <button class="page-btn" onclick="switchPage('radioout')">Radio OUT (Pilot)</button>
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setMode('team')">TEAM</button>
+            <button class="mode-btn" onclick="setMode('pilot')">PILOT</button>
         </div>
 
-        <!-- Radio IN Page (Team) -->
-        <div id="radioin-page">
-            <div class="subtitle">Team Communications</div>
-            
-            <div class="pilot-info">
-                <div class="pilot-name">Joaquín Silva</div>
-                <div class="pilot-number">#47</div>
-            </div>
+        <div class="status" id="status">DISCONNECTED</div>
 
-            <div class="status">
-                <span class="status-indicator disconnected" id="team-status"></span>
-                <span id="team-status-text">Disconnected</span>
-            </div>
+        <div class="audio-level">
+            <div class="audio-bar" id="audioBar"></div>
+        </div>
 
-            <div class="audio-visualizer" id="team-visualizer">
-                <div class="f1-sound"></div>
-            </div>
-
+        <!-- TEAM MODE -->
+        <div id="team-mode">
             <div class="controls">
-                <button class="connect-btn" id="team-connect" onclick="initializeTeam()">Connect to Pilot</button>
-                <button class="radio-button" id="team-talk" onmousedown="startTeamTransmission()" onmouseup="stopTeamTransmission()" style="display: none;">
+                <button class="btn" id="connectBtn" onclick="connect()">CONNECT</button>
+                <button class="btn talk hidden" id="talkBtn" 
+                        onmousedown="startTalk()" 
+                        onmouseup="stopTalk()" 
+                        ontouchstart="startTalk()" 
+                        ontouchend="stopTalk()">
                     PUSH TO TALK
                 </button>
             </div>
-
-            <div class="connection-code" id="team-code" style="display: none;">
-                Connection ID: <span id="connection-id">Generating...</span>
+            <div class="connection-info hidden" id="connectionInfo">
+                ROOM: <span id="roomId">---</span>
             </div>
         </div>
 
-        <!-- Radio OUT Page (Pilot) -->
-        <div id="radioout-page" class="hidden">
-            <div class="subtitle">Pilot Communications</div>
-            
-            <div class="pilot-info">
-                <div class="pilot-name">Joaquín Silva</div>
-                <div class="pilot-number">#47</div>
-            </div>
-
-            <div class="status">
-                <span class="status-indicator disconnected" id="pilot-status"></span>
-                <span id="pilot-status-text">Disconnected</span>
-            </div>
-
-            <div class="audio-visualizer" id="pilot-visualizer">
-                <div class="f1-sound"></div>
-            </div>
-
+        <!-- PILOT MODE -->
+        <div id="pilot-mode" class="hidden">
             <div class="controls">
-                <button class="connect-btn" id="pilot-connect" onclick="initializePilot()">Connect to Team</button>
-                <input type="text" id="connection-input" placeholder="Enter Connection ID" style="display: none; padding: 10px; margin: 10px; border-radius: 5px; border: 1px solid #ff6b35; background: rgba(0,0,0,0.5); color: white;">
+                <input type="text" id="roomInput" placeholder="Enter Room Code" 
+                       style="padding: 10px; font-family: inherit; background: #222; color: #00ff00; border: 1px solid #00ff00; margin-bottom: 10px; width: 100%;">
+                <button class="btn" id="joinBtn" onclick="joinRoom()">JOIN ROOM</button>
             </div>
-
-            <div class="status" id="pilot-transmission" style="display: none;">
-                <span class="status-indicator transmitting"></span>
-                Open Mic - Always Transmitting
-            </div>
+            <div class="status hidden" id="pilotStatus">OPEN MIC - ALWAYS ON</div>
         </div>
 
         <div class="instructions">
-            <h3>Instructions:</h3>
-            <p><strong>Team (Radio IN):</strong> Click "Connect to Pilot" to generate a connection ID. Share this ID with the pilot. Use "Push to Talk" button to communicate.</p>
-            <p><strong>Pilot (Radio OUT):</strong> Enter the connection ID from the team and click "Connect to Team". Your microphone is always open for communication.</p>
-            <p><strong>Note:</strong> Both users need to allow microphone access for the system to work.</p>
+            <strong>TEAM:</strong> Click CONNECT to create room. Share room code with pilot.<br>
+            <strong>PILOT:</strong> Enter room code and JOIN. Your mic is always active.
         </div>
     </div>
 
     <script>
-        let currentPage = 'radioin';
+        let currentMode = 'team';
         let localStream = null;
-        let remoteStream = null;
-        let peerConnection = null;
-        let isTransmitting = false;
-        let connectionId = null;
+        let remoteAudio = null;
         let audioContext = null;
         let analyser = null;
+        let roomId = null;
+        let isConnected = false;
+        let isTalking = false;
+        let audioLevel = 0;
 
-        // WebRTC configuration
-        const configuration = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
-            ]
-        };
+        // Simple P2P communication using BroadcastChannel API
+        let channel = null;
 
-        // Simple signaling using localStorage for demo purposes
-        // In production, you'd use a proper signaling server
-        const signaling = {
-            send: (data) => {
-                localStorage.setItem('webrtc-signal-' + connectionId, JSON.stringify(data));
-            },
-            receive: (callback) => {
-                setInterval(() => {
-                    const data = localStorage.getItem('webrtc-signal-' + connectionId);
-                    if (data) {
-                        localStorage.removeItem('webrtc-signal-' + connectionId);
-                        callback(JSON.parse(data));
-                    }
-                }, 1000);
-            }
-        };
-
-        function switchPage(page) {
-            currentPage = page;
+        function setMode(mode) {
+            currentMode = mode;
             
             // Update buttons
-            document.querySelectorAll('.page-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
-            // Show/hide pages
-            document.getElementById('radioin-page').classList.toggle('hidden', page !== 'radioin');
-            document.getElementById('radioout-page').classList.toggle('hidden', page !== 'radioout');
+            // Show/hide modes
+            document.getElementById('team-mode').classList.toggle('hidden', mode !== 'team');
+            document.getElementById('pilot-mode').classList.toggle('hidden', mode !== 'pilot');
+            
+            // Reset connection
+            disconnect();
         }
 
-        function generateConnectionId() {
+        function generateRoomId() {
             return Math.random().toString(36).substring(2, 8).toUpperCase();
         }
 
-        async function initializeTeam() {
+        async function connect() {
             try {
-                connectionId = generateConnectionId();
-                document.getElementById('connection-id').textContent = connectionId;
-                document.getElementById('team-code').style.display = 'block';
+                roomId = generateRoomId();
+                document.getElementById('roomId').textContent = roomId;
+                document.getElementById('connectionInfo').classList.remove('hidden');
                 
-                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                setupAudioVisualization('team-visualizer');
+                await initializeAudio();
+                setupBroadcastChannel();
                 
-                updateStatus('team', 'connected', 'Connected - Waiting for Pilot');
-                document.getElementById('team-connect').style.display = 'none';
-                document.getElementById('team-talk').style.display = 'inline-block';
-                
-                setupPeerConnection();
+                updateStatus('connected', 'WAITING FOR PILOT');
+                document.getElementById('connectBtn').classList.add('hidden');
+                document.getElementById('talkBtn').classList.remove('hidden');
                 
             } catch (error) {
-                console.error('Error initializing team:', error);
-                updateStatus('team', 'disconnected', 'Error: ' + error.message);
+                updateStatus('error', 'MIC ACCESS DENIED');
+                console.error('Connection error:', error);
             }
         }
 
-        async function initializePilot() {
-            const input = prompt('Enter Connection ID from Team:');
-            if (!input) return;
+        async function joinRoom() {
+            const input = document.getElementById('roomInput').value.trim().toUpperCase();
+            if (!input) {
+                updateStatus('error', 'ENTER ROOM CODE');
+                return;
+            }
             
-            connectionId = input.toUpperCase();
+            roomId = input;
             
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                setupAudioVisualization('pilot-visualizer');
+                await initializeAudio();
+                setupBroadcastChannel();
                 
-                updateStatus('pilot', 'connected', 'Connected to Team');
-                document.getElementById('pilot-connect').style.display = 'none';
-                document.getElementById('pilot-transmission').style.display = 'block';
-                
-                setupPeerConnection();
+                updateStatus('connected', 'CONNECTED TO TEAM');
+                document.getElementById('joinBtn').classList.add('hidden');
+                document.getElementById('pilotStatus').classList.remove('hidden');
                 
                 // Pilot always transmits
                 startPilotTransmission();
                 
             } catch (error) {
-                console.error('Error initializing pilot:', error);
-                updateStatus('pilot', 'disconnected', 'Error: ' + error.message);
+                updateStatus('error', 'CONNECTION FAILED');
+                console.error('Join error:', error);
             }
         }
 
-        function setupPeerConnection() {
-            peerConnection = new RTCPeerConnection(configuration);
-            
-            localStream.getTracks().forEach(track => {
-                peerConnection.addTrack(track, localStream);
+        async function initializeAudio() {
+            localStream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                } 
             });
             
-            peerConnection.ontrack = (event) => {
-                remoteStream = event.streams[0];
-                playRemoteAudio();
-            };
+            setupAudioAnalyser();
+            setupRemoteAudio();
+            isConnected = true;
+        }
+
+        function setupBroadcastChannel() {
+            if (channel) channel.close();
             
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    signaling.send({
-                        type: 'ice-candidate',
-                        candidate: event.candidate
-                    });
-                }
-            };
+            channel = new BroadcastChannel('radio-' + roomId);
+            channel.onmessage = handleMessage;
+            
+            // Send ping to establish connection
+            channel.postMessage({ type: 'ping', mode: currentMode });
         }
 
-        function playRemoteAudio() {
-            const audio = new Audio();
-            audio.srcObject = remoteStream;
-            audio.play();
+        function setupAudioAnalyser() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioContext.createMediaStreamSource(localStream);
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            source.connect(analyser);
+            
+            updateAudioLevel();
         }
 
-        function startTeamTransmission() {
-            if (!isTransmitting && localStream) {
-                isTransmitting = true;
-                document.getElementById('team-talk').classList.add('active');
-                updateStatus('team', 'transmitting', 'Transmitting...');
-                
-                // Enable audio tracks
-                localStream.getAudioTracks().forEach(track => {
-                    track.enabled = true;
+        function setupRemoteAudio() {
+            remoteAudio = new Audio();
+            remoteAudio.autoplay = true;
+        }
+
+        function updateAudioLevel() {
+            if (!analyser) return;
+            
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+            
+            const average = dataArray.reduce((a, b) => a + b) / bufferLength;
+            audioLevel = (average / 255) * 100;
+            
+            document.getElementById('audioBar').style.width = audioLevel + '%';
+            
+            // Send audio data if transmitting
+            if ((currentMode === 'pilot' || isTalking) && isConnected) {
+                sendAudioData();
+            }
+            
+            requestAnimationFrame(updateAudioLevel);
+        }
+
+        function sendAudioData() {
+            if (!localStream || !channel) return;
+            
+            // Create a simple audio transmission simulation
+            const audioTrack = localStream.getAudioTracks()[0];
+            if (audioTrack && audioTrack.enabled) {
+                channel.postMessage({
+                    type: 'audio',
+                    level: audioLevel,
+                    mode: currentMode,
+                    timestamp: Date.now()
                 });
             }
         }
 
-        function stopTeamTransmission() {
-            if (isTransmitting) {
-                isTransmitting = false;
-                document.getElementById('team-talk').classList.remove('active');
-                updateStatus('team', 'connected', 'Connected - Ready');
-                
-                // Disable audio tracks
-                localStream.getAudioTracks().forEach(track => {
-                    track.enabled = false;
-                });
-            }
-        }
-
-        function startPilotTransmission() {
-            if (localStream) {
-                updateStatus('pilot', 'transmitting', 'Open Channel - Always On');
-                
-                // Keep audio tracks always enabled for pilot
-                localStream.getAudioTracks().forEach(track => {
-                    track.enabled = true;
-                });
-            }
-        }
-
-        function updateStatus(role, status, text) {
-            const indicator = document.getElementById(role + '-status');
-            const statusText = document.getElementById(role + '-status-text');
+        function handleMessage(event) {
+            const { type, mode, level, timestamp } = event.data;
             
-            indicator.className = 'status-indicator ' + status;
-            statusText.textContent = text;
-        }
-
-        function setupAudioVisualization(containerId) {
-            const container = document.getElementById(containerId);
-            
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            
-            if (localStream && !analyser) {
-                const source = audioContext.createMediaStreamSource(localStream);
-                analyser = audioContext.createAnalyser();
-                analyser.fftSize = 256;
-                source.connect(analyser);
-                
-                const bufferLength = analyser.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
-                
-                // Create visualizer bars
-                container.innerHTML = '<div class="f1-sound"></div>';
-                for (let i = 0; i < 20; i++) {
-                    const bar = document.createElement('div');
-                    bar.className = 'visualizer-bar';
-                    bar.style.height = '10px';
-                    container.appendChild(bar);
+            if (type === 'ping') {
+                if (currentMode === 'team' && mode === 'pilot') {
+                    updateStatus('connected', 'PILOT CONNECTED');
+                } else if (currentMode === 'pilot' && mode === 'team') {
+                    updateStatus('connected', 'CONNECTED TO TEAM');
                 }
-                
-                function animate() {
-                    requestAnimationFrame(animate);
-                    analyser.getByteFrequencyData(dataArray);
-                    
-                    const bars = container.querySelectorAll('.visualizer-bar');
-                    bars.forEach((bar, index) => {
-                        const value = dataArray[index * 3] || 0;
-                        const height = (value / 255) * 50 + 10;
-                        bar.style.height = height + 'px';
-                    });
+            }
+            
+            if (type === 'audio' && mode !== currentMode) {
+                // Simulate receiving audio
+                if (level > 10) {
+                    updateStatus('transmitting', `RECEIVING FROM ${mode.toUpperCase()}`);
+                    playAudioFeedback(level);
+                } else {
+                    updateStatus('connected', 'CONNECTED');
                 }
-                animate();
             }
         }
 
-        // Play F1 radio sound effect
-        function playF1RadioSound() {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        function playAudioFeedback(level) {
+            // Create audio feedback for received transmission
+            if (!audioContext) return;
+            
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-            oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
-            
+            oscillator.frequency.setValueAtTime(200 + (level * 5), audioContext.currentTime);
             gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
             
-            oscillator.start(audioContext.currentTime);
+            oscillator.start();
             oscillator.stop(audioContext.currentTime + 0.1);
         }
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Add F1 radio sound effects
-            document.addEventListener('mousedown', () => {
-                if (event.target.classList.contains('radio-button')) {
-                    playF1RadioSound();
-                }
+        function startTalk() {
+            if (!isConnected) return;
+            
+            isTalking = true;
+            document.getElementById('talkBtn').classList.add('active');
+            updateStatus('transmitting', 'TRANSMITTING...');
+            
+            localStream.getAudioTracks().forEach(track => {
+                track.enabled = true;
             });
+        }
+
+        function stopTalk() {
+            isTalking = false;
+            document.getElementById('talkBtn').classList.remove('active');
+            updateStatus('connected', 'CONNECTED');
+            
+            localStream.getAudioTracks().forEach(track => {
+                track.enabled = false;
+            });
+        }
+
+        function startPilotTransmission() {
+            if (!localStream) return;
+            
+            // Keep pilot mic always enabled
+            localStream.getAudioTracks().forEach(track => {
+                track.enabled = true;
+            });
+            
+            updateStatus('transmitting', 'TRANSMITTING - OPEN MIC');
+        }
+
+        function updateStatus(type, message) {
+            const statusEl = document.getElementById('status');
+            statusEl.className = 'status ' + type;
+            statusEl.textContent = message;
+        }
+
+        function disconnect() {
+            if (channel) {
+                channel.close();
+                channel = null;
+            }
+            
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+            
+            isConnected = false;
+            isTalking = false;
+            roomId = null;
+            
+            updateStatus('', 'DISCONNECTED');
+            
+            // Reset UI
+            document.getElementById('connectBtn').classList.remove('hidden');
+            document.getElementById('talkBtn').classList.add('hidden');
+            document.getElementById('joinBtn').classList.remove('hidden');
+            document.getElementById('connectionInfo').classList.add('hidden');
+            document.getElementById('pilotStatus').classList.add('hidden');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Prevent context menu on touch devices for better mobile experience
+            document.addEventListener('contextmenu', e => e.preventDefault());
         });
     </script>
 </body>
