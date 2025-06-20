@@ -4,92 +4,189 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio P2P F1 - Joaquín Silva #47</title>
-    <!-- PeerJS CDN for signaling -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <!-- PeerJS CDN para signaling -->
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
+        :root {
+            --bg: #0b0b0b;
+            --card: #1a1a1a;
+            --accent: #00ff88;
+            --accent-dark: #00cc6a;
+            --text: #e0e0e0;
+            --text-light: #888;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Courier New', monospace; background: #000; color: #0f0; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .container { background: #111; border: 2px solid #0f0; border-radius: 8px; padding: 20px; width: 100%; max-width: 420px; text-align: center; }
-        .title { font-size: 1.6em; margin-bottom: 16px; }
-        .controls { margin: 20px 0; }
-        input, button { font-family: inherit; }
-        input { width: 100%; padding: 10px; margin-bottom: 10px; background: #222; color: #0f0; border: 1px solid #0f0; border-radius: 4px; }
-        button { padding: 12px 20px; background: #0f0; color: #000; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s; }
-        button:hover { background: #0c0; }
-        .status { margin-top: 12px; padding: 8px; background: #222; border-left: 4px solid #0f0; }
-        .audio-meter { width: 100%; height: 10px; background: #333; margin-top: 12px; overflow: hidden; }
-        .meter-bar { height: 100%; background: linear-gradient(90deg, #0f0, #ff0, #f00); width: 0; transition: width 0.1s; }
-        @media (max-width: 480px) {
-            .container { padding: 12px; }
-            button { width: 100%; margin-bottom: 8px; }
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: radial-gradient(circle at top, #111, #000);
+            color: var(--text);
+            line-height: 1.4;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        .card {
+            background: var(--card);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 480px;
+            padding: 24px;
+            box-shadow: 0 0 20px rgba(0,255,136,0.2);
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 16px;
+            text-align: center;
+            color: var(--accent);
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        input {
+            font-family: inherit;
+            padding: 12px 14px;
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            background: #0d0d0d;
+            color: var(--text);
+            font-size: 1rem;
+        }
+        button {
+            font-family: inherit;
+            padding: 12px 16px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        button:hover { background: var(--accent-dark); }
+        button:active { transform: scale(0.98); }
+        .mute-btn {
+            grid-column: span 2;
+            background: #ff4444;
+            color: #fff;
+        }
+        .mute-btn.active {
+            background: #ffdd44;
+            color: #000;
+        }
+        .status {
+            margin-top: 12px;
+            padding: 10px;
+            background: #0d0d0d;
+            border-left: 4px solid var(--accent);
+            font-size: 0.95rem;
+        }
+        .audio-meter {
+            width: 100%;
+            height: 12px;
+            background: #222;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+        .meter-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #ffee00, #ff4444);
+            width: 0;
+            transition: width 0.1s;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            text-align: center;
+            color: var(--text-light);
+        }
+        @media (max-width: 500px) {
+            .controls { grid-template-columns: 1fr; }
+            .mute-btn { grid-column: span 1; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="title">Radio P2P F1 - #47 Joaquín Silva</div>
+    <div class="card">
+        <h1>🚀 Radio P2P F1</h1>
+        <p style="text-align:center; font-size:0.9rem; color:var(--text-light);">#47 Joaquín Silva</p>
         <div class="controls">
             <button id="create-room">Crear Sala</button>
-            <input id="room-id" placeholder="ID de Sala" />
-            <button id="join-room">Unirse a Sala</button>
+            <input id="room-id" placeholder="ID Sala (4 chars)" maxlength="4">
+            <button id="join-room">Unirse</button>
+            <button id="mute-btn" class="mute-btn">Silenciar</button>
         </div>
         <div class="status" id="status">Estado: Desconectado</div>
         <div class="audio-meter"><div class="meter-bar" id="meter"></div></div>
+        <div class="footer">Usa en segundo plano y silencia cuando quieras. Compatible Android / iOS.</div>
     </div>
 
 <script>
 (async function(){
-    // Inicialización P2P usando PeerJS
-    const peer = new Peer({ host: '0.peerjs.com', secure: true, port: 443 });
-    let localStream, connCall;
+    function genCode() { return Math.random().toString(36).substring(2, 6).toUpperCase(); }
+    let localStream, connCall, peer;
     const statusEl = document.getElementById('status');
     const meterBar = document.getElementById('meter');
-
+    const muteBtn = document.getElementById('mute-btn');
+    let isMuted = false;
     async function initAudio() {
-        localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const audioCtx = new AudioContext();
-        const analyser = audioCtx.createAnalyser();
-        const source = audioCtx.createMediaStreamSource(localStream);
-        source.connect(analyser);
-        analyser.fftSize = 256;
-        const data = new Uint8Array(analyser.frequencyBinCount);
-        (function updateMeter(){
-            analyser.getByteFrequencyData(data);
-            const avg = data.reduce((a,b)=>a+b)/data.length / 255;
-            meterBar.style.width = (avg * 100) + '%';
-            requestAnimationFrame(updateMeter);
-        })();
+        if (!localStream) {
+            localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const audioCtx = new AudioContext();
+            const analyser = audioCtx.createAnalyser();
+            const source = audioCtx.createMediaStreamSource(localStream);
+            source.connect(analyser);
+            analyser.fftSize = 256;
+            const data = new Uint8Array(analyser.frequencyBinCount);
+            (function updateMeter(){ analyser.getByteFrequencyData(data);
+                const avg = data.reduce((a,b)=>a+b)/data.length/255;
+                meterBar.style.width = (avg * 100) + '%';
+                requestAnimationFrame(updateMeter);
+            })();
+        }
     }
-
-    peer.on('open', id => {
-        statusEl.textContent = 'Estado: ID de Sala ' + id;
-    });
-
-    peer.on('call', call => {
-        connCall = call;
-        call.answer(localStream);
-        statusEl.textContent = 'Estado: Llamada entrante';
-        call.on('stream', remoteStream => {
-            new Audio(URL.createObjectURL(remoteStream)).play();
-            statusEl.textContent = 'Estado: En P2P con ' + call.peer;
+    function setupPeer(id) {
+        if (peer) peer.destroy();
+        peer = new Peer(id, { host: '0.peerjs.com', secure: true, port: 443 });
+        peer.on('open', () => statusEl.textContent = 'Sala ID: ' + peer.id);
+        peer.on('call', call => {
+            connCall = call;
+            call.answer(localStream);
+            statusEl.textContent = 'Llamada entrante, contestando...';
+            call.on('stream', playRemote);
         });
-    });
-
+    }
+    function playRemote(remoteStream) {
+        const audio = new Audio(); audio.srcObject = remoteStream; audio.play();
+        statusEl.textContent = 'Conectado a: ' + connCall.peer;
+    }
     document.getElementById('create-room').onclick = async ()=>{
-        await initAudio();
-        statusEl.textContent = 'Sala creada: ' + peer.id;
+        const code = genCode(); document.getElementById('room-id').value = code;
+        await initAudio(); setupPeer(code);
+        statusEl.textContent = 'Sala creada: ' + code;
     };
-
     document.getElementById('join-room').onclick = async ()=>{
-        const id = document.getElementById('room-id').value.trim();
-        if(!id) { statusEl.textContent = 'Ingrese ID de Sala'; return; }
-        if(!localStream) await initAudio();
-        connCall = peer.call(id, localStream);
-        connCall.on('stream', remoteStream => {
-            new Audio(URL.createObjectURL(remoteStream)).play();
-            statusEl.textContent = 'Conectado a ' + id;
-        });
+        const id = document.getElementById('room-id').value.trim().toUpperCase();
+        if (!id || id.length !== 4) return statusEl.textContent = 'ID inválido';
+        await initAudio(); const myId = genCode(); setupPeer(myId);
+        connCall = peer.call(id, localStream); connCall.on('stream', playRemote);
     };
+    muteBtn.onclick = () => {
+        if (!localStream) return;
+        isMuted = !isMuted;
+        localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
+        muteBtn.classList.toggle('active');
+        muteBtn.textContent = isMuted ? 'Desilenciar' : 'Silenciar';
+    };
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && peer && !localStream) initAudio();
+    });
 })();
 </script>
 </body>
