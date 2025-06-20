@@ -200,8 +200,9 @@
         </div>
 
         <div class="instructions">
-            <strong>TEAM:</strong> Click CONNECT to create room. Share room code with pilot.<br>
-            <strong>PILOT:</strong> Enter room code and JOIN. Your mic is always active.
+            <strong>TEAM:</strong> Click CONNECT to create room. Share the URL with pilot.<br>
+            <strong>PILOT:</strong> Use shared URL or enter room code manually.<br>
+            <strong>URL FORMAT:</strong> ?room=ABC123&mode=pilot
         </div>
     </div>
 
@@ -251,6 +252,10 @@
                 document.getElementById('connectBtn').classList.add('hidden');
                 document.getElementById('talkBtn').classList.remove('hidden');
                 
+                // Update URL with room code
+                setUrlParameter('room', roomId);
+                setUrlParameter('mode', 'team');
+                
             } catch (error) {
                 updateStatus('error', 'MIC ACCESS DENIED');
                 console.error('Connection error:', error);
@@ -273,6 +278,10 @@
                 updateStatus('connected', 'CONNECTED TO TEAM');
                 document.getElementById('joinBtn').classList.add('hidden');
                 document.getElementById('pilotStatus').classList.remove('hidden');
+                
+                // Update URL with room code and pilot mode
+                setUrlParameter('room', roomId);
+                setUrlParameter('mode', 'pilot');
                 
                 // Pilot always transmits
                 startPilotTransmission();
@@ -466,10 +475,66 @@
             document.getElementById('pilotStatus').classList.add('hidden');
         }
 
+        // URL parameter handling
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function setUrlParameter(name, value) {
+            const url = new URL(window.location);
+            url.searchParams.set(name, value);
+            window.history.replaceState({}, '', url);
+        }
+
+        function autoConnectFromUrl() {
+            const urlRoom = getUrlParameter('room');
+            const urlMode = getUrlParameter('mode');
+            
+            if (urlRoom) {
+                roomId = urlRoom.toUpperCase();
+                
+                if (urlMode === 'pilot') {
+                    setMode('pilot');
+                    document.getElementById('roomInput').value = roomId;
+                    setTimeout(() => joinRoom(), 500);
+                } else {
+                    // Team mode - auto connect with existing room
+                    setTimeout(() => connectWithRoom(roomId), 500);
+                }
+            }
+        }
+
+        async function connectWithRoom(existingRoom) {
+            try {
+                roomId = existingRoom;
+                document.getElementById('roomId').textContent = roomId;
+                document.getElementById('connectionInfo').classList.remove('hidden');
+                
+                await initializeAudio();
+                setupBroadcastChannel();
+                
+                updateStatus('connected', 'ROOM RESTORED - WAITING FOR PILOT');
+                document.getElementById('connectBtn').classList.add('hidden');
+                document.getElementById('talkBtn').classList.remove('hidden');
+                
+                // Update URL
+                setUrlParameter('room', roomId);
+                setUrlParameter('mode', 'team');
+                
+            } catch (error) {
+                updateStatus('error', 'MIC ACCESS DENIED');
+                console.error('Connection error:', error);
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             // Prevent context menu on touch devices for better mobile experience
             document.addEventListener('contextmenu', e => e.preventDefault());
+            
+            // Auto-connect from URL parameters
+            autoConnectFromUrl();
         });
     </script>
 </body>
