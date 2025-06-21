@@ -7,108 +7,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
   <style>
-    :root {
-      --bg: #0b0b0b;
-      --card: #1b1b1b;
-      --accent: #00ff99;
-      --accent-dark: #00cc77;
-      --text: #e0e0e0;
-      --text-light: #666;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Orbitron', sans-serif;
-      background: linear-gradient(to bottom, #000000, #121212);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .card {
-      background: var(--card);
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      width: 100%;
-      max-width: 500px;
-      padding: 24px;
-      box-shadow: 0 0 20px rgba(0, 255, 153, 0.2);
-    }
-    h1 {
-      font-size: 1.8rem;
-      text-align: center;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-    .subtitle {
-      text-align: center;
-      font-size: 0.9rem;
-      color: var(--text-light);
-      margin-bottom: 24px;
-    }
-    .controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    input, button {
-      font-family: inherit;
-      padding: 12px;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: 1px solid var(--accent);
-      background: #000;
-      color: var(--text);
-    }
-    button {
-      background: var(--accent);
-      color: #000;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-    }
-    button:hover { background: var(--accent-dark); }
-    button:active { transform: scale(0.98); }
-    .mute {
-      grid-column: span 2;
-      background: #ff4444;
-      color: #fff;
-    }
-    .mute.active {
-      background: #ffdd44;
-      color: #000;
-    }
-    .status {
-      background: #111;
-      border-left: 4px solid var(--accent);
-      padding: 10px;
-      font-size: 0.95rem;
-      margin-bottom: 16px;
-    }
-    .meter {
-      width: 100%;
-      height: 12px;
-      background: #222;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    .bar {
-      height: 100%;
-      background: linear-gradient(90deg, #00ff99, #ffee00, #ff4444);
-      width: 0;
-      transition: width 0.1s;
-    }
-    .footer {
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-light);
-      margin-top: 16px;
-    }
-    @media (max-width: 500px) {
-      .controls { grid-template-columns: 1fr; }
-      .mute { grid-column: span 1; }
-    }
+    :root { --bg: #0b0b0b; --card: #1b1b1b; --accent: #00ff99; --accent-dark: #00cc77; --text: #e0e0e0; --text-light: #666; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Orbitron', sans-serif; background:linear-gradient(to bottom,#000,#121212); color:var(--text); display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
+    .card { background:var(--card); border:2px solid var(--accent); border-radius:12px; width:100%; max-width:500px; padding:24px; box-shadow:0 0 20px rgba(0,255,153,0.2); }
+    h1 { font-size:1.8rem; text-align:center; color:var(--accent); margin-bottom:8px; }
+    .subtitle { text-align:center; font-size:0.9rem; color:var(--text-light); margin-bottom:24px; }
+    .controls { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+    input, button { font-family:inherit; padding:12px; font-size:1rem; border-radius:6px; border:1px solid var(--accent); background:#000; color:var(--text); }
+    button { background:var(--accent); color:#000; cursor:pointer; transition:background 0.2s,transform 0.1s; }
+    button:hover { background:var(--accent-dark); }
+    button:active { transform:scale(0.98); }
+    .mute { grid-column:span 2; background:#ff4444; color:#fff; }
+    .mute.active { background:#ffdd44; color:#000; }
+    .status { background:#111; border-left:4px solid var(--accent); padding:10px; font-size:0.95rem; margin-bottom:16px; word-break:break-all; }
+    .meter { width:100%; height:12px; background:#222; border-radius:6px; overflow:hidden; }
+    .bar { height:100%; background:linear-gradient(90deg,#00ff99,#ffee00,#ff4444); width:0%; transition:width 0.1s; }
+    .footer { text-align:center; font-size:0.8rem; color:var(--text-light); margin-top:16px; }
+    @media(max-width:500px){ .controls{ grid-template-columns:1fr; } .mute{ grid-column:span 1;} }
   </style>
 </head>
 <body>
@@ -123,7 +39,7 @@
     </div>
     <div class="status" id="status">Estado: Desconectado</div>
     <div class="meter"><div class="bar" id="bar"></div></div>
-    <div class="footer">Funciona en segundo plano. Sin servidor adicional.</div>
+    <div class="footer">Se conecta directamente vía URL: <code>?room=ABCD</code></div>
   </div>
 
   <script>
@@ -133,69 +49,65 @@
     const bar = document.getElementById('bar');
     const muteBtn = document.getElementById('mute');
 
-    function genCode() {
-      return Math.random().toString(36).substring(2, 6).toUpperCase();
-    }
+    function genCode() { return Math.random().toString(36).substring(2,6).toUpperCase(); }
+    function getParam() { const p = new URLSearchParams(window.location.search).get('room'); return p ? p.toUpperCase() : null; }
+    function updateUrl(code) { const url = new URL(window.location); url.searchParams.set('room', code); window.history.replaceState({},'',url); }
 
-    async function initAudio() {
-      localStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
-      const ctx = new AudioContext();
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
-      const source = ctx.createMediaStreamSource(localStream);
-      source.connect(analyser);
-      const data = new Uint8Array(analyser.frequencyBinCount);
-      function update() {
-        analyser.getByteFrequencyData(data);
-        const avg = data.reduce((a,b) => a+b) / data.length / 255;
-        bar.style.width = (avg * 100) + '%';
-        requestAnimationFrame(update);
+    async function initAudio(){
+      if(!localStream){
+        localStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+        const ctx = new AudioContext(), analyser = ctx.createAnalyser(); analyser.fftSize=256;
+        const source = ctx.createMediaStreamSource(localStream); source.connect(analyser);
+        const data = new Uint8Array(analyser.frequencyBinCount);
+        (function meter(){ analyser.getByteFrequencyData(data);
+          const avg=data.reduce((a,b)=>a+b)/data.length/255;
+          bar.style.width = (avg*100)+'%'; requestAnimationFrame(meter);
+        })();
       }
-      update();
     }
 
-    function setupPeer(id) {
-      if (peer) peer.destroy();
-      peer = new Peer(id, { host: '0.peerjs.com', secure: true, port: 443 });
-      peer.on('open', id => statusEl.textContent = 'Sala ID: ' + id);
-
-      peer.on('call', incoming => {
-        call = incoming;
-        call.answer(localStream);
-        statusEl.textContent = 'Conectado con: ' + call.peer;
+    function setupPeer(id, isHost){
+      if(peer) peer.destroy();
+      peer = new Peer(id, {host:'0.peerjs.com',secure:true,port:443});
+      peer.on('open', id=>{
+        statusEl.textContent = (isHost?'Sala creada: ':'Conectado a: ')+id;
+        if(isHost) updateUrl(id);
+      });
+      peer.on('call', incoming=>{
+        call = incoming; call.answer(localStream);
         call.on('stream', playStream);
       });
     }
 
-    function playStream(remoteStream) {
-      const audio = new Audio();
-      audio.srcObject = remoteStream;
-      audio.play();
-    }
+    function playStream(remoteStream){ const audio=new Audio(); audio.srcObject=remoteStream; audio.play(); }
 
-    document.getElementById('create').onclick = async () => {
-      await initAudio();
-      const code = genCode();
-      document.getElementById('room').value = code;
-      setupPeer(code);
+    document.getElementById('create').onclick = async ()=>{
+      await initAudio(); const code = genCode(); document.getElementById('room').value=code;
+      setupPeer(code,true);
     };
 
-    document.getElementById('join').onclick = async () => {
-      await initAudio();
-      const room = document.getElementById('room').value.trim().toUpperCase();
-      if (room.length !== 4) return statusEl.textContent = 'Código inválido';
-      setupPeer(genCode());
-      call = peer.call(room, localStream);
-      call.on('stream', playStream);
+    document.getElementById('join').onclick = async ()=>{
+      const room=document.getElementById('room').value.trim().toUpperCase();
+      if(room.length!==4) return statusEl.textContent='Código inválido';
+      await initAudio(); setupPeer(genCode(),false);
+      call=peer.call(room,localStream); call.on('stream',playStream);
     };
 
-    muteBtn.onclick = () => {
-      if (!localStream) return;
-      muted = !muted;
-      localStream.getAudioTracks().forEach(t => t.enabled = !muted);
-      muteBtn.classList.toggle('active');
-      muteBtn.textContent = muted ? 'Activar Mic' : 'Silenciar';
+    muteBtn.onclick=()=>{
+      if(!localStream) return;
+      muted=!muted; localStream.getAudioTracks().forEach(t=>t.enabled=!muted);
+      muteBtn.classList.toggle('active'); muteBtn.textContent=muted?'Activar Mic':'Silenciar';
     };
+
+    // Auto-conexión si existe parámetro
+    window.addEventListener('DOMContentLoaded', async ()=>{
+      const room = getParam();
+      if(room && room.length===4){
+        document.getElementById('room').value=room;
+        await initAudio(); setupPeer(genCode(),false);
+        call=peer.call(room,localStream); call.on('stream',playStream);
+      }
+    });
   </script>
 </body>
 </html>
