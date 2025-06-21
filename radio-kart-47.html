@@ -1,193 +1,201 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radio P2P F1 - Joaquín Silva #47</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <!-- PeerJS CDN para signaling -->
-    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
-    <style>
-        :root {
-            --bg: #0b0b0b;
-            --card: #1a1a1a;
-            --accent: #00ff88;
-            --accent-dark: #00cc6a;
-            --text: #e0e0e0;
-            --text-light: #888;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Orbitron', sans-serif;
-            background: radial-gradient(circle at top, #111, #000);
-            color: var(--text);
-            line-height: 1.4;
-            display: flex;
-            justify-content: center;
-            padding: 40px 20px;
-        }
-        .card {
-            background: var(--card);
-            border: 2px solid var(--accent);
-            border-radius: 12px;
-            width: 100%;
-            max-width: 480px;
-            padding: 24px;
-            box-shadow: 0 0 20px rgba(0,255,136,0.2);
-        }
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 16px;
-            text-align: center;
-            color: var(--accent);
-        }
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 12px;
-            margin: 20px 0;
-        }
-        input {
-            font-family: inherit;
-            padding: 12px 14px;
-            border: 1px solid var(--accent);
-            border-radius: 6px;
-            background: #0d0d0d;
-            color: var(--text);
-            font-size: 1rem;
-        }
-        button {
-            font-family: inherit;
-            padding: 12px 16px;
-            background: var(--accent);
-            color: #000;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-        button:hover { background: var(--accent-dark); }
-        button:active { transform: scale(0.98); }
-        .mute-btn {
-            grid-column: span 2;
-            background: #ff4444;
-            color: #fff;
-        }
-        .mute-btn.active {
-            background: #ffdd44;
-            color: #000;
-        }
-        .status {
-            margin-top: 12px;
-            padding: 10px;
-            background: #0d0d0d;
-            border-left: 4px solid var(--accent);
-            font-size: 0.95rem;
-        }
-        .audio-meter {
-            width: 100%;
-            height: 12px;
-            background: #222;
-            border-radius: 6px;
-            overflow: hidden;
-            margin-top: 16px;
-        }
-        .meter-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #00ff88, #ffee00, #ff4444);
-            width: 0;
-            transition: width 0.1s;
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 0.8rem;
-            text-align: center;
-            color: var(--text-light);
-        }
-        @media (max-width: 500px) {
-            .controls { grid-template-columns: 1fr; }
-            .mute-btn { grid-column: span 1; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 Team Radio - Joaquín Silva #47</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  <style>
+    :root {
+      --bg: #0b0b0b;
+      --card: #1b1b1b;
+      --accent: #00ff99;
+      --accent-dark: #00cc77;
+      --text: #e0e0e0;
+      --text-light: #666;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(to bottom, #000000, #121212);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .card {
+      background: var(--card);
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      padding: 24px;
+      box-shadow: 0 0 20px rgba(0, 255, 153, 0.2);
+    }
+    h1 {
+      font-size: 1.8rem;
+      text-align: center;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-bottom: 24px;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    input, button {
+      font-family: inherit;
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid var(--accent);
+      background: #000;
+      color: var(--text);
+    }
+    button {
+      background: var(--accent);
+      color: #000;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    button:hover { background: var(--accent-dark); }
+    button:active { transform: scale(0.98); }
+    .mute {
+      grid-column: span 2;
+      background: #ff4444;
+      color: #fff;
+    }
+    .mute.active {
+      background: #ffdd44;
+      color: #000;
+    }
+    .status {
+      background: #111;
+      border-left: 4px solid var(--accent);
+      padding: 10px;
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+    .meter {
+      width: 100%;
+      height: 12px;
+      background: #222;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .bar {
+      height: 100%;
+      background: linear-gradient(90deg, #00ff99, #ffee00, #ff4444);
+      width: 0;
+      transition: width 0.1s;
+    }
+    .footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-top: 16px;
+    }
+    @media (max-width: 500px) {
+      .controls { grid-template-columns: 1fr; }
+      .mute { grid-column: span 1; }
+    }
+  </style>
 </head>
 <body>
-    <div class="card">
-        <h1>🚀 Radio P2P F1</h1>
-        <p style="text-align:center; font-size:0.9rem; color:var(--text-light);">#47 Joaquín Silva</p>
-        <div class="controls">
-            <button id="create-room">Crear Sala</button>
-            <input id="room-id" placeholder="ID Sala (4 chars)" maxlength="4">
-            <button id="join-room">Unirse</button>
-            <button id="mute-btn" class="mute-btn">Silenciar</button>
-        </div>
-        <div class="status" id="status">Estado: Desconectado</div>
-        <div class="audio-meter"><div class="meter-bar" id="meter"></div></div>
-        <div class="footer">Usa en segundo plano y silencia cuando quieras. Compatible Android / iOS.</div>
+  <div class="card">
+    <h1>F1 TEAM RADIO</h1>
+    <div class="subtitle">Joaquín Silva - #47 | P2P Voice Chat</div>
+    <div class="controls">
+      <button id="create">Crear Sala</button>
+      <button id="join">Unirse</button>
+      <input id="room" placeholder="Código de Sala (4 chars)" maxlength="4">
+      <button id="mute" class="mute">Silenciar</button>
     </div>
+    <div class="status" id="status">Estado: Desconectado</div>
+    <div class="meter"><div class="bar" id="bar"></div></div>
+    <div class="footer">Funciona en segundo plano. Sin servidor adicional.</div>
+  </div>
 
-<script>
-(async function(){
-    function genCode() { return Math.random().toString(36).substring(2, 6).toUpperCase(); }
-    let localStream, connCall, peer;
+  <script>
+    let localStream, peer, call;
+    let muted = false;
     const statusEl = document.getElementById('status');
-    const meterBar = document.getElementById('meter');
-    const muteBtn = document.getElementById('mute-btn');
-    let isMuted = false;
+    const bar = document.getElementById('bar');
+    const muteBtn = document.getElementById('mute');
+
+    function genCode() {
+      return Math.random().toString(36).substring(2, 6).toUpperCase();
+    }
+
     async function initAudio() {
-        if (!localStream) {
-            localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const audioCtx = new AudioContext();
-            const analyser = audioCtx.createAnalyser();
-            const source = audioCtx.createMediaStreamSource(localStream);
-            source.connect(analyser);
-            analyser.fftSize = 256;
-            const data = new Uint8Array(analyser.frequencyBinCount);
-            (function updateMeter(){ analyser.getByteFrequencyData(data);
-                const avg = data.reduce((a,b)=>a+b)/data.length/255;
-                meterBar.style.width = (avg * 100) + '%';
-                requestAnimationFrame(updateMeter);
-            })();
-        }
+      localStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      const ctx = new AudioContext();
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      const source = ctx.createMediaStreamSource(localStream);
+      source.connect(analyser);
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      function update() {
+        analyser.getByteFrequencyData(data);
+        const avg = data.reduce((a,b) => a+b) / data.length / 255;
+        bar.style.width = (avg * 100) + '%';
+        requestAnimationFrame(update);
+      }
+      update();
     }
+
     function setupPeer(id) {
-        if (peer) peer.destroy();
-        peer = new Peer(id, { host: '0.peerjs.com', secure: true, port: 443 });
-        peer.on('open', () => statusEl.textContent = 'Sala ID: ' + peer.id);
-        peer.on('call', call => {
-            connCall = call;
-            call.answer(localStream);
-            statusEl.textContent = 'Llamada entrante, contestando...';
-            call.on('stream', playRemote);
-        });
+      if (peer) peer.destroy();
+      peer = new Peer(id, { host: '0.peerjs.com', secure: true, port: 443 });
+      peer.on('open', id => statusEl.textContent = 'Sala ID: ' + id);
+
+      peer.on('call', incoming => {
+        call = incoming;
+        call.answer(localStream);
+        statusEl.textContent = 'Conectado con: ' + call.peer;
+        call.on('stream', playStream);
+      });
     }
-    function playRemote(remoteStream) {
-        const audio = new Audio(); audio.srcObject = remoteStream; audio.play();
-        statusEl.textContent = 'Conectado a: ' + connCall.peer;
+
+    function playStream(remoteStream) {
+      const audio = new Audio();
+      audio.srcObject = remoteStream;
+      audio.play();
     }
-    document.getElementById('create-room').onclick = async ()=>{
-        const code = genCode(); document.getElementById('room-id').value = code;
-        await initAudio(); setupPeer(code);
-        statusEl.textContent = 'Sala creada: ' + code;
+
+    document.getElementById('create').onclick = async () => {
+      await initAudio();
+      const code = genCode();
+      document.getElementById('room').value = code;
+      setupPeer(code);
     };
-    document.getElementById('join-room').onclick = async ()=>{
-        const id = document.getElementById('room-id').value.trim().toUpperCase();
-        if (!id || id.length !== 4) return statusEl.textContent = 'ID inválido';
-        await initAudio(); const myId = genCode(); setupPeer(myId);
-        connCall = peer.call(id, localStream); connCall.on('stream', playRemote);
+
+    document.getElementById('join').onclick = async () => {
+      await initAudio();
+      const room = document.getElementById('room').value.trim().toUpperCase();
+      if (room.length !== 4) return statusEl.textContent = 'Código inválido';
+      setupPeer(genCode());
+      call = peer.call(room, localStream);
+      call.on('stream', playStream);
     };
+
     muteBtn.onclick = () => {
-        if (!localStream) return;
-        isMuted = !isMuted;
-        localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
-        muteBtn.classList.toggle('active');
-        muteBtn.textContent = isMuted ? 'Desilenciar' : 'Silenciar';
+      if (!localStream) return;
+      muted = !muted;
+      localStream.getAudioTracks().forEach(t => t.enabled = !muted);
+      muteBtn.classList.toggle('active');
+      muteBtn.textContent = muted ? 'Activar Mic' : 'Silenciar';
     };
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && peer && !localStream) initAudio();
-    });
-})();
-</script>
+  </script>
 </body>
 </html>
