@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>F1 Team Radio - Joaquín Silva #47</title>
+  <title>Kart Team radio - Joaquín Silva #47</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
   <style>
@@ -196,33 +196,23 @@
     }
     
     .voice-controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      display: flex;
+      justify-content: center;
       margin-bottom: 20px;
     }
     
     .mute-btn { 
-      grid-column: span 2; 
-      background: linear-gradient(135deg, var(--danger), #cc0000);
+      width: 100%;
+      background: linear-gradient(135deg, var(--success), #45a049);
       color: #fff;
       font-weight: 500;
+      font-size: 1.1rem;
+      padding: 16px;
     }
     
-    .mute-btn.active { 
-      background: linear-gradient(135deg, var(--warning), #cc8800);
-      color: #000;
-    }
-    
-    .push-to-talk {
-      background: linear-gradient(135deg, #4CAF50, #45a049);
-      color: white;
-    }
-    
-    .push-to-talk.active {
-      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-      color: #000;
-      box-shadow: 0 0 20px rgba(0,255,153,0.6);
+    .mute-btn.muted { 
+      background: linear-gradient(135deg, var(--danger), #cc0000);
+      color: #fff;
     }
     
     .status { 
@@ -338,10 +328,10 @@
     }
     
     @media(max-width: 500px) { 
-      .room-controls, .voice-controls { 
+      .room-controls { 
         grid-template-columns: 1fr; 
       } 
-      .mute-btn, .room-input-group { 
+      .room-input-group { 
         grid-column: span 1;
       }
       
@@ -357,6 +347,11 @@
       input, button {
         padding: 12px;
         font-size: 0.9rem;
+      }
+      
+      .mute-btn {
+        font-size: 1rem;
+        padding: 14px;
       }
     }
     
@@ -393,8 +388,7 @@
     </div>
 
     <div class="voice-controls">
-      <button id="pushToTalk" class="push-to-talk">Push-to-Talk</button>
-      <button id="muteToggle" class="mute-btn">Silenciar</button>
+      <button id="muteToggle" class="mute-btn">🔊 Micrófono Activo</button>
     </div>
 
     <div class="status" id="status">
@@ -426,8 +420,8 @@
     </div>
 
     <div class="footer">
-      🎯 Conexión directa P2P • Sin servidores intermediarios<br>
-      Acceso rápido: <code>?room=CODIGO</code>
+      🎯 Conexión directa P2P • Comunicación continua manos libres<br>
+      Acceso rápido: <code>?room=CODIGO</code> • Presiona <code>M</code> para silenciar
     </div>
   </div>
 
@@ -439,13 +433,11 @@
         this.localStream = null;
         this.remoteStream = null;
         this.isMuted = false;
-        this.isPushToTalk = false;
         this.isConnected = false;
         this.roomCode = '';
         this.isHost = false;
         this.audioContext = null;
         this.analyser = null;
-        this.micEnabled = true;
         
         this.initializeElements();
         this.setupEventListeners();
@@ -459,7 +451,6 @@
           createRoom: document.getElementById('createRoom'),
           joinRoom: document.getElementById('joinRoom'),
           roomCode: document.getElementById('roomCode'),
-          pushToTalk: document.getElementById('pushToTalk'),
           muteToggle: document.getElementById('muteToggle'),
           status: document.getElementById('status'),
           audioBar: document.getElementById('audioBar'),
@@ -477,36 +468,6 @@
         this.elements.createRoom.onclick = () => this.createRoom();
         this.elements.joinRoom.onclick = () => this.joinRoom();
         this.elements.muteToggle.onclick = () => this.toggleMute();
-        
-        // Push to talk events
-        this.elements.pushToTalk.onmousedown = () => this.startPushToTalk();
-        this.elements.pushToTalk.onmouseup = () => this.stopPushToTalk();
-        this.elements.pushToTalk.onmouseleave = () => this.stopPushToTalk();
-        
-        // Touch events for mobile
-        this.elements.pushToTalk.ontouchstart = (e) => {
-          e.preventDefault();
-          this.startPushToTalk();
-        };
-        this.elements.pushToTalk.ontouchend = (e) => {
-          e.preventDefault();
-          this.stopPushToTalk();
-        };
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-          if (e.code === 'Space' && !e.target.matches('input')) {
-            e.preventDefault();
-            this.startPushToTalk();
-          }
-        });
-
-        document.addEventListener('keyup', (e) => {
-          if (e.code === 'Space' && !e.target.matches('input')) {
-            e.preventDefault();
-            this.stopPushToTalk();
-          }
-        });
 
         // Room code input formatting
         this.elements.roomCode.oninput = (e) => {
@@ -519,6 +480,14 @@
             this.joinRoom();
           }
         };
+
+        // Keyboard shortcuts for mute (M key)
+        document.addEventListener('keydown', (e) => {
+          if (e.key.toLowerCase() === 'm' && !e.target.matches('input')) {
+            e.preventDefault();
+            this.toggleMute();
+          }
+        });
       }
 
       generateRoomCode() {
@@ -610,8 +579,13 @@
             }
           });
 
+          // Micrófono activo por defecto
+          this.localStream.getAudioTracks().forEach(track => {
+            track.enabled = true;
+          });
+
           this.setupAudioAnalyzer();
-          this.updateStatus('🎤 Micrófono activado', 'success');
+          this.updateStatus('🎤 Micrófono activado - Listo para comunicar', 'success');
         } catch (error) {
           throw new Error('No se pudo acceder al micrófono: ' + error.message);
         }
@@ -742,45 +716,27 @@
       }
 
       toggleMute() {
-        if (!this.localStream) return;
+        if (!this.localStream) {
+          this.updateStatus('❌ No hay conexión de audio activa', 'error');
+          return;
+        }
         
         this.isMuted = !this.isMuted;
+        
+        // Cambiar estado de todos los tracks de audio
         this.localStream.getAudioTracks().forEach(track => {
           track.enabled = !this.isMuted;
         });
         
-        this.elements.muteToggle.classList.toggle('active', this.isMuted);
-        this.elements.muteToggle.textContent = this.isMuted ? '🔊 Activar' : '🔇 Silenciar';
+        // Actualizar UI del botón
+        this.elements.muteToggle.classList.toggle('muted', this.isMuted);
+        this.elements.muteToggle.textContent = this.isMuted ? '🔇 Micrófono Silenciado' : '🔊 Micrófono Activo';
         
-        this.updateStatus(this.isMuted ? '🔇 Micrófono silenciado' : '🔊 Micrófono activado', 'warning');
-      }
-
-      startPushToTalk() {
-        if (!this.localStream || this.isPushToTalk) return;
-        
-        this.isPushToTalk = true;
-        this.elements.pushToTalk.classList.add('active');
-        this.elements.pushToTalk.textContent = '🗣️ HABLANDO';
-        this.micEnabled = true;
-        
-        this.localStream.getAudioTracks().forEach(track => {
-          track.enabled = true;
-        });
-      }
-
-      stopPushToTalk() {
-        if (!this.isPushToTalk) return;
-        
-        this.isPushToTalk = false;
-        this.elements.pushToTalk.classList.remove('active');
-        this.elements.pushToTalk.textContent = 'Push-to-Talk';
-        this.micEnabled = false;
-        
-        if (!this.isMuted) {
-          this.localStream.getAudioTracks().forEach(track => {
-            track.enabled = false;
-          });
-        }
+        // Actualizar status
+        const statusMsg = this.isMuted ? 
+          '🔇 Micrófono SILENCIADO - Los demás no te escuchan' : 
+          '🔊 Micrófono ACTIVO - Comunicación abierta';
+        this.updateStatus(statusMsg, this.isMuted ? 'warning' : 'success');
       }
 
       updateStatus(message, type = '') {
