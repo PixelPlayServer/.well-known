@@ -1,12 +1,12 @@
 {
-  "version": "3.0.1",
-  "releaseDate": "2025-06-23",
+  "version": "3.0.0",
+  "releaseDate": "2025-05-31",
   "name": "PixelPlay Launcher",
   "description": "Launcher oficial para conectarse al servidor PixelPlay Minecraft 1.20.1",
   "requirements": {
     "java": "Java 17 o superior",
     "ram": "4GB RAM mínimo (8GB recomendado)",
-    "storage": "3GB espacio libre",
+    "storage": "2GB espacio libre",
     "minecraft": "Minecraft Java Edition"
   },
   "downloads": {
@@ -18,45 +18,33 @@
       "checksum": "sha256:placeholder-checksum-for-windows",
       "compatible": ["Windows 10", "Windows 11"],
       "architecture": ["x64", "x86"]
-    }
-  },
-  "updateInfo": {
-    "mandatory": false,
-    "releaseNotes": "https://pixelplay.gg/",
-    "downloadUrl": "https://pixelplay.gg/",
-    "updateZip": {
-      "windows": "https://github.com/PixelPlayServer/.well-known/releases/download/main-realese/Pixelplay-upd.zip",
     },
-    "minVersion": "3.0.1",
-    "features": [
-      "Sistema de actualizaciones automáticas",
-      "Corrección de bugs críticos"
-    ]
-  },
   "changelog": [
     {
-      "version": "3.0.1",
-      "date": "2025-06-23",
+      "version": "3.0.0",
+      "date": "2025-05-31",
       "changes": [
-        "🔄 Sistema de actualizaciones automáticas integrado",
-        "🐛 Corrección de bugs críticos de estabilidad",
-        "🛡️ Verificación de integridad de archivos",
+        "Añadido soporte para archivos locales y en la nube",
+        "Mejorado sistema de verificación de integridad",
+        "Optimización del proceso de descarga",
+        "Soporte experimental para Linux"
       ]
     },
+    {
+      "version": "1.0.0",
+      "date": "2025-05-31",
+      "changes": [
+        "Lanzamiento inicial del PixelPlay Launcher",
+        "Soporte completo para Windows y macOS",
+        "Instalación automática de mods y configuraciones",
+        "Sistema de actualizaciones automáticas",
+        "Interfaz moderna y fácil de usar"
+      ]
+    }
   ],
   "support": {
-    "discord": "https://discord.gg/ezHCr2Abbb",
+    "discord": "can't give",
     "email": "soporte@pixelplay.gg",
-    "website": "https://pixelplay.gg/",
-    "documentation": "https://pixelplay.gg/"
-  },
-  "security": {
-    "signatures": {
-      "windows": "authenticode"
-    },
-    "checksums": {
-      "algorithm": "sha256",
-      "verification": "required"
-    }
+    "website": "https://pixelplay.gg/support"
   }
-}
+}}
