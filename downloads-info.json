@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0",
+  "version": "3.0.1",
   "releaseDate": "2025-06-23",
   "name": "PixelPlay Launcher",
   "description": "Launcher oficial para conectarse al servidor PixelPlay Minecraft 1.20.1",
@@ -52,9 +52,7 @@
   },
   "security": {
     "signatures": {
-      "windows": "authenticode",
-      "mac": "codesign",
-      "linux": "gpg"
+      "windows": "authenticode"
     },
     "checksums": {
       "algorithm": "sha256",
