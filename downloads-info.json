@@ -6,7 +6,7 @@
   "requirements": {
     "java": "Java 17 o superior",
     "ram": "4GB RAM mínimo (8GB recomendado)",
-    "storage": "2GB espacio libre",
+    "storage": "3GB espacio libre",
     "minecraft": "Minecraft Java Edition"
   },
   "downloads": {
@@ -18,86 +18,37 @@
       "checksum": "sha256:placeholder-checksum-for-windows",
       "compatible": ["Windows 10", "Windows 11"],
       "architecture": ["x64", "x86"]
-    },
-    "mac": {
-      "type": "cloud",
-      "filename": "Pixelplay-installer.dmg",
-      "cloudUrl": "https://github.com/PixelPlayServer/.well-known/releases/download/main-realese/Pixelplay-installer.dmg",
-      "size": "~950MB",
-      "checksum": "sha256:placeholder-checksum-for-mac",
-      "compatible": ["macOS 10.15+", "macOS 11+", "macOS 12+"],
-      "architecture": ["x64", "arm64"]
-    },
-    "linux": {
-      "type": "cloud",
-      "filename": "Pixelplay-linux.AppImage",
-      "cloudUrl": "https://github.com/PixelPlayServer/.well-known/releases/download/main-realese/Pixelplay-linux.AppImage",
-      "size": "~980MB",
-      "checksum": "sha256:placeholder-checksum-for-linux",
-      "compatible": ["Ubuntu 18.04+", "Debian 10+", "Fedora 30+"],
-      "architecture": ["x64"]
     }
   },
   "updateInfo": {
     "mandatory": false,
-    "releaseNotes": "https://pixelplay.gg/changelog/3.0.0",
-    "downloadUrl": "https://pixelplay.gg/downloads/",
+    "releaseNotes": "https://pixelplay.gg/",
+    "downloadUrl": "https://pixelplay.gg/",
     "updateZip": {
-      "windows": "https://github.com/PixelPlayServer/.well-known/releases/download/main-realese/pixelplay-update-windows.zip",
-      "mac": "https://github.com/PixelPlayServer/.well-known/releases/download/main-realese/pixelplay-update-mac.zip",
-      "linux": "https://github.com/PixelPlayServer/.well-known/releases/download/main-realese/pixelplay-update-linux.zip"
+      "windows": "https://github.com/PixelPlayServer/.well-known/releases/download/main-realese/Pixelplay-upd.zip",
     },
-    "minVersion": "2.0.0",
+    "minVersion": "3.0.1",
     "features": [
       "Sistema de actualizaciones automáticas",
-      "Mejoras en la velocidad de descarga",
-      "Nuevo sistema de autenticación",
-      "Interfaz rediseñada",
       "Corrección de bugs críticos"
     ]
   },
   "changelog": [
     {
-      "version": "3.0.0",
+      "version": "3.0.1",
       "date": "2025-06-23",
       "changes": [
         "🔄 Sistema de actualizaciones automáticas integrado",
-        "⚡ Mejoras significativas en velocidad de descarga",
-        "🔐 Sistema de autenticación mejorado con Microsoft",
-        "🎨 Interfaz completamente rediseñada",
         "🐛 Corrección de bugs críticos de estabilidad",
-        "📦 Soporte mejorado para archivos en la nube",
         "🛡️ Verificación de integridad de archivos",
-        "🚀 Optimización del proceso de instalación"
       ]
     },
-    {
-      "version": "2.9.0",
-      "date": "2025-05-31",
-      "changes": [
-        "Añadido soporte para archivos locales y en la nube",
-        "Mejorado sistema de verificación de integridad",
-        "Optimización del proceso de descarga",
-        "Soporte experimental para Linux"
-      ]
-    },
-    {
-      "version": "1.0.0",
-      "date": "2025-05-31",
-      "changes": [
-        "Lanzamiento inicial del PixelPlay Launcher",
-        "Soporte completo para Windows y macOS",
-        "Instalación automática de mods y configuraciones",
-        "Sistema de actualizaciones automáticas",
-        "Interfaz moderna y fácil de usar"
-      ]
-    }
   ],
   "support": {
-    "discord": "discord.gg/pixelplay",
+    "discord": "https://discord.gg/ezHCr2Abbb",
     "email": "soporte@pixelplay.gg",
-    "website": "https://pixelplay.gg/support",
-    "documentation": "https://pixelplay.gg/docs"
+    "website": "https://pixelplay.gg/",
+    "documentation": "https://pixelplay.gg/"
   },
   "security": {
     "signatures": {
