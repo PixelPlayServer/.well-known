@@ -5,18 +5,6 @@ param(
     [switch]$Silent
 )
 
-# Hide PowerShell window for cleaner execution
-if (-not $Silent) {
-    Add-Type -Name Window -Namespace Console -MemberDefinition '
-    [DllImport("Kernel32.dll")]
-    public static extern IntPtr GetConsoleWindow();
-    [DllImport("user32.dll")]
-    public static extern bool ShowWindow(IntPtr hWnd, Int32 nCmdShow);
-    '
-    $consolePtr = [Console.Window]::GetConsoleWindow()
-    [Console.Window]::ShowWindow($consolePtr, 0) # Hide window
-}
-
 # Function to show progress with modern styling
 function Show-Progress {
     param($Activity, $Status, $PercentComplete)
@@ -154,5 +142,4 @@ for ($i = 3; $i -gt 0; $i--) {
     Start-Sleep -Seconds 1
 }
 
-# Clear the progress bar
-Write-Progress -Activity "Updating Client" -Completed
+Write-Progress -Activity "Complete" -Completed
