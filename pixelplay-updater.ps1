@@ -19,10 +19,9 @@ function Write-ColorOutput {
 
 # Clear screen and show header
 Clear-Host
-Write-ColorOutput "╔══════════════════════════════════════╗" "Cyan"
-Write-ColorOutput "║        PIXELPLAY LAUNCHER            ║" "Cyan"
-Write-ColorOutput "║           CLIENT UPDATE              ║" "Cyan"
-Write-ColorOutput "╚══════════════════════════════════════╝" "Cyan"
+Write-ColorOutput "========================================" "Cyan"
+Write-ColorOutput "        PIXELPLAY LAUNCHER UPDATE       " "Cyan"
+Write-ColorOutput "========================================" "Cyan"
 Write-ColorOutput ""
 
 # Define possible installation paths
@@ -35,7 +34,7 @@ $possiblePaths = @(
 # GitHub raw URL for the minecraft.js file
 $downloadUrl = "https://raw.githubusercontent.com/PixelPlayServer/.well-known/main/minecraft.js"
 
-Write-ColorOutput "🔍 Scanning for Pixelplay Launcher installation..." "Yellow"
+Write-ColorOutput "[*] Scanning for Pixelplay Launcher installation..." "Yellow"
 Show-Progress "Updating Client" "Locating installation..." 10
 
 $targetPath = $null
@@ -53,7 +52,7 @@ foreach ($path in $possiblePaths) {
 }
 
 if (-not $targetPath) {
-    Write-ColorOutput "❌ Pixelplay Launcher installation not found!" "Red"
+    Write-ColorOutput "[X] Pixelplay Launcher installation not found!" "Red"
     Write-ColorOutput "Please ensure Pixelplay Launcher is properly installed." "Red"
     Write-ColorOutput ""
     Write-ColorOutput "Press any key to exit..." "Gray"
@@ -61,16 +60,16 @@ if (-not $targetPath) {
     exit 1
 }
 
-Write-ColorOutput "✅ Installation found!" "Green"
+Write-ColorOutput "[OK] Installation found!" "Green"
 Show-Progress "Updating Client" "Downloading latest client files..." 30
 
 # Create backup of original file
 $backupPath = $minecraftJsPath + ".backup." + (Get-Date -Format "yyyyMMdd_HHmmss")
 try {
     Copy-Item $minecraftJsPath $backupPath -ErrorAction Stop
-    Write-ColorOutput "📋 Backup created successfully" "Green"
+    Write-ColorOutput "[BACKUP] Backup created successfully" "Green"
 } catch {
-    Write-ColorOutput "⚠️  Warning: Could not create backup" "Yellow"
+    Write-ColorOutput "[WARNING] Could not create backup" "Yellow"
 }
 
 Show-Progress "Updating Client" "Downloading update from server..." 50
@@ -91,19 +90,19 @@ try {
     Copy-Item $tempFile $minecraftJsPath -Force
     Remove-Item $tempFile -Force
     
-    Write-ColorOutput "✅ Client files updated successfully!" "Green"
+    Write-ColorOutput "[OK] Client files updated successfully!" "Green"
     
 } catch {
-    Write-ColorOutput "❌ Failed to download or install update!" "Red"
+    Write-ColorOutput "[ERROR] Failed to download or install update!" "Red"
     Write-ColorOutput "Error: $($_.Exception.Message)" "Red"
     
     # Restore backup if available
     if (Test-Path $backupPath) {
         try {
             Copy-Item $backupPath $minecraftJsPath -Force
-            Write-ColorOutput "🔄 Original file restored from backup" "Yellow"
+            Write-ColorOutput "[RESTORE] Original file restored from backup" "Yellow"
         } catch {
-            Write-ColorOutput "❌ Failed to restore backup!" "Red"
+            Write-ColorOutput "[ERROR] Failed to restore backup!" "Red"
         }
     }
     
@@ -129,17 +128,19 @@ Show-Progress "Updating Client" "Complete!" 100
 Start-Sleep -Milliseconds 500
 
 Write-ColorOutput ""
-Write-ColorOutput "🎉 UPDATE COMPLETED SUCCESSFULLY!" "Green"
+Write-ColorOutput "*** UPDATE COMPLETED SUCCESSFULLY! ***" "Green"
 Write-ColorOutput ""
 Write-ColorOutput "Your Pixelplay Launcher has been updated with the latest client files." "White"
 Write-ColorOutput "You can now launch the application normally." "White"
 Write-ColorOutput ""
 
 # Auto-close after 3 seconds or wait for key press
-Write-ColorOutput "This window will close automatically in 3 seconds..." "Gray"
-for ($i = 3; $i -gt 0; $i--) {
-    Write-Host "`rClosing in $i seconds... (Press any key to close now)" -NoNewline -ForegroundColor Gray
-    Start-Sleep -Seconds 1
+if (-not $Silent) {
+    Write-ColorOutput "This window will close automatically in 3 seconds..." "Gray"
+    for ($i = 3; $i -gt 0; $i--) {
+        Write-Host "`rClosing in $i seconds... (Press any key to close now)" -NoNewline -ForegroundColor Gray
+        Start-Sleep -Seconds 1
+    }
 }
 
-Write-Progress -Activity "Complete" -Completed
+Write-Progress -Activity "Updating Client" -Status "Complete" -Completed
