@@ -1,0 +1,172 @@
+{
+  "movies": [
+    {
+      "id": 1,
+      "title": "A Minecraft Movie",
+      "genre": "Aventura/Animación",
+      "duration": "115 min",
+      "rating": "PG",
+      "showtimes": ["14:30", "17:00", "19:30"],
+      "poster": "⛏️",
+      "posterUrl": "",
+      "available": true,
+      "plot": "Una aventura épica en el mundo de bloques más famoso."
+    },
+    {
+      "id": 2,
+      "title": "Sonic 3",
+      "genre": "Acción/Aventura",
+      "duration": "122 min",
+      "rating": "PG",
+      "showtimes": ["15:00", "17:30", "20:00"],
+      "poster": "🦔",
+      "posterUrl": "",
+      "available": true,
+      "plot": "Sonic y Shadow se enfrentan en una batalla épica."
+    },
+    {
+      "id": 3,
+      "title": "Beetlejuice",
+      "genre": "Comedia/Fantasía",
+      "duration": "92 min",
+      "rating": "PG",
+      "showtimes": ["16:00", "18:30", "21:00"],
+      "poster": "👻",
+      "posterUrl": "",
+      "available": true,
+      "plot": "Un fantasma travieso ayuda a una pareja a espantar a los nuevos habitantes de su casa."
+    },
+    {
+      "id": 4,
+      "title": "Beetlejuice 2",
+      "genre": "Comedia/Fantasía",
+      "duration": "115 min",
+      "rating": "PG-13",
+      "showtimes": ["16:45", "19:15", "21:45"],
+      "poster": "👻",
+      "posterUrl": "",
+      "available": true,
+      "plot": "El bio-exorcista regresa más divertido que nunca."
+    },
+    {
+      "id": 5,
+      "title": "Five Nights at Freddy's",
+      "genre": "Terror/Suspense",
+      "duration": "109 min",
+      "rating": "PG-13",
+      "showtimes": ["18:00", "20:30", "23:00"],
+      "poster": "🐻",
+      "posterUrl": "",
+      "available": true,
+      "plot": "Una noche de terror en Freddy Fazbear's Pizza."
+    },
+    {
+      "id": 6,
+      "title": "Mad Max: Furiosa",
+      "genre": "Acción/Aventura",
+      "duration": "138 min",
+      "rating": "R",
+      "showtimes": ["16:30", "19:30", "22:30"],
+      "poster": "🏎️",
+      "posterUrl": "",
+      "available": true,
+      "plot": "El origen de Furiosa en el apocalíptico mundo de Mad Max."
+    },
+    {
+      "id": 7,
+      "title": "Resacón en Las Vegas",
+      "genre": "Comedia",
+      "duration": "100 min",
+      "rating": "R",
+      "showtimes": ["17:15", "19:45", "22:15"],
+      "poster": "🎲",
+      "posterUrl": "",
+      "available": true,
+      "plot": "Una noche salvaje en Las Vegas que nadie recordará."
+    },
+    {
+      "id": 8,
+      "title": "Scream",
+      "genre": "Terror/Suspense",
+      "duration": "111 min",
+      "rating": "R",
+      "showtimes": ["18:30", "21:00", "23:30"],
+      "poster": "🔪",
+      "posterUrl": "",
+      "available": true,
+      "plot": "El asesino Ghostface aterroriza nuevamente."
+    },
+    {
+      "id": 9,
+      "title": "Spider-Man: Across the Spider-Verse",
+      "genre": "Animación/Acción",
+      "duration": "140 min",
+      "rating": "PG",
+      "showtimes": ["14:00", "17:00", "20:00"],
+      "poster": "🕷️",
+      "posterUrl": "",
+      "available": true,
+      "plot": "Miles Morales viaja a través del multiverso."
+    },
+    {
+      "id": 10,
+      "title": "El Padrino II",
+      "genre": "Drama/Crimen",
+      "duration": "202 min",
+      "rating": "R",
+      "showtimes": ["15:00", "19:00"],
+      "poster": "🎭",
+      "posterUrl": "",
+      "available": true,
+      "plot": "La continuación de la saga de la familia Corleone."
+    },
+    {
+      "id": 11,
+      "title": "Deadpool y Wolverine",
+      "genre": "Acción/Comedia",
+      "duration": "135 min",
+      "rating": "R",
+      "showtimes": ["16:15", "19:00", "21:45"],
+      "poster": "⚔️",
+      "posterUrl": "",
+      "available": true,
+      "plot": "La épica colaboración entre Deadpool y Wolverine."
+    },
+    {
+      "id": 12,
+      "title": "Oppenheimer",
+      "genre": "Drama/Biografía",
+      "duration": "180 min",
+      "rating": "R",
+      "showtimes": ["15:30", "19:30"],
+      "poster": "💥",
+      "posterUrl": "",
+      "available": true,
+      "plot": "La historia del padre de la bomba atómica."
+    },
+    {
+      "id": 13,
+      "title": "La Sociedad de la Nieve",
+      "genre": "Drama/Supervivencia",
+      "duration": "144 min",
+      "rating": "R",
+      "showtimes": ["16:00", "19:15", "22:30"],
+      "poster": "❄️",
+      "posterUrl": "",
+      "available": true,
+      "plot": "La verdadera historia de los supervivientes de los Andes."
+    },
+    {
+      "id": 14,
+      "title": "F1: La Película",
+      "genre": "Deportes/Drama",
+      "duration": "135 min",
+      "rating": "PG-13",
+      "showtimes": ["14:45", "17:30", "20:15"],
+      "poster": "🏎️",
+      "posterUrl": "",
+      "available": true,
+      "plot": "La historia detrás de las carreras más emocionantes."
+    }
+  ]
+}
