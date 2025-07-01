@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelCine - Cartelera Gratuita</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            color: #495057;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: 300;
+            color: #6c757d;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #adb5bd;
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+
+        .free-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #a8e6cf, #88d8a8);
+            color: #2d5a3d;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .movie-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #f1f3f4;
+            animation: fadeInUp 0.6s ease-out;
+            position: relative;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .movie-card.unavailable {
+            opacity: 0.6;
+            filter: grayscale(50%);
+        }
+
+        .movie-card.unavailable::after {
+            content: 'NO DISPONIBLE';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            z-index: 2;
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            color: #adb5bd;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .movie-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .movie-card:hover .movie-poster img {
+            transform: scale(1.05);
+        }
+
+        .poster-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .movie-content {
+            padding: 25px;
+        }
+
+        .movie-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #343a40;
+        }
+
+        .movie-info {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.available {
+            background: linear-gradient(45deg, #a8e6cf, #88d8a8);
+            color: #2d5a3d;
+        }
+
+        .status-badge.unavailable {
+            background: #ffeaa7;
+            color: #8b6914;
+        }
+
+        .showtimes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .showtime-btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .showtime-btn:hover:not(:disabled) {
+            background: #e9ecef;
+            border-color: #ced4da;
+            transform: translateY(-1px);
+        }
+
+        .showtime-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f8f9fa;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #dee2e6;
+            border-radius: 50%;
+            border-top: 3px solid #6c757d;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 3% auto;
+            padding: 40px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            position: relative;
+            animation: modalSlideIn 0.4s ease-out;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #adb5bd;
+            float: right;
+            font-size: 24px;
+            font-weight: 300;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #6c757d;
+        }
+
+        .modal-title {
+            color: #343a40;
+            font-weight: 600;
+            margin-bottom: 30px;
+            font-size: 1.5em;
+        }
+
+        .screen {
+            background: linear-gradient(90deg, #dee2e6, #f8f9fa, #dee2e6);
+            height: 12px;
+            border-radius: 6px;
+            margin: 20px auto 40px;
+            width: 70%;
+            position: relative;
+        }
+
+        .screen::after {
+            content: 'PANTALLA';
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7em;
+            color: #adb5bd;
+            letter-spacing: 1px;
+        }
+
+        .seats-container {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            max-width: 500px;
+            margin: 0 auto 30px;
+            padding: 20px;
+        }
+
+        .seat {
+            width: 35px;
+            height: 35px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 0.7em;
+            background: white;
+        }
+
+        .seat.available {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .seat.available:hover {
+            background: #e9ecef;
+            border-color: #ced4da;
+            transform: scale(1.05);
+        }
+
+        .seat.occupied {
+            background: #ffeaa7;
+            border-color: #fdcb6e;
+            color: #8b6914;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .seat.selected {
+            background: #a8e6cf;
+            border-color: #88d8a8;
+            color: #2d5a3d;
+            transform: scale(1.05);
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .legend-seat {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        .booking-form {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background: white;
+            color: #495057;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #88d8a8;
+        }
+
+        .form-group input::placeholder {
+            color: #adb5bd;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(45deg, #a8e6cf, #88d8a8);
+            border: none;
+            color: #2d5a3d;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .confirm-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(168, 230, 207, 0.4);
+        }
+
+        .confirm-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .booking-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
+        }
+
+        .booking-summary h3 {
+            color: #343a40;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .success-message {
+            background: linear-gradient(45deg, #a8e6cf, #88d8a8);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+            color: #2d5a3d;
+        }
+
+        .success-message h3 {
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        .notification.error {
+            background: linear-gradient(45deg, #dc3545, #e74c3c);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .movies-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+
+            .movie-poster {
+                height: 350px;
+            }
+            
+            .seats-container {
+                grid-template-columns: repeat(8, 1fr);
+                gap: 6px;
+                max-width: 350px;
+            }
+            
+            .seat {
+                width: 30px;
+                height: 30px;
+                font-size: 0.6em;
+            }
+            
+            .legend {
+                gap: 15px;
+            }
+            
+            .modal-content {
+                padding: 25px;
+                margin: 5% auto;
+            }
+
+            .notification {
+                right: 10px;
+                left: 10px;
+                transform: translateY(-100px);
+            }
+
+            .notification.show {
+                transform: translateY(0);
+            }
+        }
+
+        /* Estilos para la pantalla de login */
+        #loginScreen {
+            position: fixed;
+            z-index: 2000;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loginForm {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 320px;
+        }
+
+        #loginForm h2 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 10px;
+        }
+
+        #loginForm input {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            font-size: 1em;
+        }
+
+        #loginForm button {
+            background: linear-gradient(45deg, #a8e6cf, #88d8a8);
+            color: #2d5a3d;
+            font-weight: 600;
+            padding: 12px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        #mainContent {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginScreen" style="position:fixed;z-index:2000;top:0;left:0;width:100vw;height:100vh;background:#f8f9fa;display:flex;align-items:center;justify-content:center;">
+        <form id="loginForm" style="background:white;padding:40px 30px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.12);display:flex;flex-direction:column;gap:20px;min-width:320px;">
+            <h2 style="text-align:center;color:#343a40;margin-bottom:10px;">Acceso PixelCine</h2>
+            <input type="text" id="minecraftUser" placeholder="Usuario de Minecraft" autocomplete="username" style="padding:12px 16px;border-radius:8px;border:1px solid #ced4da;font-size:1em;" required autofocus>
+            <button type="submit" style="background:linear-gradient(45deg,#a8e6cf,#88d8a8);color:#2d5a3d;font-weight:600;padding:12px 0;border:none;border-radius:8px;font-size:1em;cursor:pointer;">Entrar</button>
+        </form>
+    </div>
+    <div class="container" id="mainContent" style="display:none;">
+        <div class="header">
+            <div class="logo">PIXELCINE</div>
+            <p class="subtitle">Proyecciones cinematográficas</p>
+            <div class="free-badge">🎬 Entrada Gratuita</div>
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            Error al cargar la información de películas. Usando datos por defecto.
+        </div>
+
+        <div class="movies-grid" id="moviesGrid">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Modal de reserva -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle" class="modal-title">Reservar Asientos</h2>
+            
+            <div class="screen"></div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-seat available" style="background: #f8f9fa;"></div>
+                    <span>Disponible</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-seat occupied" style="background: #ffeaa7; border-color: #fdcb6e;"></div>
+                    <span>Ocupado</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-seat selected" style="background: #a8e6cf; border-color: #88d8a8;"></div>
+                    <span>Seleccionado</span>
+                </div>
+            </div>
+
+            <div class="seats-container" id="seatsContainer">
+                <!-- Los asientos se generarán aquí -->
+            </div>
+
+            <div class="booking-summary" id="bookingSummary" style="display: none;">
+                <h3>Resumen de Reserva</h3>
+                <p id="summaryText"></p>
+            </div>
+
+            <div class="booking-form" id="bookingForm">
+                <div class="form-group">
+                    <label>Nombre Completo:</label>
+                    <input type="text" id="customerName" placeholder="Tu nombre completo" required>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="customerEmail" placeholder="tu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono:</label>
+                    <input type="tel" id="customerPhone" placeholder="+56 9 1234 5678" required>
+                </div>
+                <button class="confirm-btn" id="confirmBooking" disabled onclick="confirmBooking()">
+                    Confirmar Reserva Gratuita
+                </button>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <h3>¡Reserva Confirmada! 🎉</h3>
+                <p>Tu reserva gratuita ha sido registrada exitosamente. Revisa tu Discord para más detalles.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Eliminar datos de películas por defecto
+        let movies = [];
+        let currentBooking = {
+            movie: null,
+            showtime: null,
+            selectedSeats: [],
+            customerInfo: {},
+            occupiedSeats: []
+        };
+
+        // Estado de la aplicación
+        const appState = {
+            isLoading: true,
+            hasError: false,
+            bookingInProgress: false
+        };
+
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        async function initApp() {
+            try {
+                await loadMovies();
+                setupEventListeners();
+            } catch (error) {
+                console.error('Error inicializando la aplicación:', error);
+                showNotification('Error al inicializar la aplicación', 'error');
+            }
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Cerrar modal al hacer clic fuera
+            window.onclick = function(event) {
+                const modal = document.getElementById('bookingModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+
+            // Validación en tiempo real del formulario
+            const formInputs = ['customerName', 'customerEmail', 'customerPhone'];
+            formInputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                input.addEventListener('input', validateForm);
+                input.addEventListener('blur', validateInput);
+            });
+
+            // Tecla Escape para cerrar modal
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        }
+
+        // Validar input individual
+        function validateInput(event) {
+            const input = event.target;
+            const isValid = input.checkValidity() && input.value.trim().length > 0;
+            
+            if (!isValid && input.value.trim().length > 0) {
+                input.style.borderColor = '#dc3545';
+            } else {
+                input.style.borderColor = '#ced4da';
+            }
+        }
+
+        // Validar formulario completo
+        function validateForm() {
+            const name = document.getElementById('customerName').value.trim();
+            const email = document.getElementById('customerEmail').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            const confirmBtn = document.getElementById('confirmBooking');
+            
+            const isFormValid = name && email && phone && 
+                               currentBooking.selectedSeats.length > 0 &&
+                               document.getElementById('customerEmail').checkValidity();
+            
+            confirmBtn.disabled = !isFormValid;
+        }
+
+        // Cargar configuración de películas SOLO desde JSON
+        async function loadMovies() {
+            try {
+                appState.isLoading = true;
+                const response = await fetch('./movie-info.json');
+                if (!response.ok) throw new Error('No se pudo cargar movie-info.json');
+                const data = await response.json();
+                movies = data.movies || [];
+                renderMovies();
+                appState.isLoading = false;
+            } catch (error) {
+                appState.hasError = true;
+                appState.isLoading = false;
+                document.getElementById('errorMessage').style.display = 'block';
+                showNotification('Error al cargar la cartelera. Verifica movie-info.json', 'error');
+            }
+        }
+
+        // Renderizar películas usando posterUrl
+        function renderMovies() {
+            const grid = document.getElementById('moviesGrid');
+            const moviesHTML = movies.map((movie, index) => `
+                <div class="movie-card ${!movie.available ? 'unavailable' : ''}" 
+                     style="animation-delay: ${index * 0.1}s">
+                    <div class="movie-poster">
+                        <img src="${movie.posterUrl}" 
+                             alt="${movie.title}" 
+                             loading="lazy"
+                             onerror="this.parentElement.innerHTML='<div class=\'poster-placeholder\'>🎬</div>'">
+                    </div>
+                    <div class="movie-content">
+                        <div class="status-badge ${movie.available ? 'available' : 'unavailable'}">
+                            ${movie.available ? 'Disponible' : 'No Disponible'}
+                        </div>
+                        <h3 class="movie-title">${movie.title}</h3>
+                        <p class="movie-info">
+                            ${movie.genre} • ${movie.duration} • ${movie.rating}
+                            ${movie.imdbRating ? `<br>IMDb: ⭐${movie.imdbRating}` : ''}
+                        </p>
+                        ${movie.plot ? `<p class="movie-info">${movie.plot}</p>` : ''}
+                        <div class="showtimes">
+                            ${movie.available ? movie.showtimes.map(time => `
+                                <button class="showtime-btn" 
+                                        onclick="openBooking(${movie.id}, '${time}')">
+                                    ${time}
+                                </button>
+                            `).join('') : '<p>No hay funciones disponibles</p>'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            grid.innerHTML = moviesHTML;
+        }
+
+        // Abrir modal de reserva
+        function openBooking(movieId, showtime) {
+            const movie = movies.find(m => m.id === movieId);
+            if (!movie || !movie.available) return;
+            
+            currentBooking = {
+                movie: movie,
+                showtime: showtime,
+                selectedSeats: [],
+                occupiedSeats: generateOccupiedSeats()
+            };
+            
+            document.getElementById('modalTitle').textContent = 
+                `Reservar - ${movie.title} (${showtime})`;
+            
+            renderSeats();
+            resetBookingForm();
+            
+            document.getElementById('bookingModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Renderizar asientos
+        function renderSeats() {
+            const container = document.getElementById('seatsContainer');
+            let seatsHTML = '';
+            
+            for (let row = 0; row < 8; row++) {
+                const rowLetter = String.fromCharCode(65 + row);
+                
+                for (let seat = 1; seat <= 10; seat++) {
+                    const seatId = `${rowLetter}${seat}`;
+                    const isOccupied = currentBooking.occupiedSeats.includes(seatId);
+                    const isSelected = currentBooking.selectedSeats.includes(seatId);
+                    
+                    seatsHTML += `
+                        <div class="seat ${isOccupied ? 'occupied' : 'available'} ${isSelected ? 'selected' : ''}"
+                             data-seat-id="${seatId}"
+                             onclick="${isOccupied ? '' : `toggleSeat('${seatId}')`}">
+                            ${seatId}
+                        </div>
+                    `;
+                }
+            }
+            
+            container.innerHTML = seatsHTML;
+            updateBookingSummary();
+        }
+
+        // Alternar selección de asiento
+        function toggleSeat(seatId) {
+            const index = currentBooking.selectedSeats.indexOf(seatId);
+            
+            if (index === -1) {
+                currentBooking.selectedSeats.push(seatId);
+            } else {
+                currentBooking.selectedSeats.splice(index, 1);
+            }
+            
+            renderSeats();
+            validateForm();
+        }
+
+        // Actualizar resumen de reserva
+        function updateBookingSummary() {
+            const summary = document.getElementById('bookingSummary');
+            const summaryText = document.getElementById('summaryText');
+            
+            if (currentBooking.selectedSeats.length > 0) {
+                summary.style.display = 'block';
+                summaryText.innerHTML = `
+                    Película: ${currentBooking.movie.title}<br>
+                    Horario: ${currentBooking.showtime}<br>
+                    Asientos seleccionados: ${currentBooking.selectedSeats.sort().join(', ')}<br>
+                    Total de asientos: ${currentBooking.selectedSeats.length}
+                `;
+            } else {
+                summary.style.display = 'none';
+            }
+        }
+
+        // Resetear formulario de reserva
+        function resetBookingForm() {
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerEmail').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('confirmBooking').disabled = true;
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('bookingForm').style.display = 'block';
+        }
+
+        // Confirmar reserva
+        async function confirmBooking() {
+            if (!validateBookingData()) return;
+            
+            const bookingData = {
+                movieId: currentBooking.movie.id,
+                showtime: currentBooking.showtime,
+                seats: currentBooking.selectedSeats,
+                customerInfo: {
+                    name: document.getElementById('customerName').value.trim(),
+                    email: document.getElementById('customerEmail').value.trim(),
+                    phone: document.getElementById('customerPhone').value.trim()
+                }
+            };
+            
+            try {
+                // Simular envío de reserva
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                document.getElementById('bookingForm').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                
+                showNotification('¡Reserva confirmada con éxito!', 'success');
+                
+                // Cerrar modal después de 3 segundos
+                setTimeout(closeModal, 3000);
+                
+            } catch (error) {
+                console.error('Error al procesar la reserva:', error);
+                showNotification('Error al procesar la reserva', 'error');
+            }
+        }
+
+        // Validar datos de reserva
+        function validateBookingData() {
+            if (currentBooking.selectedSeats.length === 0) {
+                showNotification('Selecciona al menos un asiento', 'error');
+                return false;
+            }
+            
+            const name = document.getElementById('customerName').value.trim();
+            const email = document.getElementById('customerEmail').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            
+            if (!name || !email || !phone) {
+                showNotification('Completa todos los campos del formulario', 'error');
+                return false;
+            }
+            
+            if (!document.getElementById('customerEmail').checkValidity()) {
+                showNotification('Email inválido', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('bookingModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentBooking = {
+                movie: null,
+                showtime: null,
+                selectedSeats: [],
+                occupiedSeats: []
+            };
+        }
+
+        // Mostrar notificación
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Forzar reflow para activar la transición
+            notification.offsetHeight;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Lista de usuarios permitidos
+        const allowedUsers = [
+            "Joacoorandom","ilich74","juliodisi","vitopia777","newmantella9800","diegass","diegozslayer","el_tomaco_pro","gp2301","ianede","jtproxd2024","kilemonga","santicarpi","vitto"
+        ];
+
+        // Login handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('minecraftUser').value.trim();
+            if (allowedUsers.includes(user)) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainContent').style.display = '';
+            } else {
+                document.getElementById('minecraftUser').value = '';
+            }
+        });
+    </script>
+</body>
+</html>
