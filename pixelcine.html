@@ -804,15 +804,29 @@
             };
         }
 
+        // Reiniciar todas las reservas de asientos temporalmente
+        function resetAllSeatReservations() {
+            seatsData = {};
+            saveSeatsData();
+        }
+
+        // Reiniciar todas las reservas de asientos si la URL contiene ?resetseats=true
+        function checkAndResetSeatsFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('resetseats') === 'true') {
+                resetAllSeatReservations();
+            }
+        }
+
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
+            // Reiniciar reservas de asientos si la URL lo indica
+            checkAndResetSeatsFromURL();
             // Cargar películas al iniciar
             loadMovies();
-
             // Cerrar modal
             document.querySelector('.close').onclick = closeModal;
             document.getElementById('confirmBooking').onclick = confirmBooking;
-
             // Cerrar modal al hacer clic fuera
             window.onclick = function(event) {
                 const modal = document.getElementById('bookingModal');
