@@ -56,7 +56,7 @@
       "rating": "PG-13",
       "showtimes": ["18:00", "20:30", "23:00"],
       "poster": "🐻",
-      "posterUrl": "https://static.wikia.nocookie.net/fnaf-the-novel/images/8/82/Fnaf_Movie_Poster.png/revision/latest?cb=20231031234405",
+      "posterUrl": "https://static.wikia.nocookie.net/fnaf-the-novel/images/8/82/Fnaf_Movie_Poster.png/",
       "available": true,
       "plot": "Una noche de terror en Freddy Fazbear's Pizza."
     },
@@ -92,7 +92,7 @@
       "rating": "R",
       "showtimes": ["18:30", "21:00", "23:30"],
       "poster": "🔪",
-      "posterUrl": "https://static.wikia.nocookie.net/screaam/images/d/d2/Scream_de_1996.jpg/revision/latest?cb=20220301195645&path-prefix=es",
+      "posterUrl": "https://m.media-amazon.com/images/M/MV5BMjA2NjU5MTg5OF5BMl5BanBnXkFtZTgwOTkyMzQxMDE@._V1_.jpg",
       "available": true,
       "plot": "El asesino Ghostface aterroriza nuevamente."
     },
