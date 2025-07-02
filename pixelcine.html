@@ -650,30 +650,84 @@
             updateBookingSummary();
         }
 
-        // Renderizar asientos
+        // Renderizar asientos con la nueva disposición
         function renderSeats() {
             const container = document.getElementById('seatsContainer');
             const showData = getOccupiedSeats(currentBooking.movie.id, currentBooking.showtime);
             const allOccupied = [...showData.occupied, ...showData.reserved];
             let seatsHTML = '';
 
-            for (let row = 0; row < 8; row++) {
-                const rowLetter = String.fromCharCode(65 + row);
-                for (let seat = 1; seat <= 10; seat++) {
+            // Fila 1 (A): 5 asientos
+            seatsHTML += '<div style="grid-column: span 10; display: flex; justify-content: center; margin-bottom: 8px;">';
+            for (let seat = 1; seat <= 5; seat++) {
+                const seatId = `A${seat}`;
+                const isOccupied = allOccupied.includes(seatId);
+                const seatClass = isOccupied ? 'occupied' : 'available';
+                seatsHTML += `
+                    <button class="seat ${seatClass}"
+                            data-seat="${seatId}"
+                            onclick="toggleSeat('${seatId}')"
+                            ${isOccupied ? 'disabled' : ''}>
+                        ${seatId}
+                    </button>
+                `;
+            }
+            seatsHTML += '</div>';
+
+            // Filas 2-4 (B, C, D): 5 asientos cada una
+            const filas = ['B', 'C', 'D'];
+            for (const rowLetter of filas) {
+                seatsHTML += '<div style="grid-column: span 10; display: flex; justify-content: center; margin-bottom: 8px;">';
+                for (let seat = 1; seat <= 5; seat++) {
                     const seatId = `${rowLetter}${seat}`;
                     const isOccupied = allOccupied.includes(seatId);
                     const seatClass = isOccupied ? 'occupied' : 'available';
-                    
                     seatsHTML += `
-                        <button class="seat ${seatClass}" 
-                                data-seat="${seatId}" 
+                        <button class="seat ${seatClass}"
+                                data-seat="${seatId}"
                                 onclick="toggleSeat('${seatId}')"
                                 ${isOccupied ? 'disabled' : ''}>
                             ${seatId}
                         </button>
                     `;
                 }
+                seatsHTML += '</div>';
             }
+
+            // Fila 5 (E): 2 asientos, espacio, 2 asientos
+            seatsHTML += '<div style="grid-column: span 10; display: flex; justify-content: center; margin-bottom: 8px;">';
+            // E1, E2
+            for (let seat = 1; seat <= 2; seat++) {
+                const seatId = `E${seat}`;
+                const isOccupied = allOccupied.includes(seatId);
+                const seatClass = isOccupied ? 'occupied' : 'available';
+                seatsHTML += `
+                    <button class="seat ${seatClass}"
+                            data-seat="${seatId}"
+                            onclick="toggleSeat('${seatId}')"
+                            ${isOccupied ? 'disabled' : ''}>
+                        ${seatId}
+                    </button>
+                `;
+            }
+            // Espacio para la entrada
+            seatsHTML += '<div style="width: 40px; display: inline-block;"></div>';
+            // E3, E4
+            for (let seat = 3; seat <= 4; seat++) {
+                const seatId = `E${seat}`;
+                const isOccupied = allOccupied.includes(seatId);
+                const seatClass = isOccupied ? 'occupied' : 'available';
+                seatsHTML += `
+                    <button class="seat ${seatClass}"
+                            data-seat="${seatId}"
+                            onclick="toggleSeat('${seatId}')"
+                            ${isOccupied ? 'disabled' : ''}>
+                        ${seatId}
+                    </button>
+                `;
+            }
+            seatsHTML += '</div>';
+
             container.innerHTML = seatsHTML;
         }
 
