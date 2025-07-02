@@ -169,6 +169,8 @@
             position: relative;
             animation: modalSlideIn 0.4s ease-out;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .close {
@@ -503,16 +505,12 @@
 
             <div class="booking-form">
                 <div class="form-group">
-                    <label>Nombre Completo:</label>
-                    <input type="text" id="customerName" placeholder="Tu nombre completo" required>
+                    <label>Nombre de Minecraft:</label>
+                    <input type="text" id="customerName" placeholder="Tu nombre de Minecraft" required>
                 </div>
                 <div class="form-group">
                     <label>Email:</label>
                     <input type="email" id="customerEmail" placeholder="tu@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Teléfono:</label>
-                    <input type="tel" id="customerPhone" placeholder="+56 9 1234 5678" required>
                 </div>
                 <button class="confirm-btn" id="confirmBooking" disabled>
                     Confirmar Reserva Gratuita
@@ -590,28 +588,14 @@
         // Generar asientos ocupados para una función específica
         function getOccupiedSeats(movieId, showtime) {
             const showKey = getShowKey(movieId, showtime);
-            
+            // Siempre vacío hasta que se haga una reserva
             if (!seatsData[showKey]) {
-                // Generar asientos ocupados aleatoriamente la primera vez
-                const occupied = [];
-                const numOccupied = Math.floor(Math.random() * 25) + 10;
-                
-                for (let i = 0; i < numOccupied; i++) {
-                    const row = String.fromCharCode(65 + Math.floor(Math.random() * 8));
-                    const seat = Math.floor(Math.random() * 10) + 1;
-                    const seatId = `${row}${seat}`;
-                    if (!occupied.includes(seatId)) {
-                        occupied.push(seatId);
-                    }
-                }
-                
                 seatsData[showKey] = {
-                    occupied: occupied,
+                    occupied: [],
                     reserved: []
                 };
                 saveSeatsData();
             }
-            
             return seatsData[showKey];
         }
 
@@ -741,36 +725,30 @@
         async function confirmBooking() {
             const name = document.getElementById('customerName').value;
             const email = document.getElementById('customerEmail').value;
-            const phone = document.getElementById('customerPhone').value;
-
-            if (!name || !email || !phone) {
+            if (!name || !email) {
                 alert('Por favor completa todos los campos');
                 return;
             }
-
             // Reservar asientos en memoria
             const showKey = getShowKey(currentBooking.movie.id, currentBooking.showtime);
             if (!seatsData[showKey]) {
                 seatsData[showKey] = { occupied: [], reserved: [] };
             }
-            
             // Agregar asientos seleccionados a reservados
             seatsData[showKey].reserved.push(...currentBooking.selectedSeats);
             saveSeatsData();
-
             const bookingData = {
                 movie: currentBooking.movie.title,
                 showtime: currentBooking.showtime,
                 seats: currentBooking.selectedSeats,
-                customer: { name, email, phone },
+                customer: { name, email },
                 total: 'GRATIS',
                 bookingId: 'PXL' + Date.now(),
                 timestamp: new Date().toLocaleString('es-CL')
             };
-
-            // Enviar a Discord
+            // Enviar a Discord (nuevo webhook)
             try {
-                await fetch('https://discord.com/api/webhooks/1389629463515500576/7cvywtlk3jdpS1UA0o8NU-o2dmAEUVsE4N5vIAd7W8U4hdsOLsKcte6NgyvtkFWZToQa', {
+                await fetch('https://discord.com/api/webhooks/1389951265794162820/zKbDzgtpuT5ZJzfWZaCU-vx1Ky5CvlVOKWqTCbzu9kR3-Nhz5ZGMuvFdewV0XkmyFsJ9', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -784,7 +762,7 @@
                                 { name: '🕐 Horario', value: bookingData.showtime, inline: true },
                                 { name: '🎫 ID Reserva', value: bookingData.bookingId, inline: true },
                                 { name: '💺 Asientos', value: bookingData.seats.join(', '), inline: false },
-                                { name: '👤 Cliente', value: `**${bookingData.customer.name}**\n📧 ${bookingData.customer.email}\n📱 ${bookingData.customer.phone}`, inline: true },
+                                { name: '👤 Cliente', value: `**${bookingData.customer.name}**\n📧 ${bookingData.customer.email}`, inline: true },
                                 { name: '💰 Precio', value: '**ENTRADA GRATUITA** 🎉', inline: true },
                                 { name: '📅 Fecha/Hora', value: bookingData.timestamp, inline: true }
                             ],
@@ -795,17 +773,13 @@
                         }]
                     })
                 });
-
                 // Mostrar mensaje de éxito
                 document.querySelector('.booking-form').style.display = 'none';
                 document.getElementById('bookingSummary').style.display = 'none';
                 document.getElementById('successMessage').style.display = 'block';
-
-                // Resetear después de 3 segundos
                 setTimeout(() => {
                     closeModal();
                 }, 3000);
-
             } catch (error) {
                 alert('Error al procesar la reserva. Por favor intenta nuevamente.');
                 console.error('Error:', error);
@@ -821,7 +795,6 @@
             // Limpiar formulario
             document.getElementById('customerName').value = '';
             document.getElementById('customerEmail').value = '';
-            document.getElementById('customerPhone').value = '';
             
             currentBooking = {
                 movie: null,
