@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Camera Stream</title>
+    <style>
+        body { background: #111; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        video { width: 80%; height: auto; border: 4px solid #0af; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <video id="video" controls autoplay></video>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        const video = document.getElementById('video');
+        const videoSrc = 'http://190.101.138.106:8080/hls/stream.m3u8';
+
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(videoSrc);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                video.play();
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = videoSrc;
+            video.addEventListener('loadedmetadata', function() {
+                video.play();
+            });
+        } else {
+            alert('HLS no es compatible con este navegador.');
+        }
+    </script>
+</body>
+</html>
