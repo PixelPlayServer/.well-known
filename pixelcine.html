@@ -784,6 +784,10 @@
                 bookingId: 'PXL' + Date.now(),
                 timestamp: new Date().toLocaleString('es-CL')
             };
+            // --- Generar QR code URL ---
+            const sala = '1'; // Cambia esto si tienes múltiples salas
+            const qrData = `name:${name},movie:${bookingData.movie},showtime:${bookingData.showtime},seats:${bookingData.seats.join(' ')},sala:${sala},timestamp:${bookingData.timestamp},email:${email}`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent('https://pixelplay.gg/validator?data=' + qrData)}`;
             try {
                 // Enviar a Google Sheets
                 await fetch(SHEETS_API_URL, {
@@ -791,7 +795,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(bookingData)
                 });
-                // Enviar a Discord
+                // Enviar a Discord con QR
                 await fetch('https://discord.com/api/webhooks/1389951265794162820/zKbDzgtpuT5ZJzfWZaCU-vx1Ky5CvlVOKWqTCbzu9kR3-Nhz5ZGMuvFdewV0XkmyFsJ9', {
                     method: 'POST',
                     headers: {
@@ -808,8 +812,10 @@
                                 { name: '💺 Asientos', value: bookingData.seats.join(', '), inline: false },
                                 { name: '👤 Cliente', value: `**${bookingData.customer.name}**\n📧 ${bookingData.customer.email}`, inline: true },
                                 { name: '💰 Precio', value: '**ENTRADA GRATUITA** 🎉', inline: true },
-                                { name: '📅 Fecha/Hora', value: bookingData.timestamp, inline: true }
+                                { name: '📅 Fecha/Hora', value: bookingData.timestamp, inline: true },
+                                { name: '🔗 Validador', value: `[Validar QR](https://pixelplay.gg/validator?data=${encodeURIComponent(qrData)})`, inline: false }
                             ],
+                            image: { url: qrUrl },
                             footer: {
                                 text: 'PixelCine - Proyecciones Gratuitas'
                             },
