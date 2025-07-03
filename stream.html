@@ -12,25 +12,26 @@
     <video id="video" controls autoplay></video>
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script>
-        const video = document.getElementById('video');
-        const videoSrc = 'http://190.101.138.106:8080/hls/stream.m3u8';
+<script>
+    const video = document.getElementById('video');
+    const videoSrc = 'https://190.101.138.106/hls/stream.m3u8'; // NOTA: ahora HTTPS
 
-        if (Hls.isSupported()) {
-            const hls = new Hls();
-            hls.loadSource(videoSrc);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play();
-            });
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = videoSrc;
-            video.addEventListener('loadedmetadata', function() {
-                video.play();
-            });
-        } else {
-            alert('HLS no es compatible con este navegador.');
-        }
-    </script>
+    if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(videoSrc);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function() {
+            video.play();
+        });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = videoSrc;
+        video.addEventListener('loadedmetadata', function() {
+            video.play();
+        });
+    } else {
+        alert('HLS no es compatible con este navegador.');
+    }
+</script>
+
 </body>
 </html>
