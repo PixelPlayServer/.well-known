@@ -525,8 +525,13 @@
     </div>
 
     <script>
+        // --- CONFIGURACIÓN DEL BACKEND ---
+        const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbxp44gZoN3WglG6irAtTdiIjdEvnns0jpF0o2NzJvAAFALxvgU80oO6stCm79dtrJIc/exec';
+        // --- FIN CONFIGURACIÓN ---
+
         let movies = [];
-        let seatsData = {};
+        // No más seatsData local, todo viene del backend
+        let reservations = [];
 
         let currentBooking = {
             movie: null,
@@ -544,10 +549,8 @@
                 }
                 const data = await response.json();
                 movies = data.movies || [];
-                
-                // Cargar datos de asientos guardados
-                loadSeatsData();
-                
+                // Cargar reservas desde Google Sheets
+                await loadReservationsFromBackend();
                 renderMovies();
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('moviesGrid').style.display = 'grid';
@@ -558,45 +561,25 @@
             }
         }
 
-        // Cargar datos de asientos desde memoria
-        function loadSeatsData() {
-            const saved = sessionStorage.getItem('pixelcine_seats');
-            if (saved) {
-                try {
-                    seatsData = JSON.parse(saved);
-                } catch (error) {
-                    console.error('Error loading seats data:', error);
-                    seatsData = {};
-                }
-            }
-        }
-
-        // Guardar datos de asientos en memoria
-        function saveSeatsData() {
+        // Cargar reservas desde Google Sheets
+        async function loadReservationsFromBackend() {
             try {
-                sessionStorage.setItem('pixelcine_seats', JSON.stringify(seatsData));
-            } catch (error) {
-                console.error('Error saving seats data:', error);
+                const res = await fetch(SHEETS_API_URL);
+                const data = await res.json();
+                reservations = Array.isArray(data) ? data : (data.reservations || []);
+            } catch (e) {
+                reservations = [];
+                console.error('Error loading reservations:', e);
             }
         }
 
-        // Generar clave para identificar función específica
-        function getShowKey(movieId, showtime) {
-            return `${movieId}_${showtime}`;
-        }
-
-        // Generar asientos ocupados para una función específica
+        // Obtener asientos ocupados para una función
         function getOccupiedSeats(movieId, showtime) {
-            const showKey = getShowKey(movieId, showtime);
-            // Siempre vacío hasta que se haga una reserva
-            if (!seatsData[showKey]) {
-                seatsData[showKey] = {
-                    occupied: [],
-                    reserved: []
-                };
-                saveSeatsData();
-            }
-            return seatsData[showKey];
+            const movie = movies.find(m => m.id === movieId);
+            if (!movie) return [];
+            return reservations
+                .filter(r => r.movieId == movieId && r.showtime == showtime)
+                .flatMap(r => Array.isArray(r.seats) ? r.seats : (typeof r.seats === 'string' ? r.seats.split(',').map(s => s.trim()) : []));
         }
 
         // Renderizar películas
@@ -633,35 +616,17 @@
             `).join('');
         }
 
-        // Abrir modal de reserva
-        function openBooking(movieId, showtime) {
-            const movie = movies.find(m => m.id === movieId);
-            if (!movie) return;
-
-            currentBooking.movie = movie;
-            currentBooking.showtime = showtime;
-            currentBooking.selectedSeats = [];
-
-            document.getElementById('modalTitle').textContent = 
-                `${movie.title} - ${showtime}`;
-            
-            renderSeats();
-            document.getElementById('bookingModal').style.display = 'block';
-            updateBookingSummary();
-        }
-
         // Renderizar asientos con la nueva disposición
         function renderSeats() {
             const container = document.getElementById('seatsContainer');
-            const showData = getOccupiedSeats(currentBooking.movie.id, currentBooking.showtime);
-            const allOccupied = [...showData.occupied, ...showData.reserved];
+            const occupiedSeats = getOccupiedSeats(currentBooking.movie.id, currentBooking.showtime);
             let seatsHTML = '';
 
             // Fila 1 (A): 5 asientos
             seatsHTML += '<div style="grid-column: span 10; display: flex; justify-content: center; margin-bottom: 8px;">';
             for (let seat = 1; seat <= 5; seat++) {
                 const seatId = `A${seat}`;
-                const isOccupied = allOccupied.includes(seatId);
+                const isOccupied = occupiedSeats.includes(seatId);
                 const seatClass = isOccupied ? 'occupied' : 'available';
                 seatsHTML += `
                     <button class="seat ${seatClass}"
@@ -680,7 +645,7 @@
                 seatsHTML += '<div style="grid-column: span 10; display: flex; justify-content: center; margin-bottom: 8px;">';
                 for (let seat = 1; seat <= 5; seat++) {
                     const seatId = `${rowLetter}${seat}`;
-                    const isOccupied = allOccupied.includes(seatId);
+                    const isOccupied = occupiedSeats.includes(seatId);
                     const seatClass = isOccupied ? 'occupied' : 'available';
                     seatsHTML += `
                         <button class="seat ${seatClass}"
@@ -699,7 +664,7 @@
             // E1, E2
             for (let seat = 1; seat <= 2; seat++) {
                 const seatId = `E${seat}`;
-                const isOccupied = allOccupied.includes(seatId);
+                const isOccupied = occupiedSeats.includes(seatId);
                 const seatClass = isOccupied ? 'occupied' : 'available';
                 seatsHTML += `
                     <button class="seat ${seatClass}"
@@ -715,7 +680,7 @@
             // E3, E4
             for (let seat = 3; seat <= 4; seat++) {
                 const seatId = `E${seat}`;
-                const isOccupied = allOccupied.includes(seatId);
+                const isOccupied = occupiedSeats.includes(seatId);
                 const seatClass = isOccupied ? 'occupied' : 'available';
                 seatsHTML += `
                     <button class="seat ${seatClass}"
@@ -775,6 +740,22 @@
             }
         }
 
+        // Abrir modal de reserva: ahora espera a que renderSeats termine (async)
+        async function openBooking(movieId, showtime) {
+            const movie = movies.find(m => m.id === movieId);
+            if (!movie) return;
+
+            currentBooking.movie = movie;
+            currentBooking.showtime = showtime;
+            currentBooking.selectedSeats = [];
+
+            document.getElementById('modalTitle').textContent = 
+                `${movie.title} - ${showtime}`;
+            await renderSeats();
+            document.getElementById('bookingModal').style.display = 'block';
+            updateBookingSummary();
+        }
+
         // Confirmar reserva
         async function confirmBooking() {
             const name = document.getElementById('customerName').value;
@@ -783,15 +764,18 @@
                 alert('Por favor completa todos los campos');
                 return;
             }
-            // Reservar asientos en memoria
-            const showKey = getShowKey(currentBooking.movie.id, currentBooking.showtime);
-            if (!seatsData[showKey]) {
-                seatsData[showKey] = { occupied: [], reserved: [] };
+            // Validar que los asientos siguen disponibles
+            await loadReservationsFromBackend();
+            const occupiedSeats = getOccupiedSeats(currentBooking.movie.id, currentBooking.showtime);
+            if (currentBooking.selectedSeats.some(seat => occupiedSeats.includes(seat))) {
+                alert('Uno o más asientos seleccionados ya han sido reservados. Por favor selecciona otros.');
+                renderSeats();
+                updateBookingSummary();
+                return;
             }
-            // Agregar asientos seleccionados a reservados
-            seatsData[showKey].reserved.push(...currentBooking.selectedSeats);
-            saveSeatsData();
+            // Enviar reserva al backend
             const bookingData = {
+                movieId: currentBooking.movie.id,
                 movie: currentBooking.movie.title,
                 showtime: currentBooking.showtime,
                 seats: currentBooking.selectedSeats,
@@ -800,8 +784,14 @@
                 bookingId: 'PXL' + Date.now(),
                 timestamp: new Date().toLocaleString('es-CL')
             };
-            // Enviar a Discord (nuevo webhook)
             try {
+                // Enviar a Google Sheets
+                await fetch(SHEETS_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookingData)
+                });
+                // Enviar a Discord
                 await fetch('https://discord.com/api/webhooks/1389951265794162820/zKbDzgtpuT5ZJzfWZaCU-vx1Ky5CvlVOKWqTCbzu9kR3-Nhz5ZGMuvFdewV0XkmyFsJ9', {
                     method: 'POST',
                     headers: {
@@ -827,7 +817,9 @@
                         }]
                     })
                 });
-                // Mostrar mensaje de éxito
+                // Actualizar reservas y UI
+                await loadReservationsFromBackend();
+                renderSeats();
                 document.querySelector('.booking-form').style.display = 'none';
                 document.getElementById('bookingSummary').style.display = 'none';
                 document.getElementById('successMessage').style.display = 'block';
@@ -858,24 +850,8 @@
             };
         }
 
-        // Reiniciar todas las reservas de asientos temporalmente
-        function resetAllSeatReservations() {
-            seatsData = {};
-            saveSeatsData();
-        }
-
-        // Reiniciar todas las reservas de asientos si la URL contiene ?resetseats=true
-        function checkAndResetSeatsFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('resetseats') === 'true') {
-                resetAllSeatReservations();
-            }
-        }
-
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            // Reiniciar reservas de asientos si la URL lo indica
-            checkAndResetSeatsFromURL();
             // Cargar películas al iniciar
             loadMovies();
             // Cerrar modal
