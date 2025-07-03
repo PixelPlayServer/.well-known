@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!--
+      Google Apps Script Deployment Info:
+      Deployment ID: AKfycbxp44gZoN3WglG6irAtTdiIjdEvnns0jpF0o2NzJvAAFALxvgU80oO6stCm79dtrJIc
+      Web app URL: https://script.google.com/macros/s/AKfycbwx24csHMVn9B59UO5ETFPnKovpqouZBEYITMyMtUMfus6Au8FFF9sAWpOxPBact4gH/exec
+      Library URL: https://script.google.com/macros/library/d/1vMZL4jcPUJaDAPHti9ZiGYJgsbg_rw2Hi8R8RE6x3N_oYvH729T-SoAl/3
+    -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PixelCine - Cartelera Gratuita</title>
@@ -524,17 +530,13 @@
         </div>
     </div>
 
-    <script>
+<script>
         // --- CONFIGURACIÓN DEL BACKEND ---
-        // Google Apps Script Deployment Info:
-        // Deployment ID: AKfycbxp44gZoN3WglG6irAtTdiIjdEvnns0jpF0o2NzJvAAFALxvgU80oO6stCm79dtrJIc
-        // Web app URL: https://script.google.com/macros/s/AKfycbxp44gZoN3WglG6irAtTdiIjdEvnns0jpF0o2NzJvAAFALxvgU80oO6stCm79dtrJIc/exec
-        // Library URL: https://script.google.com/macros/library/d/1vMZL4jcPUJaDAPHti9ZiGYJgsbg_rw2Hi8R8RE6x3N_oYvH729T-SoAl/3
-        const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbxp44gZoN3WglG6irAtTdiIjdEvnns0jpF0o2NzJvAAFALxvgU80oO6stCm79dtrJIc/exec';
+        // Updated to use your new deployment URL
+        const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycby6hIIhGmojh9Mi2PMK8Q-kIOlSFgDGJCIBZJdM2Emj42cDB3F9Gj1dZycRNVsfj2i-/exec';
         // --- FIN CONFIGURACIÓN ---
 
         let movies = [];
-        // No más seatsData local, todo viene del backend
         let reservations = [];
 
         let currentBooking = {
@@ -571,6 +573,7 @@
                 const res = await fetch(SHEETS_API_URL);
                 const data = await res.json();
                 reservations = Array.isArray(data) ? data : (data.reservations || []);
+                console.log('Loaded reservations:', reservations);
             } catch (e) {
                 reservations = [];
                 console.error('Error loading reservations:', e);
@@ -578,12 +581,19 @@
         }
 
         // Obtener asientos ocupados para una función
-        function getOccupiedSeats(movieId, showtime) {
-            const movie = movies.find(m => m.id === movieId);
-            if (!movie) return [];
+        function getOccupiedSeats(movieTitle, showtime) {
             return reservations
-                .filter(r => r.movieId == movieId && r.showtime == showtime)
-                .flatMap(r => Array.isArray(r.seats) ? r.seats : (typeof r.seats === 'string' ? r.seats.split(',').map(s => s.trim()) : []));
+                .filter(r => r.movie === movieTitle && r.showtime === showtime)
+                .flatMap(r => {
+                    // Handle both 'seat' and 'seats' fields from your spreadsheet
+                    if (r.seat) {
+                        return Array.isArray(r.seat) ? r.seat : r.seat.split(',').map(s => s.trim());
+                    }
+                    if (r.seats) {
+                        return Array.isArray(r.seats) ? r.seats : r.seats.split(',').map(s => s.trim());
+                    }
+                    return [];
+                });
         }
 
         // Renderizar películas
@@ -623,7 +633,7 @@
         // Renderizar asientos with the nueva disposición
         function renderSeats() {
             const container = document.getElementById('seatsContainer');
-            const occupiedSeats = getOccupiedSeats(currentBooking.movie.id, currentBooking.showtime);
+            const occupiedSeats = getOccupiedSeats(currentBooking.movie.title, currentBooking.showtime);
             let seatsHTML = '';
 
             // Fila 1 (A): 5 asientos
@@ -744,7 +754,7 @@
             }
         }
 
-        // Abrir modal de reserva: ahora espera a que renderSeats termine (async)
+        // Abrir modal de reserva
         async function openBooking(movieId, showtime) {
             const movie = movies.find(m => m.id === movieId);
             if (!movie) return;
@@ -755,7 +765,7 @@
 
             document.getElementById('modalTitle').textContent = 
                 `${movie.title} - ${showtime}`;
-            await renderSeats();
+            renderSeats();
             document.getElementById('bookingModal').style.display = 'block';
             updateBookingSummary();
         }
@@ -764,78 +774,65 @@
         async function confirmBooking() {
             const name = document.getElementById('customerName').value;
             const email = document.getElementById('customerEmail').value;
+            
             if (!name || !email) {
                 alert('Por favor completa todos los campos');
                 return;
             }
+
             // Validar que los asientos siguen disponibles
             await loadReservationsFromBackend();
-            const occupiedSeats = getOccupiedSeats(currentBooking.movie.id, currentBooking.showtime);
+            const occupiedSeats = getOccupiedSeats(currentBooking.movie.title, currentBooking.showtime);
+            
             if (currentBooking.selectedSeats.some(seat => occupiedSeats.includes(seat))) {
                 alert('Uno o más asientos seleccionados ya han sido reservados. Por favor selecciona otros.');
                 renderSeats();
                 updateBookingSummary();
                 return;
             }
-            // Enviar reserva al backend
-            const bookingData = {
-                movieId: currentBooking.movie.id,
-                movie: currentBooking.movie.title,
-                showtime: currentBooking.showtime,
-                seats: currentBooking.selectedSeats,
-                customer: { name, email },
-                total: 'GRATIS',
-                bookingId: 'PXL' + Date.now(),
-                timestamp: new Date().toLocaleString('es-CL')
-            };
-            // --- Generar QR code URL ---
-            const sala = '1'; // Cambia esto si tienes múltiples salas
-            const qrData = `name:${name},movie:${bookingData.movie},showtime:${bookingData.showtime},seats:${bookingData.seats.join(' ')},sala:${sala},timestamp:${bookingData.timestamp},email:${email}`;
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent('https://pixelplay.gg/validator?data=' + qrData)}`;
+
             try {
-                // Enviar a Google Sheets
-                await fetch(SHEETS_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(bookingData)
-                });
-                // Enviar a Discord con QR
-                await fetch('https://discord.com/api/webhooks/1389951265794162820/zKbDzgtpuT5ZJzfWZaCU-vx1Ky5CvlVOKWqTCbzu9kR3-Nhz5ZGMuvFdewV0XkmyFsJ9', {
+                // Prepare booking data to match your spreadsheet columns
+                const bookingData = {
+                    movie: currentBooking.movie.title,           // matches 'movie' column
+                    showtime: currentBooking.showtime,           // matches 'showtime' column
+                    seat: currentBooking.selectedSeats.join(', '), // matches 'seat' column
+                    name: name,                                  // matches 'name' column
+                    email: email,                               // matches 'email' column
+                    timestamp: new Date().toLocaleString('es-CL') // matches 'timestamp' column
+                };
+
+                console.log('Sending booking data:', bookingData);
+
+                // Send booking to backend
+                const response = await fetch(SHEETS_API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        embeds: [{
-                            title: '🎬 Nueva Reserva Gratuita - PixelCine',
-                            color: 0xa8e6cf,
-                            fields: [
-                                { name: '🎭 Película', value: bookingData.movie, inline: true },
-                                { name: '🕐 Horario', value: bookingData.showtime, inline: true },
-                                { name: '🎫 ID Reserva', value: bookingData.bookingId, inline: true },
-                                { name: '💺 Asientos', value: bookingData.seats.join(', '), inline: false },
-                                { name: '👤 Cliente', value: `**${bookingData.customer.name}**\n📧 ${bookingData.customer.email}`, inline: true },
-                                { name: '💰 Precio', value: '**ENTRADA GRATUITA** 🎉', inline: true },
-                                { name: '📅 Fecha/Hora', value: bookingData.timestamp, inline: true },
-                                { name: '🔗 Validador', value: `[Validar QR](https://pixelplay.gg/validator?data=${encodeURIComponent(qrData)})`, inline: false }
-                            ],
-                            image: { url: qrUrl },
-                            footer: {
-                                text: 'PixelCine - Proyecciones Gratuitas'
-                            },
-                            timestamp: new Date().toISOString()
-                        }]
-                    })
+                    body: JSON.stringify(bookingData)
                 });
-                // Actualizar reservas y UI
-                await loadReservationsFromBackend();
-                renderSeats();
-                document.querySelector('.booking-form').style.display = 'none';
-                document.getElementById('bookingSummary').style.display = 'none';
-                document.getElementById('successMessage').style.display = 'block';
-                setTimeout(() => {
-                    closeModal();
-                }, 3000);
+
+                const result = await response.json();
+                console.log('Booking result:', result);
+
+                if (result.success) {
+                    // Actualizar reservas y UI
+                    await loadReservationsFromBackend();
+                    renderSeats();
+                    document.querySelector('.booking-form').style.display = 'none';
+                    document.getElementById('bookingSummary').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                    
+                    // Reset current booking
+                    currentBooking.selectedSeats = [];
+                    
+                    setTimeout(() => {
+                        closeModal();
+                    }, 3000);
+                } else {
+                    throw new Error(result.error || 'Error desconocido');
+                }
             } catch (error) {
                 alert('Error al procesar la reserva. Por favor intenta nuevamente.');
                 console.error('Error:', error);
