@@ -167,6 +167,18 @@
       "posterUrl": "https://m.media-amazon.com/images/M/MV5BOWRiOThkM2YtYzI4NS00OWViLTk0ODMtMjNlNDYyZWQ3MzNjXkEyXkFqcGc@._V1_.jpg",
       "available": true,
       "plot": "La historia detrás de las carreras más emocionantes."
+    },
+    {
+      "id": 15,
+      "title": "Squid Game",
+      "genre": "Drama Koreano",
+      "duration": "336 min",
+      "rating": "PG-13",
+      "showtimes": ["16:00"],
+      "poster": "🦑",
+      "posterUrl": "https://upload.wikimedia.org/wikipedia/en/e/e1/Squid_Game_season_3_poster.png",
+      "available": true,
+      "plot": "Parte 2 de la famosa segunda temporada de Squid Game"
     }
   ]
 }
