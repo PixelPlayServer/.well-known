@@ -526,6 +526,10 @@
 
     <script>
         // --- CONFIGURACIÓN DEL BACKEND ---
+        // Google Apps Script Deployment Info:
+        // Deployment ID: AKfycbxp44gZoN3WglG6irAtTdiIjdEvnns0jpF0o2NzJvAAFALxvgU80oO6stCm79dtrJIc
+        // Web app URL: https://script.google.com/macros/s/AKfycbxp44gZoN3WglG6irAtTdiIjdEvnns0jpF0o2NzJvAAFALxvgU80oO6stCm79dtrJIc/exec
+        // Library URL: https://script.google.com/macros/library/d/1vMZL4jcPUJaDAPHti9ZiGYJgsbg_rw2Hi8R8RE6x3N_oYvH729T-SoAl/3
         const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbxp44gZoN3WglG6irAtTdiIjdEvnns0jpF0o2NzJvAAFALxvgU80oO6stCm79dtrJIc/exec';
         // --- FIN CONFIGURACIÓN ---
 
@@ -616,7 +620,7 @@
             `).join('');
         }
 
-        // Renderizar asientos con la nueva disposición
+        // Renderizar asientos with the nueva disposición
         function renderSeats() {
             const container = document.getElementById('seatsContainer');
             const occupiedSeats = getOccupiedSeats(currentBooking.movie.id, currentBooking.showtime);
