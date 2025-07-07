@@ -1,4 +1,8 @@
 {
   "banned_hwids": [
+        {
+      "hwid": "4753acb91c8e986a417264b34f6c03edcebe7c3955ce8505f7aface192224078",
+      "reason": "Pruebas de sancion *TEMPORAL*"
+    }
   ]
 }
