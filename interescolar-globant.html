@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipo Minecraft - Globant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+
+        .requirements {
+            text-align: left;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .requirements h2 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .requirements ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .requirements li {
+            padding: 5px 0;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .requirements li::before {
+            content: "• ";
+            color: #666;
+            margin-right: 8px;
+        }
+
+        .contact-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+
+        .contact-info strong {
+            color: #2c3e50;
+        }
+
+        .apply-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin: 20px 0;
+        }
+
+        .apply-btn:hover {
+            background: #2980b9;
+        }
+
+        .form-container {
+            display: none;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .form-container.show {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .submit-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1em;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .submit-btn:hover {
+            background: #219a52;
+        }
+
+        .back-btn {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1em;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: #7f8c8d;
+        }
+
+        .guardian-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 12px;
+            margin: 15px 0;
+            color: #856404;
+            font-size: 0.85em;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .success {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #27ae60;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+
+        .error {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #721c24;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Equipo Minecraft</h1>
+        <p class="subtitle">Globant - Instituto de Humanidades Luis Campino</p>
+
+        <div class="requirements">
+            <h2>Requisitos:</h2>
+            <ul>
+                <li>Tener Minecraft Premium</li>
+                <li>PC con buen rendimiento</li>
+                <li>Conexión a internet estable</li>
+                <li>Comunicación por Discord</li>
+                <li>Ser estudiante del Instituto de Humanidades Luis Campino</li>
+                <li>Tener más de 12 años</li>
+            </ul>
+        </div>
+
+        <div class="contact-info">
+            <strong>Contacto previo:</strong> Antes de postular, habla con Joaquín Silva - 8A, Sala 56
+        </div>
+
+        <div id="main-content">
+            <button class="apply-btn" onclick="showForm()">
+                Postular al equipo
+            </button>
+        </div>
+
+        <div id="form-container" class="form-container">
+            <h2 style="color: #2c3e50; margin-bottom: 20px; text-align: center;">Formulario de Postulación</h2>
+            
+            <div class="guardian-note">
+                <strong>Importante:</strong> Este formulario debe ser completado con la confirmación de un apoderado.
+            </div>
+
+            <form id="applicationForm" onsubmit="submitForm(event)">
+                <div class="form-group">
+                    <label for="student-name">Nombre del estudiante:</label>
+                    <input type="text" id="student-name" name="student-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="rut">RUT del estudiante:</label>
+                    <input type="text" id="rut" name="rut" placeholder="12.345.678-9" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="curso">Curso:</label>
+                    <input type="text" id="curso" name="curso" placeholder="8A" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo electrónico:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Número de teléfono:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="guardian-name">Nombre del apoderado:</label>
+                    <input type="text" id="guardian-name" name="guardian-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="minecraft-username">Usuario de Minecraft:</label>
+                    <input type="text" id="minecraft-username" name="minecraft-username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="discord-username">Usuario de Discord:</label>
+                    <input type="text" id="discord-username" name="discord-username" required>
+                </div>
+
+                <div style="margin-top: 25px; text-align: center;">
+                    <button type="button" class="back-btn" onclick="hideForm()">Volver</button>
+                    <button type="submit" class="submit-btn">Enviar postulación</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="loading" class="loading">
+            <p>Enviando postulación...</p>
+        </div>
+
+        <div id="success" class="success">
+            <p><strong>¡Postulación enviada exitosamente!</strong><br>Te contactaremos pronto.</p>
+        </div>
+
+        <div id="error" class="error">
+            <p><strong>Error al enviar la postulación.</strong><br>Por favor, inténtalo de nuevo.</p>
+        </div>
+    </div>
+
+    <script>
+        function showForm() {
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('form-container').classList.add('show');
+        }
+
+        function hideForm() {
+            document.getElementById('form-container').classList.remove('show');
+            document.getElementById('main-content').style.display = 'block';
+            hideMessages();
+        }
+
+        function hideMessages() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('success').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+        }
+
+        async function submitForm(event) {
+            event.preventDefault();
+            
+            // Mostrar loading
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            hideMessages();
+            document.getElementById('loading').style.display = 'block';
+
+            const formData = {
+                studentName: document.getElementById('student-name').value,
+                rut: document.getElementById('rut').value,
+                curso: document.getElementById('curso').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                guardianName: document.getElementById('guardian-name').value,
+                minecraftUsername: document.getElementById('minecraft-username').value,
+                discordUsername: document.getElementById('discord-username').value
+            };
+
+            // Crear mensaje para Discord
+            const discordMessage = {
+                embeds: [{
+                    title: "🎮 Nueva Postulación - Equipo Minecraft Globant",
+                    color: 3447003, // Azul
+                    fields: [
+                        {
+                            name: "👤 Estudiante",
+                            value: `**Nombre:** ${formData.studentName}\n**RUT:** ${formData.rut}\n**Curso:** ${formData.curso}`,
+                            inline: true
+                        },
+                        {
+                            name: "📧 Contacto",
+                            value: `**Email:** ${formData.email}\n**Teléfono:** ${formData.phone}`,
+                            inline: true
+                        },
+                        {
+                            name: "👨‍👩‍👧‍👦 Apoderado",
+                            value: `**Nombre:** ${formData.guardianName}`,
+                            inline: false
+                        },
+                        {
+                            name: "🎮 Gaming",
+                            value: `**Minecraft:** ${formData.minecraftUsername}\n**Discord:** ${formData.discordUsername}`,
+                            inline: false
+                        }
+                    ],
+                    timestamp: new Date().toISOString(),
+                    footer: {
+                        text: "Instituto de Humanidades Luis Campino"
+                    }
+                }]
+            };
+
+            try {
+                const response = await fetch('https://discord.com/api/webhooks/1392288182703489035/3lCdHOEqI0RpYWaLxlRv33LV42O7DMAuRVsMv9vB3KmNw--45kGMlsC-8srkBdkJf_2b', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(discordMessage)
+                });
+
+                if (response.ok) {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('applicationForm').reset();
+                    
+                    // Volver al inicio después de 3 segundos
+                    setTimeout(() => {
+                        hideMessages();
+                        document.getElementById('main-content').style.display = 'block';
+                    }, 3000);
+                } else {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                
+                // Volver al formulario después de 3 segundos
+                setTimeout(() => {
+                    hideMessages();
+                    document.getElementById('form-container').style.display = 'block';
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>
