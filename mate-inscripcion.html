@@ -323,6 +323,31 @@
             margin-top: 1rem;
         }
 
+        .success-message .countdown {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2ecc40;
+            margin-top: 0.5rem;
+        }
+
+        .discord-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #5865f2 0%, #4752c4 100%);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+        }
+
+        .discord-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(88, 101, 242, 0.4);
+        }
+
         .error-message {
             display: none;
             color: #ff4444;
@@ -550,7 +575,12 @@
                 </div>
 
                 <div class="success-message" id="successMessage">
-                    ¡Registro exitoso! Serás redirigido al servidor Discord en 3 segundos...
+                    <p>¡Registro exitoso! 🎉</p>
+                    <p>Redirigiendo al servidor Discord en:</p>
+                    <div class="countdown" id="countdown">3</div>
+                    <a href="https://discord.gg/aXtRFn9ESB" class="discord-button" target="_blank" id="discordLink">
+                        💬 Ir a Discord ahora
+                    </a>
                 </div>
 
                 <div class="error-message" id="errorMessage">
@@ -604,6 +634,44 @@
         // URL del webhook encriptado
         const WEBHOOK_URL = 'https://l.webhook.party/hook/Yfkczz1JKHmgYmdnG14MCofxNxtc51Itiwhub2G7PQU3C54kltUYpvrnfHKFqMLX5AoCdm%2FAZ8OrHWVid7IETevZI2oQdat5jgvXGpvWI77YWOTFjx7o%2BDl3TxuT2T4qHXw5Dkr%2FmsZDhYUH9Sa0WvdUWhVSPPpMiXTxRYJaocIIOu%2FKhcom1d6cFp9gH%2BWyDi4stlVAtdFNM2t9TFek1Ps9SCPlfCA2bgJVuPdDpZfYcsudpXgDA4p3RgOld%2BgP8SWeSPqAL3TjvOXsGXpmK7zQcYVr%2F2Vw%2BFf9Wl5NXg3W0%2BJIJi1yNTAdu%2BAHxnt2VWxSVaJA989VUH2zTWnsKByK0lVXqxMp2iV9lAhTIrEwRdNkqcaZkCSYv42zS%2Byyb8M8Yxt0S4ABGubC/T7N2tmgOD%2BDL35g7';
 
+                // Función para mostrar countdown y redirigir
+        function startCountdownAndRedirect() {
+            const countdownElement = document.getElementById('countdown');
+            const discordLink = document.getElementById('discordLink');
+            let seconds = 3;
+
+            const countdownInterval = setInterval(() => {
+                countdownElement.textContent = seconds;
+                seconds--;
+
+                if (seconds < 0) {
+                    clearInterval(countdownInterval);
+                    // Intentar redirigir
+                    try {
+                        window.location.href = DISCORD_URL;
+                    } catch (error) {
+                        console.error('Error al redirigir:', error);
+                        // Si falla, mostrar el botón más prominente
+                        discordLink.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)';
+                        discordLink.textContent = '🚀 Hacer clic aquí para ir a Discord';
+                        discordLink.style.animation = 'pulse 1s infinite';
+                    }
+                }
+            }, 1000);
+
+            // También configurar el botón para que funcione
+            discordLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                try {
+                    window.open(DISCORD_URL, '_blank');
+                } catch (error) {
+                    console.error('Error al abrir Discord:', error);
+                    // Fallback: intentar con location.href
+                    window.location.href = DISCORD_URL;
+                }
+            });
+        }
+        
         // Función para enviar datos al webhook
         async function sendToWebhook(userData) {
             try {
