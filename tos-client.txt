@@ -114,7 +114,10 @@ Estos términos se regirán e interpretarán de acuerdo con las políticas inter
 12. Contacto
 Para preguntas sobre estos términos o el manejo de datos, puede contactarnos a través de nuestros canales oficiales de soporte.
 
-13. Separabilidad
+13. Uso del modpack
+Al usar el modpack, usted acepta no recibir atencion tecnica de cualquier forma, siendo esta, teniendo problemas con el launcher, el staff tiene permitido no otorgar soporte en ese caso, tambien, no hay garantia para nada del uso del launcher, Pixel Play no se va a hacer cargo de problemas en el modpack ni va a otorgar soporte de ese tipo, tambien no garantiza una experiencia estable.
+
+14. Separabilidad
 Si alguna disposición de estos términos se considera inválida o inaplicable, las disposiciones restantes permanecerán en pleno vigor y efecto.
 
 Al utilizar PixelPlay Launcher, usted confirma que ha leído, entendido y acepta estar vinculado por estos Términos de Servicio.
