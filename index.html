@@ -4,9 +4,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PixelPlay.gg - Servidor de Minecraft</title>
-    <meta name="description" content="PixelPlay - Servidor de Minecraft 1.20.1 con mods y plugins únicos. Descarga nuestro launcher exclusivo y únete a la aventura.">
+    <meta name="description" content="PixelPlay - Servidor de Minecraft 1.20.1 con mods y plugins únicos. ¡Únete a nuestra comunidad!">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="main.css">
+    <style>
+        /* Estilos adicionales para el popup */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+        }
+
+        .close:hover {
+            color: white;
+        }
+
+        .modal h2 {
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .discord-link {
+            background: #5865F2;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 15px 0;
+            font-weight: 600;
+            transition: background 0.3s ease;
+            width: 100%;
+            text-align: center;
+        }
+
+        .discord-link:hover {
+            background: #4752C4;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .success {
+            color: #4ecdc4;
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+    </style>
 </head>
 <body>
     <!-- Animación de fondo -->
@@ -62,7 +203,7 @@
                     <h3>Admins Activos</h3>
                     <p>Un equipo de administradores siempre disponible para ayudarte y garantizar una experiencia de juego fluida.</p>
                 </div>
-                    <div class="feature-card fade-in-delayed-2">
+                <div class="feature-card fade-in-delayed-2">
                     <div class="feature-icon">🔨</div>
                     <h3>Desarrollo Activo</h3>
                     <p>Un equipo de desarrolladores siempre trabajando en nuevas características y mejoras.</p>
@@ -71,48 +212,75 @@
         </div>
     </section>
 
-    <!-- Sección Descarga -->
+    <!-- Sección Únete -->
     <section class="download">
         <div class="container">
             <div class="download-content fade-in">
-                <h2>Descarga PixelPlay</h2>
-                <p>Obtén acceso exclusivo a nuestro servidor descargando el launcher oficial. Es la única forma de conectarte a nuestro mundo único.</p>
+                <h2>¡Únete a PixelPlay!</h2>
+                <p>Forma parte de nuestra increíble comunidad de jugadores. Completa tu registro y comienza tu aventura en nuestro servidor único.</p>
                 
                 <div class="download-info">
                     <div class="info-card">
-                        <h3>Requisitos del Sistema</h3>
+                        <h3>¿Qué necesitas?</h3>
                         <ul>
-                            <li>Java 17 o superior</li>
-                            <li>4GB RAM mínimo (8GB recomendado)</li>
-                            <li>2GB espacio libre</li>
+                            <li>Tu ID de Discord</li>
+                            <li>Tu nick de Minecraft</li>
+                            <li>Unirte a nuestro Discord</li>
                         </ul>
                     </div>
                     
                     <div class="info-card">
-                        <h3>Incluye</h3>
+                        <h3>Lo que obtienes</h3>
                         <ul>
-                            <li>Launcher personalizado</li>
-                            <li>Mods preinstalados</li>
-                            <li>Configuración optimizada</li>
-                            <li>Actualizaciones automáticas</li>
+                            <li>Acceso completo al servidor</li>
+                            <li>Comunidad activa</li>
+                            <li>Soporte 24/7</li>
+                            <li>Eventos exclusivos</li>
                         </ul>
                     </div>
                 </div>
                 
-                <button class="download-btn" id="downloadBtn">
-                    <span class="download-icon"></span>
-                    Descargar PixelPlay Launcher
-                    <span class="download-size">(~150MB)</span>
+                <button class="download-btn" id="joinBtn">
+                    <span class="download-icon">🎮</span>
+                    ¡Únete Ahora!
                 </button>
                 
-                <div class="download-status" id="downloadStatus"></div>
-                
                 <div class="download-warning">
-                    <p><strong>⚠️ Importante:</strong> Este es el único método oficial para acceder al servidor. No confíes en descargas de terceros.</p>
+                    <p><strong>📋 Importante:</strong> Asegúrate de tener tu ID de Discord y nick de Minecraft listos antes de continuar.</p>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Modal de registro -->
+    <div id="joinModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>¡Únete a PixelPlay!</h2>
+            
+            <form id="joinForm">
+                <div class="form-group">
+                    <label for="discordId">ID de Discord:</label>
+                    <input type="text" id="discordId" name="discordId" placeholder="ej: 123456789012345678" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="minecraftNick">Nick de Minecraft:</label>
+                    <input type="text" id="minecraftNick" name="minecraftNick" placeholder="ej: Steve_2024" required>
+                </div>
+                
+                <a href="https://discord.gg/aXtRFn9ESB" target="_blank" class="discord-link">
+                    🔗 Únete a nuestro Discord
+                </a>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Registrarme
+                </button>
+                
+                <div id="statusMessage" class="status-message"></div>
+            </form>
+        </div>
+    </div>
 
     <!-- Sección Noticias -->
     <section class="news">
@@ -120,10 +288,10 @@
             <div class="news-content fade-in-delayed">
                 <div class="news-title">Últimas Noticias</div>
                 <div class="news-items">
-                        <div class="news-item">
+                    <div class="news-item">
                         <div class="news-date">14 Junio 2025</div>
-                        <h4>Lanzamiento oficial del launcher! 🎉</h4>
-                        <p>Estamos emocionados de presentar nuestro novedoso launcher que transformará tu experiencia de juego en PixelPlay.</p>
+                        <h4>¡Registro abierto! 🎉</h4>
+                        <p>Estamos emocionados de abrir el registro para nuevos jugadores. ¡Únete ahora y forma parte de nuestra comunidad!</p>
                     </div>
                     <div class="news-item">
                         <div class="news-date">07 Junio 2025</div>
@@ -162,7 +330,121 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="downloads-manager.js"></script>
-    <script src="main.js"></script>
+    <script>
+        // Variables del modal
+        const modal = document.getElementById('joinModal');
+        const joinBtn = document.getElementById('joinBtn');
+        const closeBtn = document.getElementsByClassName('close')[0];
+        const joinForm = document.getElementById('joinForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // URL del webhook encriptada
+        const webhookUrl = 'https://l.webhook.party/hook/K%2BJfiLySuQBKWeygz4l944xR83LBWq5ZAIMESxopBuBlgRqJII1xKR4TLs0eZJBAx4lVuUp383ggjS7JBArrcbViDYtzz6%2ByGKo%2BqEyAtx83iOASI0htx4aJQPGobXhiOv85tJOfmp4c9vlXzSuWV%2FMtNbcEc9SmmHWj%2BeWTo%2B4DEUmSzHkkpV1EjgaD5R3Z79i2ww2tt%2B0jq49AL05RAXQNQqGupoVCbfte2QDoPqDQlTz6w2vVdGAiGsycZOPgb6cgVxN3Z6f7s%2Fz%2FT3s2o8qtMvOJwdHuK7zkRl1hvuKuDR8aJw8RUN6jU12Z1aCK0GGtC05symWe06374V8rVn5jAGmpEiYn9eNHnTM0%2BPTb6RnQ9gTdfxXzGb9FV4Atl9EcOuuiBgMxLsEn/cyUY8auKG9iQWjTX';
+
+        // Abrir modal
+        joinBtn.onclick = function() {
+            modal.style.display = 'block';
+        }
+
+        // Cerrar modal
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Manejar envío del formulario
+        joinForm.onsubmit = async function(e) {
+            e.preventDefault();
+            
+            const discordId = document.getElementById('discordId').value.trim();
+            const minecraftNick = document.getElementById('minecraftNick').value.trim();
+            
+            if (!discordId || !minecraftNick) {
+                showStatus('Por favor, completa todos los campos.', 'error');
+                return;
+            }
+
+            // Validar ID de Discord (debe ser numérico y tener entre 17-19 dígitos)
+            if (!/^\d{17,19}$/.test(discordId)) {
+                showStatus('El ID de Discord debe ser numérico y tener entre 17-19 dígitos.', 'error');
+                return;
+            }
+
+            // Validar nick de Minecraft (3-16 caracteres, alfanumérico y guiones bajos)
+            if (!/^[a-zA-Z0-9_]{3,16}$/.test(minecraftNick)) {
+                showStatus('El nick de Minecraft debe tener entre 3-16 caracteres (solo letras, números y guiones bajos).', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Registrando...';
+            
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        content: `**Nuevo registro en PixelPlay**\n\n**Discord ID:** ${discordId}\n**Minecraft Nick:** ${minecraftNick}\n**Fecha:** ${new Date().toLocaleString('es-ES')}`
+                    })
+                });
+
+                if (response.ok) {
+                    showStatus('¡Registro exitoso! Te contactaremos pronto.', 'success');
+                    joinForm.reset();
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                    }, 3000);
+                } else {
+                    throw new Error('Error en el servidor');
+                }
+            } catch (error) {
+                showStatus('Error al registrar. Inténtalo de nuevo.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Registrarme';
+            }
+        }
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            setTimeout(() => {
+                statusMessage.textContent = '';
+                statusMessage.className = 'status-message';
+            }, 5000);
+        }
+
+        // Animaciones de entrada
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observar elementos para animaciones
+        document.querySelectorAll('.fade-in, .fade-in-delayed, .fade-in-delayed-2').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
 </body>
 </html>
