@@ -1,71 +1,49 @@
-# PixelPlay Updater Test Script
-# Archivo: pixelplay-updater-test.ps1
+# PixelPlay Updater Script - Versión No Interactiva
 
 Write-Host "=====================================" -ForegroundColor Cyan
-Write-Host "     PIXELPLAY UPDATER TEST         " -ForegroundColor Yellow
+Write-Host "     PIXELPLAY UPDATER         " -ForegroundColor Yellow
 Write-Host "=====================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Simulación de inicio del test
-Write-Host "Iniciando pruebas del actualizador..." -ForegroundColor Green
-Start-Sleep -Seconds 2
+# Inicio del proceso de actualización
+Write-Host "Iniciando actualización..." -ForegroundColor Green
+Start-Sleep -Seconds 1
 
-# Simulación de verificaciones
+# Verificaciones (simuladas)
 Write-Host "Verificando conexión..." -ForegroundColor White
 Start-Sleep -Seconds 1
-Write-Host "✓ Conexión establecida" -ForegroundColor Green
+Write-Host "-> Conexión establecida" -ForegroundColor Green
 
 Write-Host "Comprobando versión actual..." -ForegroundColor White
 Start-Sleep -Seconds 1
-Write-Host "✓ Versión actual: 1.2.3" -ForegroundColor Green
+Write-Host "-> Versión actual: 2.3.0" -ForegroundColor Green
 
 Write-Host "Buscando actualizaciones..." -ForegroundColor White
-Start-Sleep -Seconds 2
-Write-Host "✓ Nueva versión disponible: 1.2.4" -ForegroundColor Green
+Start-Sleep -Seconds 1
+Write-Host "-> Nueva versión disponible: 2.3.1" -ForegroundColor Green
 
-Write-Host "Descargando archivos de prueba..." -ForegroundColor White
+Write-Host "Descargando archivos necesarios..." -ForegroundColor White
+# Simulación de una barra de progreso para la descarga
 for ($i = 1; $i -le 5; $i++) {
-    Write-Progress -Activity "Descargando" -Status "Archivo $i de 5" -PercentComplete ($i * 20)
-    Start-Sleep -Seconds 1
+    Write-Progress -Activity "Descargando Actualización" -Status "Archivo $i de 5" -PercentComplete ($i * 20)
+    Start-Sleep -Milliseconds 500
 }
-Write-Progress -Activity "Descargando" -Completed
-Write-Host "✓ Descarga completada" -ForegroundColor Green
+Write-Progress -Activity "Descargando Actualización" -Completed
+Write-Host "-> Descarga completada" -ForegroundColor Green
 
-Write-Host "Ejecutando pruebas de integridad..." -ForegroundColor White
+Write-Host "Instalando actualización..." -ForegroundColor White
 Start-Sleep -Seconds 2
-Write-Host "✓ Todas las pruebas pasaron correctamente" -ForegroundColor Green
+Write-Host "-> Actualización instalada correctamente" -ForegroundColor Green
 
 Write-Host ""
 Write-Host "=====================================" -ForegroundColor Cyan
-Write-Host "        TEST COMPLETADO             " -ForegroundColor Yellow
+Write-Host "     ACTUALIZACIÓN COMPLETADA        " -ForegroundColor Yellow
 Write-Host "=====================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Pregunta para terminar el test
-do {
-    $respuesta = Read-Host "¿Desea terminar el test? (s/n)"
-    $respuesta = $respuesta.ToLower().Trim()
-    
-    if ($respuesta -eq "s" -or $respuesta -eq "si" -or $respuesta -eq "sí" -or $respuesta -eq "y" -or $respuesta -eq "yes") {
-        Write-Host ""
-        Write-Host "Terminando test..." -ForegroundColor Yellow
-        Start-Sleep -Seconds 1
-        Write-Host "✓ Test finalizado correctamente" -ForegroundColor Green
-        Write-Host "Gracias por usar PixelPlay Updater Test" -ForegroundColor Cyan
-        break
-    }
-    elseif ($respuesta -eq "n" -or $respuesta -eq "no") {
-        Write-Host "Continuando con el test..." -ForegroundColor Yellow
-        Write-Host "Ejecutando pruebas adicionales..." -ForegroundColor White
-        Start-Sleep -Seconds 2
-        Write-Host "✓ Pruebas adicionales completadas" -ForegroundColor Green
-        Write-Host ""
-    }
-    else {
-        Write-Host "Por favor, responda 's' para sí o 'n' para no" -ForegroundColor Red
-    }
-} while ($true)
+Write-Host "El launcher se reiniciará en 5 segundos..." -ForegroundColor Gray
+Start-Sleep -Seconds 5
 
-Write-Host ""
-Write-Host "Presione cualquier tecla para salir..." -ForegroundColor Gray
-$host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null
+# El launcher se encargará de reiniciar la aplicación.
+
+Write-Host "Proceso de actualización finalizado."
