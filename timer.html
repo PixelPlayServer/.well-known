@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelPlay.gg - Próximamente</title>
+    <meta name="description" content="PixelPlay - Servidor de Minecraft 1.20.1 con mods y plugins únicos. ¡Prepárate para la aventura!">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="main.css">
+    <style>
+        .countdown-container {
+            text-align: center;
+            padding: 4rem 0;
+        }
+        .countdown-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color-light);
+        }
+        #countdown {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        .countdown-item {
+            background: var(--surface-color);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--stroke-color);
+            min-width: 140px;
+            text-align: center;
+        }
+        .countdown-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+        .countdown-label {
+            font-size: 1rem;
+            color: var(--text-color-secondary);
+            margin-top: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="logo">Pixel<span>Play</span></div>
+                <div class="subtitle">Servidor de Minecraft 1.20.1</div>
+                <p class="description">
+                    Estamos preparando algo increíble. El servidor está a punto de lanzarse.
+                    ¡Prepárate para una aventura como ninguna otra!
+                </p>
+
+                <div class="countdown-container">
+                    <h2 class="countdown-title">Lanzamiento en</h2>
+                    <div id="countdown">
+                        <div class="countdown-item glass-card">
+                            <div id="days" class="countdown-number">00</div>
+                            <div class="countdown-label">Días</div>
+                        </div>
+                        <div class="countdown-item glass-card">
+                            <div id="hours" class="countdown-number">00</div>
+                            <div class="countdown-label">Horas</div>
+                        </div>
+                        <div class="countdown-item glass-card">
+                            <div id="minutes" class="countdown-number">00</div>
+                            <div class="countdown-label">Minutos</div>
+                        </div>
+                        <div class="countdown-item glass-card">
+                            <div id="seconds" class="countdown-number">00</div>
+                            <div class="countdown-label">Segundos</div>
+                        </div>
+                    </div>
+                    <div id="accessGranted" style="display: none; margin-top: 2rem;">
+                        <h2 class="countdown-title">¡Hemos lanzado!</h2>
+                        <p class="description">Serás redirigido en un momento...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">Pixel<span>Play</span></div>
+                <p class="footer-disclaimer">
+                    © 2025 PixelPlay. No estamos afiliados con Mojang Studios o Microsoft.<br>
+                    Minecraft es una marca registrada de Mojang Studios.
+                </p>
+                <div class="footer-social">
+                    <p>¿Necesitas ayuda? Contactanos en support@pixelplay.gg</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

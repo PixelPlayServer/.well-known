@@ -1,0 +1,50 @@
+{
+  "version": "3.0.0",
+  "releaseDate": "2025-05-31",
+  "name": "PixelPlay Launcher",
+  "description": "Launcher oficial para conectarse al servidor PixelPlay Minecraft 1.20.1",
+  "requirements": {
+    "java": "Java 17 o superior",
+    "ram": "4GB RAM mínimo (8GB recomendado)",
+    "storage": "2GB espacio libre",
+    "minecraft": "Minecraft Java Edition"
+  },
+  "downloads": {
+    "windows": {
+      "type": "cloud",
+      "filename": "Pixelplay-setup.exe",
+      "cloudUrl": "https://github.com/PixelPlayServer/.well-known/releases/download/main-realese/Pixelplay-setup.exe",
+      "size": "~1GB",
+      "checksum": "sha256:placeholder-checksum-for-windows",
+      "compatible": ["Windows 10", "Windows 11"],
+      "architecture": ["x64", "x86"]
+    },
+  "changelog": [
+    {
+      "version": "3.0.0",
+      "date": "2025-05-31",
+      "changes": [
+        "Añadido soporte para archivos locales y en la nube",
+        "Mejorado sistema de verificación de integridad",
+        "Optimización del proceso de descarga",
+        "Soporte experimental para Linux"
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "date": "2025-05-31",
+      "changes": [
+        "Lanzamiento inicial del PixelPlay Launcher",
+        "Soporte completo para Windows y macOS",
+        "Instalación automática de mods y configuraciones",
+        "Sistema de actualizaciones automáticas",
+        "Interfaz moderna y fácil de usar"
+      ]
+    }
+  ],
+  "support": {
+    "discord": "can't give",
+    "email": "soporte@pixelplay.gg",
+    "website": "https://pixelplay.gg/support"
+  }
+}}

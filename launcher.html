@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelPlay Launcher</title>
+    <!-- Importar la fuente 'Poppins' y los íconos de Lucide -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            /* Paleta de colores verdosa oscura y elegante */
+            --bg-color: #101c14;
+            --surface-color: rgba(18, 32, 24, 0.80);
+            --surface-color-hover: rgba(28, 48, 36, 0.85);
+            --glass-surface: rgba(18, 32, 24, 0.55);
+            --primary-color: #2ecc71;
+            --primary-color-light: #4be08c;
+            --special-color: #a3e635; /* Color para el modo 4 Naciones, verde lima */
+            --text-color: #e1f7e6;
+            --text-color-secondary: #a8c8b3;
+            --stroke-color: rgba(46, 204, 113, 0.22);
+            --highlight-color: rgba(46, 204, 113, 0.10);
+            --success-color: #27ae60;
+            --error-color: #ff5f57;
+            --border-radius: 12px;
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE */
+        }
+
+        *::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Fondo dinámico con gradientes animados */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 15% 25%, var(--primary-color-light) 0%, transparent 20%),
+                radial-gradient(circle at 85% 75%, #2752c1 0%, transparent 25%);
+            filter: blur(120px);
+            opacity: 0.3;
+            animation: animate-glow 15s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes animate-glow {
+            0% { transform: rotate(0deg) scale(1.0); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1.0); }
+        }
+
+        .launcher-grid {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 24px;
+            width: 100%;
+            max-width: 1100px;
+            height: 680px;
+            max-height: 90vh;
+        }
+
+        /* Contenedor principal con efecto de cristal */
+        .glass-card {
+            background: var(--glass-surface);
+            border: 1px solid var(--stroke-color);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 28px;
+            transition: var(--transition-smooth);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* --- Columna Izquierda --- */
+        .main-controls {
+            grid-column: 1 / 2;
+            grid-row: 1 / 3;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: var(--primary-color);
+        }
+
+        .subtitle {
+            color: var(--text-color-secondary);
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-color-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-size: 0.9rem;
+        }
+
+        .tab.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(130, 87, 229, 0.3);
+        }
+
+        .tab:not(.active):hover {
+            background: var(--surface-color-hover);
+            color: var(--text-color);
+        }
+
+        .auth-section { display: none; }
+        .auth-section.active { display: block; animation: fadeIn 0.5s ease; }
+
+        .auth-btn {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--stroke-color);
+            border-radius: var(--border-radius);
+            background: var(--surface-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .auth-btn:hover {
+            background: var(--surface-color-hover);
+            border-color: var(--primary-color);
+        }
+        
+        .auth-btn.microsoft { border-color: #0078d4; }
+        .auth-btn.microsoft:hover { background: rgba(0, 120, 212, 0.2); }
+        .auth-btn.nonpremium { border-color: var(--success-color); }
+        .auth-btn.nonpremium:hover { background: rgba(4, 211, 97, 0.2); }
+
+        .status-text {
+            margin: 16px 0;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.2);
+            color: var(--text-color-secondary);
+            text-align: center;
+            min-height: 45px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .status-text.success { background: rgba(4, 211, 97, 0.15); color: var(--success-color); }
+        .status-text.error { background: rgba(255, 95, 87, 0.15); color: var(--error-color); }
+        .status-text.info { background: rgba(130, 87, 229, 0.15); color: var(--primary-color-light); }
+
+        .account-display {
+            display: none;
+            background: var(--highlight-color);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin: 16px 0;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid var(--stroke-color);
+        }
+
+        .account-display.show { display: flex; animation: fadeIn 0.5s ease; }
+        .account-avatar { width: 48px; height: 48px; border-radius: 8px; }
+        .account-info { flex: 1; }
+        .account-name { font-weight: 600; font-size: 1.1rem; }
+        .account-type { color: var(--text-color-secondary); font-size: 0.8rem; }
+        
+        .logout-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-color-secondary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logout-btn:hover { background: rgba(255, 95, 87, 0.2); color: var(--error-color); }
+
+        .play-section {
+            margin-top: auto;
+            padding-top: 24px;
+            border-top: 1px solid var(--stroke-color);
+        }
+
+        .play-btn {
+            width: 100%;
+            padding: 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(130, 87, 229, 0.4);
+        }
+
+        .play-btn.show { display: flex; }
+        .play-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(130, 87, 229, 0.5); }
+        .play-btn:disabled { background: var(--text-color-secondary); cursor: not-allowed; box-shadow: none; transform: none;}
+
+        /* --- Columna Derecha --- */
+        .news-card {
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .config-card {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color-light);
+        }
+
+        .news-list {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 10px; /* Espacio para el scrollbar */
+        }
+
+        .news-item {
+            padding: 14px 0;
+            color: var(--text-color-secondary);
+            border-bottom: 1px solid var(--stroke-color);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .news-item:last-child { border-bottom: none; }
+        .news-item:first-child { padding-top: 0; }
+        .news-item strong { color: var(--text-color); font-weight: 500; }
+
+        .config-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+        .config-row:last-child { margin-bottom: 0; }
+
+        .config-label {
+            color: var(--text-color-secondary);
+            font-weight: 400;
+            font-size: 0.95rem;
+        }
+
+        .config-input-wrapper {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .config-input {
+            padding: 10px 14px;
+            border: 1px solid var(--stroke-color);
+            border-radius: 8px;
+            background: var(--surface-color);
+            color: var(--text-color);
+            width: 140px;
+            text-align: center;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .config-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(130, 87, 229, 0.3);
+        }
+        
+        select.config-input {
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a8a8b3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+        }
+
+        /* --- Overlays y Modales --- */
+        .loading-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-color);
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+        .loading-box {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .loading-spinner {
+            margin: 0 auto;
+        }
+        .loading-text {
+            color: var(--text-color-secondary);
+            margin-top: 16px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .loading-backdrop .loading-spinner { width: 48px; height: 48px; border-width: 4px; }
+        /* Centrado horizontal y vertical del spinner y texto */
+        #loading-overlay .loading-box {
+            flex-direction: row;
+            gap: 18px;
+            align-items: center;
+            justify-content: center;
+        }
+        #loading-overlay .loading-spinner {
+            margin: 0;
+        }
+        #loading-overlay .loading-text {
+            margin-top: 0;
+            font-size: 1.15rem;
+            text-align: left;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: var(--surface-color);
+            border: 1px solid var(--stroke-color);
+            border-radius: var(--border-radius);
+            padding: 32px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            animation: modalSlide 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--primary-color-light);
+        }
+
+        .modal-text {
+            color: var(--text-color-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .username-input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--stroke-color);
+            border-radius: 10px;
+            background: rgba(0,0,0,0.2);
+            color: var(--text-color);
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: var(--transition-smooth);
+        }
+        .username-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(130, 87, 229, 0.3);
+        }
+
+        .modal-buttons { display: flex; gap: 12px; justify-content: center; }
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-size: 0.95rem;
+        }
+        .modal-btn.primary { background: var(--primary-color); color: white; }
+        .modal-btn.secondary { background: var(--surface-color-hover); color: var(--text-color); }
+        .modal-btn:hover { opacity: 0.85; transform: translateY(-2px); }
+
+        /* --- Sección 4 Naciones --- */
+        #4naciones-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--stroke-color);
+            animation: fadeIn 0.5s ease;
+        }
+        #4naciones-play-btn {
+            background: linear-gradient(90deg, var(--special-color) 0%, #ffd966 100%);
+            color: #202024;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 4px 20px rgba(255, 193, 7, 0.3);
+        }
+        #4naciones-play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 193, 7, 0.4);
+        }
+
+
+        /* Animaciones y utilidades */
+        .loading-spinner {
+            width: 20px; height: 20px;
+            border: 2px solid var(--stroke-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes modalSlide { from { opacity: 0; transform: translateY(-20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Window controls (opcional, si es para Electron) */
+        .window-controls {
+            position: fixed; top: 12px; right: 12px; display: flex; gap: 8px; z-index: 1000;
+        }
+        .window-btn {
+            width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer;
+        }
+        .window-btn.close { background: #ff5f57; }
+        .window-btn.min { background: #ffbd2e; }
+        .window-btn.max { background: #28ca42; }
+
+        .creditos {
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(22, 22, 28, 0.85);
+            color: var(--text-color-secondary);
+            font-size: 0.85rem;
+            padding: 10px 18px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+            z-index: 100;
+            pointer-events: none;
+            user-select: none;
+        }
+        .creditos strong {
+            color: var(--primary-color-light);
+        }
+
+        .config-creditos-row {
+            display: flex;
+            flex-direction: row;
+            gap: 18px;
+            width: 100%;
+        }
+        .config-card, .creditos-panel {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+        .creditos-panel {
+            background: var(--glass-surface);
+            border: 1px solid var(--stroke-color);
+            border-radius: var(--border-radius);
+            padding: 18px 18px 12px 18px;
+            box-shadow: 0 4px 18px 0 rgba(0,0,0,0.18);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+            min-width: 160px;
+            max-width: 220px;
+            margin-top: 0;
+        }
+        .credito-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .credito-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 5px;
+            background: #222;
+            border: 1.2px solid var(--stroke-color);
+        }
+        .credito-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .credito-nombre {
+            font-weight: 600;
+            color: var(--primary-color-light);
+            font-size: 0.95rem;
+        }
+        .credito-rol {
+            color: var(--text-color-secondary);
+            font-size: 0.85rem;
+        }
+        @media (max-width: 900px) {
+            .config-creditos-row { flex-direction: column; gap: 10px; }
+            .creditos-panel { max-width: 100%; min-width: 0; padding: 10px; }
+        }
+
+        .creditos-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Overlay de Carga Inicial -->
+    <div id="loading-overlay" class="loading-backdrop">
+        <div class="loading-box">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Verificando...</div>
+        </div>
+    </div>
+
+    <!-- Modal de Suspensión (Oculto por defecto) -->
+    <div id="ban-modal" class="modal-backdrop" style="display: none;">
+        <div class="modal-content">
+            <i data-lucide="shield-off" style="width: 64px; height: 64px; color: var(--error-color); margin-bottom: 16px;"></i>
+            <div class="modal-title" style="color: var(--error-color);">Estás suspendido de PixelPlay</div>
+            <div class="modal-text">
+                Tu acceso ha sido restringido. Por favor, contacta con el equipo de soporte para más información.
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Términos de Servicio (Oculto por defecto) -->
+    <div id="tos-modal" class="modal-backdrop" style="display:none;z-index:30000;">
+        <div class="modal-content" style="max-width:700px;width:95%;text-align:left;max-height:80vh;overflow-y:auto;">
+            <div class="modal-title" style="font-size:1.3rem;">Términos de Servicio - PixelPlay Launcher</div>
+            <div class="modal-text" style="font-size:1rem;line-height:1.6;">
+                <strong>Debes aceptar los <a href='https://pixelplay.gg/tos-client.txt' target='_blank' style='color:var(--primary-color-light);text-decoration:underline;'>Términos de Servicio oficiales</a> para continuar.</strong>
+                <br><br>
+                Al utilizar PixelPlay Launcher, usted confirma que ha leído, entendido y acepta estar vinculado por estos Términos de Servicio.
+            </div>
+            <div class="modal-buttons" style="margin-top:18px;justify-content:flex-end;">
+                <button class="modal-btn primary" id="tos-accept-btn">Aceptar y continuar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="window-controls">
+        <button class="window-btn min" onclick="minimizeWindow()"></button>
+        <button class="window-btn max" onclick="maximizeWindow()"></button>
+        <button class="window-btn close" onclick="closeWindow()"></button>
+    </div>
+
+    <div class="launcher-grid">
+        <!-- Columna Izquierda: Controles Principales -->
+        <div class="glass-card main-controls">
+            <div class="header">
+                <div class="logo">Pixel<span>Play</span></div>
+                <div class="subtitle">Lanzador oficial</div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('microsoft')">Microsoft</button>
+                <button class="tab" onclick="switchTab('nonpremium')">Sin Conexión</button>
+            </div>
+
+            <!-- Sección de Login Microsoft -->
+            <div id="microsoft-section" class="auth-section active">
+                <button id="microsoft-login-btn" class="auth-btn microsoft">
+                    <i data-lucide="microsoft"></i>
+                    Iniciar con Microsoft
+                </button>
+                <div id="microsoft-status" class="status-text">Listo para iniciar sesión</div>
+                <div id="microsoft-account" class="account-display">
+                    <img id="microsoft-avatar" class="account-avatar" src="" alt="Avatar">
+                    <div class="account-info">
+                        <div id="microsoft-name" class="account-name"></div>
+                        <div class="account-type">Cuenta Microsoft</div>
+                    </div>
+                    <button id="microsoft-logout" class="logout-btn" title="Cerrar Sesión"><i data-lucide="log-out"></i></button>
+                </div>
+            </div>
+
+            <!-- Sección de Modo Offline -->
+            <div id="nonpremium-section" class="auth-section">
+                <button id="nonpremium-login-btn" class="auth-btn nonpremium">
+                    <i data-lucide="user-plus"></i>
+                    Jugar Sin Conexión
+                </button>
+                <div id="nonpremium-status" class="status-text">Listo para jugar sin conexión</div>
+                <div id="nonpremium-account" class="account-display">
+                    <img id="nonpremium-avatar" class="account-avatar" src="" alt="Avatar">
+                    <div class="account-info">
+                        <div id="nonpremium-name" class="account-name"></div>
+                        <div class="account-type">Modo Sin Conexión</div>
+                    </div>
+                    <button id="nonpremium-logout" class="logout-btn" title="Limpiar"><i data-lucide="trash-2"></i></button>
+                </div>
+            </div>
+
+            <!-- Sección 4 Naciones (Oculta por defecto) -->
+            <div id="4naciones-section" style="display: none;">
+                <div class="card-title" style="margin-bottom: 16px; justify-content: center; color: var(--special-color);"><i data-lucide="star"></i>Modo Exclusivo</div>
+                <button id="4naciones-play-btn" class="auth-btn">
+                    <i data-lucide="swords"></i>
+                    Jugar 4 Naciones
+                </button>
+            </div>
+
+            <div class="play-section">
+                 <button id="play-button" class="play-btn" disabled>
+                    <i data-lucide="play-circle"></i>
+                    <span>Jugar</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Noticias y Configuración -->
+        <div class="glass-card news-card">
+            <div class="card-title"><i data-lucide="newspaper"></i>Últimas Novedades</div>
+            <div class="news-list">
+                <div class="news-item"><strong>¡Bienvenido a PixelPlay v2!</strong> Interfaz completamente rediseñada para una experiencia moderna.</div>
+                <div class="news-item"><strong>Rendimiento Mejorado:</strong> Optimizaciones internas para un inicio más rápido y estable.</div>
+                <div class="news-item"><strong>Soporte Extendido:</strong> Mejor compatibilidad con las últimas versiones del juego.</div>
+            </div>
+        </div>
+
+        <div class="config-creditos-row">
+            <div class="glass-card config-card">
+                <div class="card-title"><i data-lucide="settings-2"></i>Configuración</div>
+                <div class="config-row">
+                    <label class="config-label" for="ram-input">Memoria RAM</label>
+                    <div class="config-input-wrapper">
+                        <input id="ram-input" class="config-input" type="number" min="1024" max="16384" step="512" value="4096">
+                    </div>
+                </div>
+                <div class="config-row">
+                    <label class="config-label" for="version-select">Versión del Juego</label>
+                    <div class="config-input-wrapper">
+                        <select id="version-select" class="config-input" style="width: 180px;">
+                            <option value="">Cargando...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="creditos-panel">
+                <div class="card-title" style="font-size:1rem;margin-bottom:8px;"><i data-lucide="users" style="width:18px;height:18px;"></i> Créditos</div>
+                <div class="creditos-list">
+                    <div class="credito-item">
+                        <img class="credito-avatar" src="https://mc-heads.net/avatar/Joacoorandom/28" alt="Joacoorandom skin">
+                        <div class="credito-info">
+                            <span class="credito-nombre">Joacoorandom</span>
+                            <span class="credito-rol">Programador e inspector</span>
+                        </div>
+                    </div>
+                    <div class="credito-item">
+                        <img class="credito-avatar" src="https://mc-heads.net/avatar/Vitopia777/28" alt="Vitopia777 skin">
+                        <div class="credito-info">
+                            <span class="credito-nombre">Vitopia777</span>
+                            <span class="credito-rol">Inspector</span>
+                        </div>
+                    </div>
+                    <div class="credito-item">
+                        <img class="credito-avatar" src="https://mc-heads.net/avatar/JulioDisi/28" alt="JulioDisi skin">
+                        <div class="credito-info">
+                            <span class="credito-nombre">JulioDisi</span>
+                            <span class="credito-rol">Inspector</span>
+                        </div>
+                    </div>
+                    <div class="credito-item">
+                        <img class="credito-avatar" src="https://mc-heads.net/avatar/ilich74/28" alt="Ilich74 skin">
+                        <div class="credito-info">
+                            <span class="credito-nombre">Ilich74</span>
+                            <span class="credito-rol">Inspector y beta tester</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+           // --- SISTEMA DE ACTUALIZACIÓN AUTOMÁTICA ---
+        function logToMain(...args) {
+            // Intenta enviar logs al proceso principal de Electron
+            try {
+                if (window.electronAPI && window.electronAPI.log) {
+                    window.electronAPI.log(args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' '));
+                }
+            } catch (e) { /* fallback: nada */ }
+        }
+        function updaterLog(...args) {
+            console.log(...args);
+            logToMain('[Updater]', ...args);
+            // También muestra el log en el modal de actualización si está visible
+            const logContainer = document.getElementById('update-log-container');
+            if (logContainer) {
+                const logEntry = document.createElement('div');
+                logEntry.textContent = args.join(' ');
+                logContainer.appendChild(logEntry);
+                logContainer.scrollTop = logContainer.scrollHeight; // Auto-scroll
+            }
+        }
+
+        async function checkForLauncherUpdate() {
+            try {
+                updaterLog('Revisando actualización...');
+                // Leer versión local desde version-info.json en el root
+                let localVersion = null;
+                try {
+                    updaterLog('Leyendo version-info.json...');
+                    const res = await fetch('version-info.json', { cache: 'no-store' });
+                    if (res.ok) {
+                        const data = await res.json();
+                        localVersion = data.version;
+                        updaterLog('Versión local encontrada:', localVersion);
+                    } else {
+                        updaterLog('No se pudo leer version-info.json, status:', res.status);
+                    }
+                } catch (e) {
+                    updaterLog('No se pudo leer version-info.json', e);
+                }
+
+                // Consultar versión remota
+                updaterLog('Consultando versión remota...');
+                const remoteRes = await fetch('https://raw.githubusercontent.com/PixelPlayServer/.well-known/main/powerupdate.json', { cache: 'no-store' });
+                if (!remoteRes.ok) {
+                    updaterLog('No se pudo obtener powerupdate.json, status:', remoteRes.status);
+                    return;
+                }
+                const remoteData = await remoteRes.json();
+                const remoteScript = remoteData.current_script?.[0]?.script;
+                const remoteVersion = remoteData.current_script?.[0]?.version;
+                updaterLog('Versión remota encontrada:', remoteVersion);
+                if (!remoteScript || !remoteVersion) {
+                    updaterLog('powerupdate.json no tiene los campos esperados.');
+                    return;
+                }
+
+                // Función para comparar versiones (v2.3.0 < v2.4.0)
+                function versionCompare(v1, v2) {
+                    const a = v1.replace(/[^0-9.]/g, '').split('.').map(Number);
+                    const b = v2.replace(/[^0-9.]/g, '').split('.').map(Number);
+                    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+                        if ((a[i] || 0) < (b[i] || 0)) return -1;
+                        if ((a[i] || 0) > (b[i] || 0)) return 1;
+                    }
+                    return 0;
+                }
+
+                if (!localVersion) {
+                    updaterLog('No se encontró versión local, se recomienda actualizar.');
+                }
+
+                if (!localVersion || versionCompare(localVersion, remoteVersion) < 0) {
+                    updaterLog(`Hay una actualización disponible. Local: ${localVersion || 'N/A'} | Remota: ${remoteVersion}`);
+                    showModal(
+                        'Actualización disponible',
+                        `Se ha detectado una nueva versión del launcher (<b>${remoteVersion}</b>).<br>Para jugar, debes actualizar el cliente`,
+                        [
+                            { text: 'Actualizar', class: 'primary', action: async () => { await runPowerShellUpdate(remoteScript); } }
+                        ]
+                    );
+                } else {
+                    updaterLog('El launcher está actualizado. Local:', localVersion, '| Remota:', remoteVersion);
+                }
+            } catch (e) {
+                updaterLog('Error al buscar actualización:', e);
+            }
+        }
+
+        // Descarga y ejecuta el script PowerShell
+        async function runPowerShellUpdate(scriptUrl) {
+            // Muestra un modal con un log
+            showModal(
+                'Actualizando Launcher',
+                '<div id="update-log-container" style="height: 150px; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; text-align: left;"></div>',
+                [] // Sin botones inicialmente
+            );
+
+            try {
+                // Solo aceptar scripts de raw.githubusercontent.com
+                if (!/^https:\/\/raw\.githubusercontent\.com\//.test(scriptUrl)) {
+                    updaterLog('El script no es de raw.githubusercontent.com. Abortando actualización.');
+                    showModal('Error', 'El script de actualización no es válido.', [{ text: 'OK', class: 'primary', action: hideModal }]);
+                    return;
+                }
+                updaterLog('Iniciando actualización automática...');
+                
+                // Descargar el script
+                updaterLog('Descargando script desde:', scriptUrl);
+                const res = await fetch(scriptUrl, { cache: 'no-store' });
+                if (!res.ok) throw new Error(`No se pudo descargar el script de actualización (status: ${res.status}).`);
+                const scriptText = await res.text();
+                updaterLog('Script descargado correctamente.');
+
+                const scriptFileName = 'update.ps1';
+                
+                if (window.electronAPI && window.electronAPI.saveFile) {
+                    updaterLog('Guardando script en el disco...');
+                    const saveResult = await window.electronAPI.saveFile(scriptFileName, scriptText);
+                    if (!saveResult.success) {
+                        throw new Error('No se pudo guardar el script: ' + saveResult.error);
+                    }
+                    updaterLog('Script guardado en:', saveResult.path);
+
+                    if (window.electronAPI.runPowerShell) {
+                        updaterLog('Ejecutando script de PowerShell...');
+                        await window.electronAPI.runPowerShell(saveResult.path);
+                        updaterLog('El script de actualización se ha iniciado. El launcher se cerrará.');
+                        
+                        // Actualizar modal para indicar que se debe reiniciar
+                        showModal(
+                            'Actualización en curso',
+                            'El actualizador se ha iniciado. Una vez que termine, el launcher se reiniciará automáticamente. Si no lo hace, por favor, reinícialo manualmente.',
+                            [{ text: 'Reiniciar ahora', class: 'primary', action: () => window.electronAPI.restartApp() }]
+                        );
+                    }
+                } else {
+                    throw new Error('La API de Electron no está disponible para guardar o ejecutar el script.');
+                }
+            } catch (e) {
+                updaterLog('Error durante la actualización:', e.message);
+                showModal('Error de Actualización', `Ocurrió un error: <br><pre style="text-align:left;background:#2c2c2c;padding:8px;border-radius:4px;">${e.message}</pre>`, [{ text: 'Cerrar', class: 'primary', action: hideModal }]);
+            }
+        }""
+
+        // --- SCRIPT DE SEGURIDAD Y ARRANQUE ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkForLauncherUpdate();
+            // Mostrar ToS si es la primera vez
+            if (!localStorage.getItem('pixelplay_tos_accepted')) {
+                document.getElementById('tos-modal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                document.getElementById('tos-accept-btn').onclick = function() {
+                    localStorage.setItem('pixelplay_tos_accepted', '1');
+                    document.getElementById('tos-modal').style.display = 'none';
+                    document.body.style.overflow = '';
+                };
+                return;
+            }
+            // Escucha SIEMPRE el mensaje de baneo, usando ambos métodos
+            let banDetected = false;
+            function mostrarBanModal(reason) {
+                const loadingOverlay = document.getElementById('loading-overlay');
+                const banModal = document.getElementById('ban-modal');
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => loadingOverlay.style.display = 'none', 500);
+                banModal.style.display = 'flex';
+                const modalText = banModal.querySelector('.modal-text');
+                if (modalText && reason) {
+                    modalText.innerHTML = `Tu acceso ha sido restringido.<br><b>Motivo:</b> ${reason}<br>Por favor, contacta con el equipo de soporte para más información.`;
+                }
+                lucide.createIcons();
+                document.body.style.pointerEvents = 'none';
+                banModal.style.pointerEvents = 'auto';
+                banDetected = true;
+            }
+            // Escucha por window.electronAPI o por ipcRenderer (si existe)
+            let ipcFallback = false;
+            try {
+                if (window.electronAPI && typeof window.electronAPI.receive === 'function') {
+                    window.electronAPI.receive('hwid-ban', (data) => {
+                        mostrarBanModal(data.reason);
+                    });
+                } else if (window.require) {
+                    const { ipcRenderer } = window.require('electron');
+                    ipcRenderer.on('hwid-ban', (event, data) => {
+                        mostrarBanModal(data.reason);
+                    });
+                    ipcFallback = true;
+                }
+            } catch (e) {
+                // No hay preload ni nodeIntegration
+            }
+            // Si no hay baneo, inicializa la app normalmente
+            setTimeout(() => {
+                if (!banDetected) runSecurityCheck();
+            }, ipcFallback ? 200 : 100);
+        });
+
+        function mostrarBanModal(reason) {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const banModal = document.getElementById('ban-modal');
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => loadingOverlay.style.display = 'none', 500);
+            banModal.style.display = 'flex';
+            // Cambia el texto del modal para mostrar el motivo
+            const modalText = banModal.querySelector('.modal-text');
+            if (modalText && reason) {
+                modalText.innerHTML = `Tu acceso ha sido restringido.<br><b>Motivo:</b> ${reason}<br>Por favor, contacta con el equipo de soporte para más información.`;
+            }
+            lucide.createIcons();
+            // Bloquea toda la UI
+            document.body.style.pointerEvents = 'none';
+            banModal.style.pointerEvents = 'auto';
+        }
+
+        async function runSecurityCheck() {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const banModal = document.getElementById('ban-modal');
+            const SECURITY_CHECK_TIMEOUT = 10000; // 10 segundos
+
+            try {
+                const checkPromise = performHwidCheck();
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Timeout de seguridad excedido.')), SECURITY_CHECK_TIMEOUT)
+                );
+
+                // Espera a que el chequeo termine o se agote el tiempo
+                const isBanned = await Promise.race([checkPromise, timeoutPromise]);
+
+                if (isBanned) {
+                    // Muestra modal de baneo y detiene la carga de la UI principal
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => loadingOverlay.style.display = 'none', 500);
+                    banModal.style.display = 'flex';
+                    lucide.createIcons(); // Renderiza el ícono del modal de baneo
+                } else {
+                    // No está baneado, procede con la app
+                    await initializeAppLogic();
+                    // Oculta overlay de carga con una transición suave
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => loadingOverlay.style.display = 'none', 500);
+                }
+            } catch (error) {
+                // Si hay un error (ej. timeout, red), se procede con la carga de la app por seguridad
+                console.warn('El chequeo de seguridad falló:', error.message);
+                await initializeAppLogic();
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => loadingOverlay.style.display = 'none', 500);
+            }
+        }
+
+        async function performHwidCheck() {
+            try {
+                // 1. Generar el HWID usando la lógica proporcionada directamente aquí
+                const os = require('os');
+                const crypto = require('crypto');
+                function getNetworkInfo() {
+                    const interfaces = os.networkInterfaces();
+                    const macAddresses = Object.values(interfaces)
+                        .flat()
+                        .filter(iface => iface && !iface.internal && iface.mac && iface.mac !== '00:00:00:00:00:00')
+                        .map(iface => iface.mac);
+                    return { macAddresses };
+                }
+                function generateEnhancedHWID() {
+                    const cpuInfo = os.cpus()[0];
+                    const networkInfo = getNetworkInfo();
+                    const hwidData = {
+            hostname: os.hostname(),
+            platform: os.platform(),
+            arch: os.arch(),
+            cpuModel: cpuInfo.model,
+            cpuSpeed: cpuInfo.speed,
+            totalMemory: os.totalmem(),
+            userInfo: os.userInfo()
+                    };
+                    const hwidString = JSON.stringify(hwidData);
+                    return crypto.createHash('sha256').update(hwidString).digest('hex');
+                }
+                const userHwid = generateEnhancedHWID();
+                if (!userHwid) {
+                    console.warn("No se pudo obtener el HWID. Se omitirá la verificación.");
+                    return false; // No se puede verificar, se asume que no está baneado
+                }
+
+                // 2. Obtener la lista de baneados desde la URL
+                const response = await fetch('https://pixelplay.gg/sanciones-hwid.json', { cache: 'no-store' });
+                if (!response.ok) {
+                    console.warn(`No se pudo obtener la lista de baneados. Status: ${response.status}`);
+                    return false; // Falla la petición, se asume que no está baneado
+                }
+                
+                const blacklist = await response.json();
+
+                // 3. Comprobar si el HWID está en la lista
+                if (blacklist && Array.isArray(blacklist.banned_hwids)) {
+                    return blacklist.banned_hwids.includes(userHwid);
+                } else {
+                    console.warn("El formato de la lista de baneados es incorrecto.");
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error durante el chequeo de HWID:", error);
+                return false; // Cualquier error en el proceso, se asume que no está baneado
+            }
+        }
+        
+        // --- LÓGICA PRINCIPAL DE LA APLICACIÓN ---
+
+        // Global state
+        let currentAccount = null;
+        let isLoading = false;
+
+        // Envolver la lógica principal de la app en una función para llamarla después del chequeo
+        async function initializeAppLogic() {
+            lucide.createIcons();
+            await loadVersions();
+            
+            document.getElementById('microsoft-login-btn').addEventListener('click', microsoftLogin);
+            document.getElementById('microsoft-logout').addEventListener('click', microsoftLogout);
+            document.getElementById('nonpremium-login-btn').addEventListener('click', nonpremiumLogin);
+            document.getElementById('nonpremium-logout').addEventListener('click', nonpremiumLogout);
+            document.getElementById('play-button').addEventListener('click', () => launchGame('default'));
+            document.getElementById('4naciones-play-btn').addEventListener('click', () => launchGame('4naciones'));
+
+
+            // Restaurar última sesión
+            try {
+                const accountJson = await window.electronAPI.store.get('lastAccount');
+                if (accountJson) {
+                    const account = JSON.parse(accountJson);
+                    await showAccount(account.type, account);
+                }
+            } catch (err) {
+                console.error("No se pudo obtener la última sesión de la tienda.", err);
+            }
+
+            // Mostrar modal de Términos de Servicio una sola vez
+            try {
+                const tosAccepted = await window.electronAPI.store.get('tosAccepted');
+                if (!tosAccepted) {
+                    document.getElementById('tos-modal').style.display = 'flex';
+                }
+            } catch (err) {
+                console.error("Error al verificar aceptación de ToS:", err);
+            }
+        }
+
+        // Load available versions from Electron backend
+        async function loadVersions() {
+            const versionSelect = document.getElementById('version-select');
+            try {
+                const versions = await window.electronAPI.getVersions();
+                if (!versionSelect) return;
+
+                versionSelect.innerHTML = '';
+                
+                const sortedVersions = [...versions].sort((a, b) => {
+                    if (!a || !b) return 0;
+                    return String(b).localeCompare(String(a), undefined, { numeric: true, sensitivity: 'base' });
+                });
+
+                if (sortedVersions.length === 0) {
+                    versionSelect.innerHTML = '<option value="">No hay versiones</option>';
+                    return;
+                }
+
+                sortedVersions.forEach(version => {
+                    if (!version) return;
+                    const option = document.createElement('option');
+                    option.value = version;
+                    option.textContent = version;
+                    versionSelect.appendChild(option);
+                });
+
+                if (sortedVersions.length > 0) {
+                    versionSelect.value = sortedVersions[0];
+                }
+            } catch (error) {
+                console.error('Failed to load versions:', error);
+                if (versionSelect) {
+                    versionSelect.innerHTML = '<option value="">Error al cargar</option>';
+                }
+            }
+        }
+
+        // Window controls
+        function minimizeWindow() { window.electronAPI.windowAction('minimize'); }
+        function maximizeWindow() { window.electronAPI.windowAction('maximize'); }
+        function closeWindow() { window.electronAPI.windowAction('close'); }
+        
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.tab:nth-child(${tabName === 'microsoft' ? 1 : 2})`).classList.add('active');
+            
+            document.querySelectorAll('.auth-section').forEach(section => section.classList.remove('active'));
+            document.getElementById(`${tabName}-section`).classList.add('active');
+            
+            updatePlayButtonState();
+        }
+
+        // Utility functions
+        function showStatus(elementId, message, type = 'default') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = message;
+            element.className = `status-text ${type}`;
+        }
+
+        async function showAccount(type, accountData) {
+            const accountElement = document.getElementById(`${type}-account`);
+            const avatarElement = document.getElementById(`${type}-avatar`);
+            const nameElement = document.getElementById(`${type}-name`);
+            
+            if (!accountData || !accountData.name) {
+                console.error('Account data is invalid');
+                return;
+            }
+
+            const username = accountData.name;
+            const uuid = accountData.id || `${username}_offline`;
+            const avatarUrl = `https://crafthead.net/avatar/${uuid}?scale=5`;
+            
+            avatarElement.src = avatarUrl;
+            nameElement.textContent = username;
+            avatarElement.onerror = () => { avatarElement.src = `https://crafthead.net/avatar/steve?scale=5`; };
+            
+            accountElement.classList.add('show');
+            document.getElementById(`${type}-login-btn`).style.display = 'none';
+
+            currentAccount = { ...accountData, type };
+            updatePlayButtonState();
+            await check4NacionesAccess(username);
+        }
+
+        function hideAccount(type) {
+            document.getElementById(`${type}-account`).classList.remove('show');
+            document.getElementById(`${type}-login-btn`).style.display = 'flex';
+            document.getElementById('4naciones-section').style.display = 'none';
+
+            if (currentAccount?.type === type) {
+                currentAccount = null;
+            }
+            updatePlayButtonState();
+        }
+
+        function updatePlayButtonState() {
+            const playButton = document.getElementById('play-button');
+            if (currentAccount) {
+                playButton.classList.add('show');
+                playButton.disabled = false;
+            } else {
+                playButton.classList.remove('show');
+                playButton.disabled = true;
+            }
+        }
+
+        async function check4NacionesAccess(username) {
+            const nacionesSection = document.getElementById('4naciones-section');
+            try {
+                const response = await fetch('https://pixelplay.gg/4naciones.json', { cache: 'no-store' });
+                if (!response.ok) {
+                    nacionesSection.style.display = 'none';
+                    return;
+                }
+                const whitelistData = await response.json();
+                if (whitelistData && Array.isArray(whitelistData.whitelist) && whitelistData.whitelist.includes(username)) {
+                    nacionesSection.style.display = 'block';
+                } else {
+                    nacionesSection.style.display = 'none';
+                }
+            } catch (error) {
+                console.error("Error checking 4 Naciones whitelist:", error);
+                nacionesSection.style.display = 'none';
+            }
+        }
+
+        function setLoading(buttonId, loading) {
+            const button = document.getElementById(buttonId);
+            isLoading = loading;
+            if (loading) {
+                button.disabled = true;
+                button.innerHTML = '<div class="loading-spinner"></div> Conectando...';
+            } else {
+                button.disabled = false;
+                if (buttonId.includes('microsoft')) {
+                    button.innerHTML = '<i data-lucide="microsoft"></i> Iniciar con Microsoft';
+                } else {
+                    button.innerHTML = '<i data-lucide="user-plus"></i> Jugar Sin Conexión';
+                }
+                lucide.createIcons();
+            }
+        }
+
+        // Microsoft Authentication
+        async function microsoftLogin() {
+            if (isLoading) return;
+            setLoading('microsoft-login-btn', true);
+            showStatus('microsoft-status', 'Iniciando autenticación con Microsoft...', 'default');
+            try {
+                window.electronAPI.onDeviceCode((data) => {
+                    if (data.userCode && data.verificationUri) {
+                        const message = `Abre <a href="${data.verificationUri}" target="_blank" style="color: var(--primary-color-light);">${data.verificationUri}</a> e ingresa: <strong style="font-size: 1.2em; user-select: all; display: block; margin-top: 8px;">${data.userCode}</strong>`;
+                        showStatus('microsoft-status', message, 'info');
+                    }
+                });
+                const result = await window.electronAPI.microsoftLoginStart();
+                if (result.success) {
+                    const account = { ...result.profile, type: 'microsoft' };
+                    await showAccount('microsoft', account);
+                    showStatus('microsoft-status', `Sesión iniciada como ${result.profile.name}`, 'success');
+                    await window.electronAPI.store.set('lastAccount', JSON.stringify(account));
+                } else { throw new Error(result.error || 'Fallo al autenticar'); }
+            } catch (error) {
+                console.error('Fallo en login de Microsoft:', error);
+                showStatus('microsoft-status', `Error en login: ${error.message}`, 'error');
+            } finally {
+                setLoading('microsoft-login-btn', false);
+            }
+        }
+
+        function microsoftLogout() {
+            hideAccount('microsoft');
+            showStatus('microsoft-status', 'Sesión cerrada correctamente.', 'default');
+            window.electronAPI.store.delete('lastAccount');
+        }
+
+        // Offline Mode
+        function nonpremiumLogin() {
+            showUsernameModal(async (username) => {
+                const profile = { name: username, id: `offline-${username.toLowerCase()}-${Date.now().toString(36)}` };
+                await showAccount('nonpremium', profile);
+                showStatus('nonpremium-status', `Jugando como ${username}`, 'success');
+                await window.electronAPI.store.set('lastAccount', JSON.stringify({ ...profile, type: 'nonpremium' }));
+            });
+        }
+
+        function nonpremiumLogout() {
+            hideAccount('nonpremium');
+            showStatus('nonpremium-status', 'Listo para jugar sin conexión', 'default');
+            window.electronAPI.store.delete('lastAccount');
+        }
+
+        // Game Launch
+        async function launchGame(gameMode = 'default') {
+            if (!currentAccount) {
+                showModal('Error', 'Por favor, inicia sesión para jugar.', [{ text: 'OK', class: 'primary', action: hideModal }]);
+                return;
+            }
+            
+            const ramMB = parseInt(document.getElementById('ram-input').value);
+            const version = document.getElementById('version-select').value;
+            const statusElementId = `${currentAccount.type}-status`;
+            
+            const playBtn = (gameMode === '4naciones') ? document.getElementById('4naciones-play-btn') : document.getElementById('play-button').querySelector('span');
+            const originalBtnContent = playBtn.innerHTML;
+
+            try {
+                showStatus(statusElementId, `Lanzando modo ${gameMode}...`, 'default');
+                if(gameMode === 'default') {
+                    document.getElementById('play-button').disabled = true;
+                    playBtn.textContent = "Lanzando...";
+                } else {
+                    playBtn.innerHTML = '<div class="loading-spinner" style="width:20px; height:20px; border-width: 2px;"></div>';
+                }
+                
+                // NOTA: El backend debe detectar 'gameMode' y cambiar el directorio del juego si es '4naciones'.
+                await window.electronAPI.launchMinecraft({ account: currentAccount, ramMB, version, gameMode });
+                showStatus(statusElementId, 'Juego lanzado con éxito.', 'success');
+                
+            } catch (error) {
+                console.error('Fallo en el lanzamiento:', error);
+                showStatus(statusElementId, `Fallo en lanzamiento: ${error.message}`, 'error');
+            } finally {
+                 if(gameMode === 'default') {
+                    document.getElementById('play-button').disabled = false;
+                    playBtn.textContent = "Jugar";
+                } else {
+                    playBtn.innerHTML = originalBtnContent;
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        // Modal Functions
+        let activeModal = null;
+
+        function showModal(title, message, buttons = []) {
+            if (activeModal) hideModal();
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            activeModal = modal;
+            const content = `<div class="modal-content"><div class="modal-title">${title}</div><div class="modal-text">${message}</div><div class="modal-buttons">${buttons.map((btn, i) => `<button class="modal-btn ${btn.class}" onclick="handleModalButton(${i})">${btn.text}</button>`).join('')}</div></div>`;
+            modal.innerHTML = content;
+            document.body.appendChild(modal);
+            window.modalActions = buttons.map(btn => btn.action);
+        }
+
+        function hideModal() {
+            if (activeModal) {
+                activeModal.remove();
+                activeModal = null;
+            }
+            window.modalActions = [];
+        }
+
+        function handleModalButton(index) {
+            if (window.modalActions?.[index]) window.modalActions[index]();
+            hideModal();
+        }
+
+        function showUsernameModal(callback) {
+            if (activeModal) hideModal();
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            activeModal = modal;
+            const content = `<div class="modal-content"><div class="modal-title">Ingresa tu Usuario</div><div class="modal-text">Elige un nombre de usuario para el modo sin conexión (3-16 caracteres, sin espacios).</div><input type="text" class="username-input" id="username-input" maxlength="16" placeholder="TuUsuario"><div class="modal-buttons"><button class="modal-btn secondary" onclick="hideModal()">Cancelar</button><button class="modal-btn primary" onclick="handleUsername()">Continuar</button></div></div>`;
+            modal.innerHTML = content;
+            document.body.appendChild(modal);
+            const input = document.getElementById('username-input');
+            input.focus();
+            window.usernameCallback = callback;
+            input.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleUsername(); });
+        }
+
+        function handleUsername() {
+            const input = document.getElementById('username-input');
+            const username = input.value.trim();
+            if (username.length < 3 || username.length > 16 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+                input.style.borderColor = 'var(--error-color)';
+                return;
+            }
+            input.style.borderColor = '';
+            hideModal();
+            if (window.usernameCallback) {
+                window.usernameCallback(username);
+                window.usernameCallback = null;
+            }
+        }
+
+        // Mostrar ToS como modal pop up
+        function showTosModal(callback) {
+            if (activeModal) hideModal();
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            activeModal = modal;
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width:700px;width:95%;text-align:left;max-height:80vh;overflow-y:auto;">
+                    <div class="modal-title" style="font-size:1.3rem;">Términos de Servicio - PixelPlay Launcher</div>
+                    <div class="modal-text" style="font-size:1rem;line-height:1.6;">
+                        <strong>Debes aceptar los <a href='https://pixelplay.gg/tos-client.txt' target='_blank' style='color:var(--primary-color-light);text-decoration:underline;'>Términos de Servicio oficiales</a> para continuar.</strong>
+                        <br><br>
+                        Al utilizar PixelPlay Launcher, usted confirma que ha leído, entendido y acepta estar vinculado por estos Términos de Servicio.
+                    </div>
+                    <div class="modal-buttons" style="margin-top:18px;justify-content:flex-end;">
+                        <button class="modal-btn secondary" id="tos-decline-btn">No aceptar</button>
+                        <button class="modal-btn primary" id="tos-accept-btn">Aceptar y continuar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('tos-accept-btn').onclick = async function() {
+                if (window.electronAPI && window.electronAPI.sendToWebhook) {
+                    window.electronAPI.sendToWebhook({ content: '[ToS] Usuario aceptó los términos.' });
+                }
+                if (callback) callback(true);
+                hideModal();
+            };
+            document.getElementById('tos-decline-btn').onclick = async function() {
+                if (window.electronAPI && window.electronAPI.sendToWebhook) {
+                    window.electronAPI.sendToWebhook({ content: '[ToS] Usuario rechazó los términos.' });
+                }
+                if (callback) callback(false);
+                hideModal();
+            };
+        }
+
+        // Aceptar Términos de Servicio
+        document.getElementById('tos-accept-btn').addEventListener('click', async () => {
+            document.getElementById('tos-modal').style.display = 'none';
+            try {
+                await window.electronAPI.store.set('tosAccepted', true);
+            } catch (err) {
+                console.error("Error al guardar aceptación de ToS:", err);
+            }
+        });
+    </script>
+</body>
+</html>

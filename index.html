@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelPlay.gg - Servidor de Minecraft</title>
+    <meta name="description" content="PixelPlay - Servidor de Minecraft 1.20.1 con mods y plugins únicos. ¡Únete a nuestra comunidad!">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <!-- Sección Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="logo">Pixel<span>Play</span></div>
+                <div class="subtitle">Servidor de Minecraft 1.20.1</div>
+                <p class="description">
+                    Experimenta Minecraft como nunca antes con nuestra colección única de mods y plugins. 
+                    Un mundo lleno de aventuras, creatividad y diversión te espera.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">1.20.1</span>
+                        <span class="stat-label">Versión</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Online</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">30+</span>
+                        <span class="stat-label">Mods & Plugins</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Características -->
+    <section class="features">
+        <div class="container">
+            <h2 class="features-title">Características Únicas</h2>
+            <div class="features-grid">
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Plugins Optimizados</h3>
+                    <p>Plugins personalizados que mejoran el rendimiento y añaden funcionalidades únicas.</p>
+                </div>
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>Admins Activos</h3>
+                    <p>Un equipo de administradores siempre disponible para ayudarte y garantizar una experiencia de juego fluida.</p>
+                </div>
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">🔨</div>
+                    <h3>Desarrollo Activo</h3>
+                    <p>Un equipo de desarrolladores siempre trabajando en nuevas características y mejoras.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Únete -->
+    <section class="download">
+        <div class="container">
+            <div class="download-content">
+                <h2>¡Únete a PixelPlay!</h2>
+                <p>Forma parte de nuestra increíble comunidad de jugadores. Completa tu registro y comienza tu aventura en nuestro servidor único.</p>
+                
+                <button class="download-btn" id="joinBtn">
+                    <i data-lucide="play-circle"></i>
+                    ¡Únete Ahora!
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal de registro -->
+    <div id="joinModal" class="modal">
+        <div class="modal-content glass-card">
+            <span class="close">&times;</span>
+            <h2>¡Únete a PixelPlay!</h2>
+            
+            <form id="joinForm">
+                <div class="form-group">
+                    <label for="discordId">Nick de Discord:</label>
+                    <input type="text" id="discordId" name="discordId" placeholder="ej: jack.fx" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="minecraftNick">Nick de Minecraft:</label>
+                    <input type="text" id="minecraftNick" name="minecraftNick" placeholder="ej: Steve_2024" required>
+                </div>
+                
+                <a href="https://discord.gg/aXtRFn9ESB" target="_blank" class="download-btn" style="text-decoration: none; margin-bottom: 1rem; display: block;">
+                    Únete a nuestro Discord
+                </a>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Registrarme
+                </button>
+                
+                <div id="statusMessage" class="status-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sección Noticias -->
+    <section class="news">
+        <div class="container">
+            <h2 class="news-title">Últimas Noticias</h2>
+            <div class="news-list">
+                <div class="news-item">
+                    <div class="news-date">14 Junio 2025</div>
+                    <h4>¡Registro abierto! 🎉</h4>
+                    <p>Estamos emocionados de abrir el registro para nuevos jugadores. ¡Únete ahora y forma parte de nuestra comunidad!</p>
+                </div>
+                <div class="news-item">
+                    <div class="news-date">07 Junio 2025</div>
+                    <h4>Playevent en marcha! 🎉</h4>
+                    <p>Estamos emocionados de presentar nuestras nuevas funciones en el cliente para mejorar la experiencia de Minecraft.</p>
+                </div>
+                <div class="news-item">
+                    <div class="news-date">30 Abril 2025</div>
+                    <h4>Nuevo cliente disponible</h4>
+                    <p>Lanzamiento oficial del PixelPlay Launcher con interfaz renovada y mejor rendimiento.</p>
+                </div>
+                <div class="news-item">
+                    <div class="news-date">15 Marzo 2025</div>
+                    <h4>Actualización de Mods</h4>
+                    <p>Actualización importante de mods y plugins para mejorar la jugabilidad y estabilidad del servidor.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">Pixel<span>Play</span></div>
+                <p class="footer-disclaimer">
+                    © 2025 PixelPlay. No estamos afiliados con Mojang Studios o Microsoft.<br>
+                    Minecraft es una marca registrada de Mojang Studios.
+                </p>
+                <div class="footer-social">
+                    <p>¿Necesitas ayuda? Contactanos en support@pixelplay.gg</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        // Variables del modal
+        const modal = document.getElementById('joinModal');
+        const joinBtn = document.getElementById('joinBtn');
+        const closeBtn = document.getElementsByClassName('close')[0];
+        const joinForm = document.getElementById('joinForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // URL del webhook
+        const webhookUrl = 'https://l.webhook.party/hook/K%2BJfiLySuQBKWeygz4l944xR83LBWq5ZAIMESxopBuBlgRqJII1xKR4TLs0eZJBAx4lVuUp383ggjS7JBArrcbViDYtzz6%2ByGKo%2BqEyAtx83iOASI0htx4aJQPGobXhiOv85tJOfmp4c9vlXzSuWV%2FMtNbcEc9SmmHWj%2BeWTo%2B4DEUmSzHkkpV1EjgaD5R3Z79i2ww2tt%2B0jq49AL05RAXQNQqGupoVCbfte2QDoPqDQlTz6w2vVdGAiGsycZOPgb6cgVxN3Z6f7s%2Fz%2FT3s2o8qtMvOJwdHuK7zkRl1hvuKuDR8aJw8RUN6jU12Z1aCK0GGtC05symWe06374V8rVn5jAGmpEiYn9eNHnTM0%2BPTb6RnQ9gTdfxXzGb9FV4Atl9EcOuuiBgMxLsEn/cyUY8auKG9iQWjTX';
+
+        // Abrir modal
+        joinBtn.onclick = function() {
+            modal.style.display = 'block';
+        }
+
+        // Cerrar modal
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Manejar envío del formulario
+        joinForm.onsubmit = async function(e) {
+            e.preventDefault();
+            
+            const discordId = document.getElementById('discordId').value.trim();
+            const minecraftNick = document.getElementById('minecraftNick').value.trim();
+            
+            if (!discordId || !minecraftNick) {
+                showStatus('Por favor, completa todos los campos.', 'error');
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9_]{3,16}$/.test(minecraftNick)) {
+                showStatus('El nick de Minecraft debe tener entre 3-16 caracteres (solo letras, números y guiones bajos).', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Registrando...';
+            
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        content: `**Nuevo registro en PixelPlay**
+
+**Discord ID:** ${discordId}
+**Minecraft Nick:** ${minecraftNick}
+**Fecha:** ${new Date().toLocaleString('es-ES')}`
+                    })
+                });
+
+                if (response.ok) {
+                    showStatus('¡Registro exitoso! Te contactaremos pronto.', 'success');
+                    joinForm.reset();
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                    }, 3000);
+                } else {
+                    throw new Error('Error en el servidor');
+                }
+            } catch (error) {
+                showStatus('Error al registrar. Inténtalo de nuevo.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Registrarme';
+            }
+        }
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            setTimeout(() => {
+                statusMessage.textContent = '';
+                statusMessage.className = 'status-message';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
