@@ -30,7 +30,7 @@
         <div class="container">
             <div class="download-content">
                 <h2>Descargar Pixel Play Launcher</h2>
-                <p>Haz clic en el botón de abajo para descargar la última versión de nuestro launcher. Compatible con Windows, macOS y Linux.</p>
+                <p>Haz clic en el botón de abajo para descargar la última versión de nuestro launcher. Compatible con Windows.</p>
                 
                 <button class="download-btn" id="downloadBtn">
                     <i data-lucide="download"></i>
@@ -61,42 +61,68 @@
     <script>
         lucide.createIcons();
 
-        const downloadBtn = document.getElementById('downloadBtn');
-        const downloadInfo = document.getElementById('download-info');
-
-        downloadBtn.onclick = function() {
-            // El usuario configurará esta parte.
-            // Como ejemplo, podría detectar el SO y mostrar un mensaje.
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadContent = document.querySelector('.download-content');
             const os = getOS();
-            let downloadUrl = '#'; // URL de descarga por defecto
-            let fileName = 'PixelPlay-Launcher';
+            const isMobileDevice = isMobile();
 
-            if (os === 'Windows') {
-                downloadUrl = '#'; // URL para Windows
-                fileName += '.exe';
-            } else if (os === 'Mac OS') {
-                downloadUrl = '#'; // URL para macOS
-                fileName += '.dmg';
-            } else if (os === 'Linux') {
-                downloadUrl = '#'; // URL para Linux
-                fileName += '.AppImage';
+            if (os === 'Mac OS' || os === 'Linux' || isMobileDevice) {
+                let platform = 'desconocido';
+                if (os !== 'Unknown' && os !== 'Windows') {
+                    platform = os;
+                } else if (isMobileDevice) {
+                    platform = 'móvil';
+                }
+                
+                downloadContent.innerHTML = `
+                    <h2>Plataforma no compatible</h2>
+                    <p>Actualmente, nuestro launcher no es compatible con <strong>${platform}</strong>.</p>
+                    <p>Sin embargo, puedes unirte a nuestro servidor instalando el modpack manualmente.</p>
+                    <a href="https://pixelplay.gg/modpack" class="download-btn" style="text-decoration: none; margin-top: 1rem; display: inline-block;">
+                        <i data-lucide="package"></i>
+                        Ver Modpack
+                    </a>
+                `;
+                lucide.createIcons(); // Re-render icons
+            } else if (os === 'Windows') {
+                const downloadBtn = document.getElementById('downloadBtn');
+                const downloadInfo = document.getElementById('download-info');
+                
+
+                downloadBtn.onclick = function() {
+                    // This part can be configured by the user.
+                    let downloadUrl = '#'; // Default download URL
+                    let fileName = 'PixelPlay-Launcher.exe';
+
+                    downloadInfo.textContent = `Iniciando descarga de ${fileName}...`;
+                    
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    // link.click(); // This would start the actual download
+                    document.body.removeChild(link);
+
+                    alert('El botón de descarga está listo para ser configurado con la URL correcta.');
+                };
             } else {
-                downloadInfo.textContent = 'No se pudo detectar tu sistema operativo.';
-                return;
+                 downloadContent.innerHTML = `
+                    <h2>Plataforma no compatible</h2>
+                    <p>No hemos podido detectar tu sistema operativo. Si usas Windows, por favor, recarga la página.</p>
+                    <p>Si usas otro sistema, puedes unirte a nuestro servidor instalando el modpack manualmente.</p>
+                    <a href="https://pixelplay.gg/modpack" class="download-btn" style="text-decoration: none; margin-top: 1rem; display: inline-block;">
+                        <i data-lucide="package"></i>
+                        Ver Modpack
+                    </a>
+                `;
+                lucide.createIcons();
             }
+        });
 
-            downloadInfo.textContent = `Iniciando descarga de ${fileName}...`;
-            
-            // Simular la descarga
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = fileName;
-            document.body.appendChild(link);
-            // link.click(); // Esto iniciaría la descarga real
-            document.body.removeChild(link);
-
-            alert('El botón de descarga está listo para ser configurado con la URL correcta.');
-        };
+        function isMobile() {
+            const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+            return regex.test(navigator.userAgent);
+        }
 
         function getOS() {
             const userAgent = window.navigator.userAgent;
