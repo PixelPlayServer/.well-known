@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelPlay.gg - Descargar Launcher</title>
+    <meta name="description" content="Descarga el launcher oficial de PixelPlay para una experiencia de juego optimizada en nuestro servidor de Minecraft.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <!-- Sección Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="logo">Pixel<span>Play</span></div>
+                <div class="subtitle">Launcher Oficial</div>
+                <p class="description">
+                    Descarga nuestro launcher para acceder a todas las funcionalidades y optimizaciones que ofrecemos para la mejor experiencia en Minecraft.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Descarga -->
+    <section class="download">
+        <div class="container">
+            <div class="download-content">
+                <h2>Descargar Pixel Play Launcher</h2>
+                <p>Haz clic en el botón de abajo para descargar la última versión de nuestro launcher. Compatible con Windows, macOS y Linux.</p>
+                
+                <button class="download-btn" id="downloadBtn">
+                    <i data-lucide="download"></i>
+                    Descargar Ahora
+                </button>
+                <div id="download-info" style="margin-top: 1rem; font-size: 0.9rem; color: #ccc;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">Pixel<span>Play</span></div>
+                <p class="footer-disclaimer">
+                    © 2025 PixelPlay. No estamos afiliados con Mojang Studios o Microsoft.<br>
+                    Minecraft es una marca registrada de Mojang Studios.
+                </p>
+                <div class="footer-social">
+                    <p>¿Necesitas ayuda? Contactanos en support@pixelplay.gg</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        const downloadBtn = document.getElementById('downloadBtn');
+        const downloadInfo = document.getElementById('download-info');
+
+        downloadBtn.onclick = function() {
+            // El usuario configurará esta parte.
+            // Como ejemplo, podría detectar el SO y mostrar un mensaje.
+            const os = getOS();
+            let downloadUrl = '#'; // URL de descarga por defecto
+            let fileName = 'PixelPlay-Launcher';
+
+            if (os === 'Windows') {
+                downloadUrl = '#'; // URL para Windows
+                fileName += '.exe';
+            } else if (os === 'Mac OS') {
+                downloadUrl = '#'; // URL para macOS
+                fileName += '.dmg';
+            } else if (os === 'Linux') {
+                downloadUrl = '#'; // URL para Linux
+                fileName += '.AppImage';
+            } else {
+                downloadInfo.textContent = 'No se pudo detectar tu sistema operativo.';
+                return;
+            }
+
+            downloadInfo.textContent = `Iniciando descarga de ${fileName}...`;
+            
+            // Simular la descarga
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            // link.click(); // Esto iniciaría la descarga real
+            document.body.removeChild(link);
+
+            alert('El botón de descarga está listo para ser configurado con la URL correcta.');
+        };
+
+        function getOS() {
+            const userAgent = window.navigator.userAgent;
+            if (userAgent.indexOf("Win") != -1) return "Windows";
+            if (userAgent.indexOf("Mac") != -1) return "Mac OS";
+            if (userAgent.indexOf("Linux") != -1) return "Linux";
+            return "Unknown";
+        }
+    </script>
+</body>
+</html>
