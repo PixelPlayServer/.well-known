@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Water Conservation Poster</title>
+    <title>Water Conservation Poster - Compact</title>
     <style>
         body {
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
             min-height: 100vh;
         }
         
         .poster {
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
             overflow: hidden;
         }
         
@@ -26,219 +26,192 @@
             background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
             color: white;
             text-align: center;
-            padding: 30px 20px;
+            padding: 20px 15px;
             position: relative;
         }
         
         .header::before {
             content: '💧';
             position: absolute;
-            top: 10px;
-            left: 30px;
-            font-size: 40px;
+            top: 8px;
+            left: 20px;
+            font-size: 30px;
         }
         
         .header::after {
             content: '💧';
             position: absolute;
-            top: 10px;
-            right: 30px;
-            font-size: 40px;
+            top: 8px;
+            right: 20px;
+            font-size: 30px;
         }
         
         .main-title {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
         .subtitle {
-            font-size: 18px;
+            font-size: 14px;
             opacity: 0.9;
         }
         
         .content {
-            padding: 30px;
+            padding: 25px;
         }
         
         .section {
-            margin-bottom: 35px;
-            border-left: 5px solid #2196f3;
-            padding-left: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #2196f3;
+            padding-left: 18px;
         }
         
         .section-title {
-            font-size: 24px;
+            font-size: 20px;
             color: #1976d2;
             font-weight: bold;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin-bottom: 12px;
         }
         
         .section-content {
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 13px;
+            line-height: 1.5;
             color: #333;
-            text-align: justify;
         }
         
-        .survey-results {
+        .survey-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin: 20px 0;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
         }
         
         .survey-item {
             background: #f8f9ff;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 15px 10px;
+            border-radius: 8px;
             border: 2px solid #e3f2fd;
+            text-align: center;
         }
         
         .survey-question {
             font-weight: bold;
             color: #1976d2;
+            font-size: 11px;
             margin-bottom: 10px;
         }
         
-        .survey-answer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 8px 0;
-            padding: 8px;
-            background: white;
-            border-radius: 5px;
+        .survey-result {
+            font-size: 12px;
+            margin: 4px 0;
         }
         
-        .yes-answer {
-            border-left: 4px solid #4caf50;
-        }
-        
-        .no-answer {
-            border-left: 4px solid #f44336;
-        }
-        
-        .percentage {
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        .yes-percentage {
+        .yes-result {
             color: #4caf50;
+            font-weight: bold;
         }
         
-        .no-percentage {
+        .no-result {
             color: #f44336;
+            font-weight: bold;
         }
         
-        .solutions-grid {
+        .solutions-container {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 25px;
-            margin: 20px 0;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin: 15px 0;
         }
         
         .solution {
             background: linear-gradient(135deg, #f8f9ff 0%, #e8f4f8 100%);
-            padding: 25px;
-            border-radius: 15px;
+            padding: 18px 12px;
+            border-radius: 10px;
             border: 2px solid #2196f3;
-            position: relative;
+            text-align: center;
         }
         
         .solution-icon {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 30px;
+            font-size: 28px;
+            margin-bottom: 10px;
         }
         
         .solution-title {
-            font-size: 18px;
+            font-size: 13px;
             font-weight: bold;
             color: #1976d2;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
-        .solution-details {
-            font-size: 13px;
-            line-height: 1.5;
-        }
-        
-        .solution-list {
-            list-style: none;
-            padding: 0;
-            margin: 10px 0;
-        }
-        
-        .solution-list li {
-            padding: 5px 0;
-            position: relative;
-            padding-left: 20px;
-        }
-        
-        .solution-list li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: #4caf50;
-            font-weight: bold;
+        .solution-text {
+            font-size: 11px;
+            line-height: 1.4;
         }
         
         .highlight-box {
             background: linear-gradient(135deg, #fff3e0 0%, #ffcc02 20%, #fff3e0 100%);
-            padding: 20px;
-            border-radius: 12px;
+            padding: 15px;
+            border-radius: 10px;
             border: 2px solid #ff9800;
-            margin: 20px 0;
+            margin: 15px 0;
             text-align: center;
         }
         
         .highlight-text {
-            font-size: 16px;
+            font-size: 13px;
             font-weight: bold;
             color: #e65100;
         }
         
         .call-to-action {
             background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c8 100%);
-            padding: 25px;
-            border-radius: 15px;
+            padding: 15px;
+            border-radius: 12px;
             border: 3px solid #4caf50;
             text-align: center;
         }
         
         .action-title {
-            font-size: 22px;
+            font-size: 16px;
             color: #2e7d32;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
-        .action-list {
-            text-align: left;
-            font-size: 14px;
-            max-width: 600px;
-            margin: 0 auto;
+        .action-text {
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        
+        .tips-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .tip {
+            background: white;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            border-left: 3px solid #4caf50;
         }
         
         .footer {
             background: #263238;
             color: white;
             text-align: center;
-            padding: 25px;
-            font-size: 14px;
+            padding: 15px;
+            font-size: 11px;
         }
         
         .footer-quote {
-            font-size: 18px;
+            font-size: 14px;
             font-style: italic;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         .authors {
@@ -247,17 +220,16 @@
         }
         
         @media (max-width: 768px) {
-            .survey-results {
+            .survey-grid {
                 grid-template-columns: 1fr;
             }
             
-            .main-title {
-                font-size: 24px;
+            .solutions-container {
+                grid-template-columns: 1fr;
             }
             
-            .poster {
-                margin: 10px;
-                max-width: none;
+            .tips-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -267,118 +239,71 @@
         <!-- Header -->
         <div class="header">
             <h1 class="main-title">WATER CONSERVATION IN OUR SCHOOL</h1>
-            <p class="subtitle">Let's Save Water Together! - A Research Project by Grigori and Joaquin - 8th Grade 2025</p>
+            <p class="subtitle">Research Project by Grigori & Joaquin - 8th Grade</p>
         </div>
 
         <div class="content">
-            <!-- Introduction Section -->
+            <!-- Problem -->
             <div class="section">
-                <h2 class="section-title">🌍 Why Water Conservation Matters</h2>
+                <h2 class="section-title">🌍 The Problem</h2>
                 <div class="section-content">
-                    Water is one of the most important resources on Earth. Every person needs clean water to live, but many people around the world don't have enough water. In our school, we use water every day for drinking, washing hands, cleaning, and in the bathrooms. However, we have noticed that our school might be wasting water. Students sometimes leave taps running, and some people even block the automatic sensors in the toilets on purpose.
-                </div>
-            </div>
-
-            <!-- Research Section -->
-            <div class="section">
-                <h2 class="section-title">🔍 Our Research Method</h2>
-                <div class="section-content">
-                    To understand the water situation in our school, we conducted a survey with 8 students from different grades. We asked them three important questions about water use and conservation in our school.
+                    Water is essential for life, but our school is wasting this precious resource every day. Students often leave taps running, and some even block the automatic sensors in toilets on purpose. This wasteful behavior needs to change immediately. We conducted research to understand the situation better and found practical solutions to help our school save water and protect the environment.
                 </div>
             </div>
 
             <!-- Survey Results -->
             <div class="section">
-                <h2 class="section-title">📊 Complete Survey Results</h2>
-                <div class="survey-results">
+                <h2 class="section-title">📊 Our Survey Results (8 students)</h2>
+                <div class="survey-grid">
                     <div class="survey-item">
-                        <div class="survey-question">Question 1: Does our school waste water?</div>
-                        <div class="survey-answer yes-answer">
-                            <span>✅ YES: 6 students</span>
-                            <span class="percentage yes-percentage">75%</span>
-                        </div>
-                        <div class="survey-answer no-answer">
-                            <span>❌ NO: 2 students</span>
-                            <span class="percentage no-percentage">25%</span>
-                        </div>
+                        <div class="survey-question">Does our school waste water?</div>
+                        <div class="survey-result yes-result">✅ YES: 75%</div>
+                        <div class="survey-result no-result">❌ NO: 25%</div>
                     </div>
                     
                     <div class="survey-item">
-                        <div class="survey-question">Question 2: Is it important to save water?</div>
-                        <div class="survey-answer yes-answer">
-                            <span>✅ YES: 7 students</span>
-                            <span class="percentage yes-percentage">87.5%</span>
-                        </div>
-                        <div class="survey-answer no-answer">
-                            <span>❌ NO: 1 student</span>
-                            <span class="percentage no-percentage">12.5%</span>
-                        </div>
+                        <div class="survey-question">Is saving water important?</div>
+                        <div class="survey-result yes-result">✅ YES: 87.5%</div>
+                        <div class="survey-result no-result">❌ NO: 12.5%</div>
                     </div>
                     
                     <div class="survey-item">
-                        <div class="survey-question">Question 3: Have you seen people blocking sensors?</div>
-                        <div class="survey-answer yes-answer">
-                            <span>✅ YES: 4 students</span>
-                            <span class="percentage yes-percentage">50%</span>
-                        </div>
-                        <div class="survey-answer no-answer">
-                            <span>❌ NO: 4 students</span>
-                            <span class="percentage no-percentage">50%</span>
-                        </div>
+                        <div class="survey-question">Seen people blocking sensors?</div>
+                        <div class="survey-result yes-result">✅ YES: 50%</div>
+                        <div class="survey-result no-result">❌ NO: 50%</div>
                     </div>
                 </div>
                 
                 <div class="highlight-box">
-                    <div class="highlight-text">🔍 CONCLUSION: Students know water is important, but some still waste it every day!</div>
+                    <div class="highlight-text">Students know water is important, but many still waste it!</div>
                 </div>
             </div>
 
-            <!-- Solutions Section -->
+            <!-- Solutions -->
             <div class="section">
                 <h2 class="section-title">💡 Our Three Solutions</h2>
-                <div class="solutions-grid">
+                <div class="solutions-container">
                     <div class="solution">
                         <div class="solution-icon">📋</div>
-                        <div class="solution-title">SOLUTION 1: WATER AWARENESS CAMPAIGN</div>
-                        <div class="solution-details">
-                            <strong>What it is:</strong> A comprehensive poster and information campaign throughout the school.
-                            <ul class="solution-list">
-                                <li>Create colorful, informative posters with water-saving tips</li>
-                                <li>Include before/after photos showing correct vs incorrect water use</li>
-                                <li>Place materials in strategic locations: bathrooms, fountains, hallways</li>
-                                <li>Update posters monthly with new tips and challenges</li>
-                            </ul>
-                            <strong>Expected results:</strong> Students will be more conscious about their water use and remember to turn off taps.
+                        <div class="solution-title">AWARENESS POSTERS</div>
+                        <div class="solution-text">
+                            Create informative and colorful posters with practical water-saving tips and facts. Place them strategically in bathrooms, near water fountains, and in hallways where students can see them daily and learn proper water habits.
                         </div>
                     </div>
                     
                     <div class="solution">
                         <div class="solution-icon">🤝</div>
-                        <div class="solution-title">SOLUTION 2: STUDENT WATER MONITOR PROGRAM</div>
-                        <div class="solution-details">
-                            <strong>What it is:</strong> A volunteer program where students help monitor and educate about water use.
-                            <ul class="solution-list">
-                                <li>Recruit responsible students from each grade as "Water Monitors"</li>
-                                <li>Train them to educate classmates about proper water use</li>
-                                <li>Create a reporting system for broken taps and sensor problems</li>
-                                <li>Give monthly awards to classes with best water-saving behavior</li>
-                            </ul>
-                            <strong>Expected results:</strong> Fewer incidents of sensor blocking, faster reporting of problems.
+                        <div class="solution-title">WATER MONITORS</div>
+                        <div class="solution-text">
+                            Train responsible student volunteers to become "Water Monitors" who help educate their peers about proper water use, report maintenance problems, and recognize classes with the best water-saving behavior.
                         </div>
                     </div>
                     
                     <div class="solution">
                         <div class="solution-icon">🏆</div>
-                        <div class="solution-title">SOLUTION 3: SCHOOL-WIDE WATER CHALLENGE</div>
-                        <div class="solution-details">
-                            <strong>What it is:</strong> A fun, competitive program that motivates students to save water.
-                            <ul class="solution-list">
-                                <li>Launch different water-saving challenges each week</li>
-                                <li>Track water usage by grade or class if possible</li>
-                                <li>Post weekly leaderboards showing which classes are doing best</li>
-                                <li>Give prizes to winning classes: extra break time, special privileges</li>
-                            </ul>
-                            <strong>Expected results:</strong> Significant reduction in water waste and increased student engagement.
+                        <div class="solution-title">WATER CHALLENGE</div>
+                        <div class="solution-text">
+                            Organize exciting weekly competitions between classes to see who can save the most water. Track progress, post leaderboards, and give prizes to motivate all students to participate actively.
                         </div>
                     </div>
                 </div>
@@ -386,29 +311,25 @@
 
             <!-- Call to Action -->
             <div class="call-to-action">
-                <h2 class="action-title">🌟 Join Our Water Conservation Mission!</h2>
-                <div class="action-list">
-                    <div class="section-content">
-                        <strong>💧 HOW YOU CAN HELP RIGHT NOW:</strong>
-                        <ul class="solution-list">
-                            <li>Always turn off taps completely after use</li>
-                            <li>Don't play with or block automatic sensors</li>
-                            <li>Report leaks or broken taps to teachers immediately</li>
-                            <li>Use only the water you need - don't waste it</li>
-                            <li>Encourage your friends and family to save water too</li>
-                            <li>Support our Water Monitor Program by volunteering</li>
-                        </ul>
-                        <strong>🎯 OUR GOAL:</strong> We want our school to become a model of water conservation for other schools. Together, we can prove that young people care about the environment!
-                    </div>
+                <h2 class="action-title">🌟 How You Can Help!</h2>
+                <div class="action-text">
+                    <strong>Every student can make a difference:</strong>
+                </div>
+                <div class="tips-grid">
+                    <div class="tip">✓ Turn off taps completely</div>
+                    <div class="tip">✓ Don't block sensors</div>
+                    <div class="tip">✓ Report leaks quickly</div>
+                    <div class="tip">✓ Use only needed water</div>
+                    <div class="tip">✓ Tell friends to save water</div>
+                    <div class="tip">✓ Join our monitor program</div>
                 </div>
             </div>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            <div class="footer-quote">"Every drop counts - Let's save water together!"</div>
-            <div class="authors">Contact us: Grigori & Joaquin - 8th Grade Water Conservation Project Team</div>
-            <div>Special thanks to all students who participated in our survey</div>
+            <div class="footer-quote">"Small actions, BIG impact!"</div>
+            <div class="authors">Grigori & Joaquin - Water Conservation Team</div>
         </div>
     </div>
 </body>
